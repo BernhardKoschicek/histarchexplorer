@@ -1,1 +1,1 @@
-# histarchexplorer
+# repository for the frontend development 
