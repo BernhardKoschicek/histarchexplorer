@@ -11,9 +11,4 @@ SESSION_COOKIE_SECURE = False
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-ROOT_PATH = Path(__file__)
-
-STATIC_PATH = ROOT_PATH / 'static'
-IMAGE_PATH = STATIC_PATH / 'images'
-THUMBNAIL_PATH = STATIC_PATH / 'thumbnails'
-
+SCSS_FILES = ['colors', 'toggle']

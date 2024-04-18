@@ -4,6 +4,9 @@
   <link rel="stylesheet" href="/static/css/styles.css">
   <link rel="stylesheet"
         href="/static/node_modules/bootstrap/dist/css/bootstrap.css">
+  {% for css in config['SCSS_FILES'] %}
+    <link rel="stylesheet" href="/static/css/{{ css }}.css">
+  {% endfor %}
 
   <script
     src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

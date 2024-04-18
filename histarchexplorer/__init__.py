@@ -1,16 +1,16 @@
+from pathlib import Path
 from typing import Any
 
 from flask import Flask, Response, session, request
 from flask_babel import Babel
-
+from scss.compiler import compile_file
 
 app = Flask(__name__, instance_relative_config=True)
-app.config.from_object('config')
+app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
 
 from histarchexplorer import views
-
 
 @babel.localeselector
 def get_locale() -> str:
@@ -28,6 +28,16 @@ def inject_conf_var() -> dict[str, Any]:
             'language',
             request.accept_languages.best_match(
                 app.config['LANGUAGES'].keys()))}
+
+
+@app.before_request
+def before_request() -> None:
+    static_path = Path(app.root_path) / 'static'
+    for file in app.config['SCSS_FILES']:
+        scss_string = compile_file(static_path / 'sass' / f'{file}.scss')
+        with open(static_path / 'css' / f'{file}.css', 'w') as css_file:
+            css_file.write(scss_string)
+
 
 
 @app.after_request
