@@ -2,10 +2,29 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet"
+        href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+
+  <script
+    src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <meta charset="UTF-8">
+
   <title>Histarchexplorer</title>
 </head>
 <body>
-<p>Histarchexplorer</p>
+
+<main>
+  <header class="header container">
+    {% include 'navbar.html' %}
+  </header>
+  <div class="content">
+    <div class="row">
+      <div class="col-6">
+        <h1 class="display-2">Histarchexplorer</h1>
+      </div>
+    </div>
+  </div>
+</main>
+
 </body>
 </html>
