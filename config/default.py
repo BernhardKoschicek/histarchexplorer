@@ -11,4 +11,5 @@ SESSION_COOKIE_SECURE = False
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-SCSS_FILES = ['colors', 'toggle']
+NAVBAR_ELEMENTS = ['entities', 'about', 'search']
+

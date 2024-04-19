@@ -5,12 +5,16 @@ from runserver import app
 
 @app.route('/')
 def index():
-    return render_template('layout.html')
+    return render_template('index.html')
 
 
-@app.route('/sites')
-def sites():
-    return render_template('sites.html')
+@app.route('/entities')
+def entities():
+    return render_template('entities.html')
+
+@app.route('/search')
+def search():
+    return render_template('search.html')
 
 
 @app.route('/about')

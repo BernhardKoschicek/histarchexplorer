@@ -2,3 +2,19 @@ p {
     font-family: "Roboto Slab", "ff-tisa-web-pro", "Georgia", Arial, sans-serif;
     color: grey;
 }
+
+.navbar-brand {
+    width: 260px;
+    height: 30px;
+    background-image: url('../images/logos/thanados.png');
+    background-size: cover;
+}
+
+@media (max-width: 991px) {
+    .navbar-brand {
+        width: 30px;
+        height: 30px;
+        background-image: url('../images/logos/thanados_small.png');
+        background-size: cover;
+    }
+}

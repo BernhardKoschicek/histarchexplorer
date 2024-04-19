@@ -1,28 +1,21 @@
 <!DOCTYPE html>
 <html lang="{{ CURRENT_LANGUAGE }}">
 <head>
-  <link rel="stylesheet" href="/static/css/styles.css">
-  <link rel="stylesheet"
-        href="/static/node_modules/bootstrap/dist/css/bootstrap.css">
-  {% for css in config['SCSS_FILES'] %}
-    <link rel="stylesheet" href="/static/css/{{ css }}.css">
-  {% endfor %}
 
-  <script
-    src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
 
-  <title>Histarchexplorer</title>
+    <meta charset="UTF-8">
+    <title>Histarchexplorer</title>
 </head>
 <body>
-<header class="container-fluid">
-  {% include 'navbar.html' %}
+<header>
+    {% include 'navbar.html' %}
 </header>
 <main>
-  <div class="container" style="padding-top: 80px;">
     {% block content %}{% endblock %}
-  </div>
-</main>
+    </main>
 <footer>
 
 </footer>
