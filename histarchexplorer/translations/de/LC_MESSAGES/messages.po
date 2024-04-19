@@ -1,0 +1,182 @@
+# German translations for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-04-19 13:28+0200\n"
+"PO-Revision-Date: 2023-02-16 16:44+0100\n"
+"Last-Translator: \n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#~ msgid "items"
+#~ msgstr "Objekte"
+
+#~ msgid "persons"
+#~ msgstr "Personen"
+
+#~ msgid "groups"
+#~ msgstr "Gruppen"
+
+#~ msgid "events"
+#~ msgstr "Ereignisse"
+
+#~ msgid "places"
+#~ msgstr "Orte"
+
+#~ msgid "about"
+#~ msgstr "Über"
+
+#~ msgid "until"
+#~ msgstr "bis"
+
+#~ msgid "as"
+#~ msgstr "als"
+
+#~ msgid "actors"
+#~ msgstr "Akteure"
+
+#~ msgid "event"
+#~ msgstr "Ereignis"
+
+#~ msgid "source"
+#~ msgstr "Quelle"
+
+#~ msgid "filter by case study"
+#~ msgstr "nach Case Study filtern"
+
+#~ msgid "is composed of"
+#~ msgstr ""
+
+#~ msgid "open details"
+#~ msgstr "Details"
+
+#~ msgid "swipe left/right or use arrow keys to navigate"
+#~ msgstr "nach links/rechts wischen oder mit Pfeiltasten navigieren"
+
+#~ msgid "actor(s)"
+#~ msgstr "Akteur(e)"
+
+#~ msgid "open image in viewer"
+#~ msgstr "Bild in Viewer öffnen"
+
+#~ msgid "event(s)"
+#~ msgstr "Ereignis(se)"
+
+#~ msgid "item(s)"
+#~ msgstr "Objekt(e)"
+
+#~ msgid "map"
+#~ msgstr "Karte"
+
+#~ msgid "images"
+#~ msgstr "Bilder"
+
+#~ msgid "current"
+#~ msgstr "aktuelles"
+
+#~ msgid "source(s)"
+#~ msgstr "Quelle(n)"
+
+#~ msgid "sources"
+#~ msgstr "Quellen"
+
+#~ msgid "indirect connection(s)"
+#~ msgstr "indirekte Verbindung(en)"
+
+#~ msgid "Location of"
+#~ msgstr "Standort von"
+
+#~ msgid "center of"
+#~ msgstr "Mittelpunkt von"
+
+#~ msgid "contains"
+#~ msgstr "beinhaltet"
+
+#~ msgid "area of"
+#~ msgstr "Fläche von"
+
+#~ msgid "3D models"
+#~ msgstr "3D Modelle"
+
+#~ msgid "network"
+#~ msgstr "Netzwerk"
+
+#~ msgid "mainpage"
+#~ msgstr "Startseite"
+
+#~ msgid "swipe or use arrow keys to navigate"
+#~ msgstr "wischen oder mit Pfeiltasten navigieren"
+
+#~ msgid "of"
+#~ msgstr "von"
+
+#~ msgid "filter"
+#~ msgstr "filtern"
+
+#~ msgid "sort"
+#~ msgstr "sortieren"
+
+#~ msgid "reset"
+#~ msgstr "zurücksetzen"
+
+#~ msgid "search term"
+#~ msgstr "Suchbegriff"
+
+#~ msgid "sort by"
+#~ msgstr "sortieren nach"
+
+#~ msgid "name"
+#~ msgstr "Name"
+
+#~ msgid "type"
+#~ msgstr "Typus"
+
+#~ msgid "begin"
+#~ msgstr "Beginn"
+
+#~ msgid "end"
+#~ msgstr "Ende"
+
+#~ msgid "switch view"
+#~ msgstr "Ansicht wechseln"
+
+#~ msgid "filter by"
+#~ msgstr "filtern nach"
+
+#~ msgid "and"
+#~ msgstr "und"
+
+#~ msgid "or"
+#~ msgstr "oder"
+
+#~ msgid "media"
+#~ msgstr "Medien"
+
+#~ msgid "no media"
+#~ msgstr "keine Medien"
+
+#~ msgid "types"
+#~ msgstr "Typus"
+
+#~ msgid "Timespan"
+#~ msgstr "Zeitspanne"
+
+#~ msgid "include entries without date"
+#~ msgstr "inklusive Einträge ohne Datum"
+
+#~ msgid "loading"
+#~ msgstr "lade"
+
+#~ msgid "learn more"
+#~ msgstr "mehr"
+

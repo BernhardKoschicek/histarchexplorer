@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Any
 
 from flask import Flask, Response, session, request
@@ -13,10 +12,10 @@ from histarchexplorer import views
 
 @babel.localeselector
 def get_locale() -> str:
-    return session.get(
-        'language',
-        request.accept_languages.best_match(
-            app.config['LANGUAGES'].keys()))
+    if 'language' in session:
+        return session['language']
+    best_match = request.accept_languages.best_match(app.config['LANGUAGES'])
+    return best_match or 'en'
 
 
 @app.context_processor
