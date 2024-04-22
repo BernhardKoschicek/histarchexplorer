@@ -8,7 +8,9 @@ app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
 
+# pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer import views
+
 
 @babel.localeselector
 def get_locale() -> str:
