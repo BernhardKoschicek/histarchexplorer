@@ -24,14 +24,19 @@ def get_locale() -> str:
 def inject_conf_var() -> dict[str, Any]:
     return {
         'AVAILABLE_LANGUAGES': app.config['LANGUAGES'],
+
         'CURRENT_LANGUAGE': session.get(
             'language',
             request.accept_languages.best_match(
                 app.config['LANGUAGES'].keys())),
+<<<<<<< HEAD
         'NAVBAR_ELEMENTS': [{'original': 'entities', session['language']: _('entities')},
                             {'original': 'search', session['language']: _('search')},
                             {'original': 'about', session['language']: _('about')}],
     }
+=======
+        'NAVBAR_ELEMENTS': app.config['NAVBAR_ELEMENTS']}
+>>>>>>> cfdd733d1320a90d4dc30cd20517e3ef0731b977
 
 
 @app.before_request
