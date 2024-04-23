@@ -1,0 +1,11 @@
+.navbar-brand {
+    width: 260px;
+    height: 30px;
+    background-size: cover;
+    background-image: url('../images/logos/logo_260x30.png');
+
+    @media (max-width: 991px) {
+        width: 30px;
+        background-image: url('../images/logos/logo_30x30.png');
+    }
+}
