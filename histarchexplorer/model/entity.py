@@ -9,7 +9,7 @@ from histarchexplorer.model.util import format_date, split_date_string, \
 
 
 class Entity:
-    def __init__(self, json: dict[str, any]) -> None:
+    def __init__(self, json: dict[str, Any]) -> None:
         data = json['features'][0]
         self.id = data['@id'].rsplit('/', 1)[-1]
         self.name = data['properties']['title']

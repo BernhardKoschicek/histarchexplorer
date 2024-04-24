@@ -1,6 +1,7 @@
 from typing import Optional
 
-from flask import Response, redirect, render_template, request, session
+from flask import redirect, render_template, request, session
+from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.model.entity import Entity
