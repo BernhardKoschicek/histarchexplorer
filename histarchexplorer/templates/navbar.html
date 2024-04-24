@@ -22,19 +22,4 @@
       </ul>
     </div>
   </div>
-  <div
-    class="translation list-group list-group-flush align-end d-lg-block col-2">
-    {% for language in AVAILABLE_LANGUAGES.items() %}
-      <div class="list-group-item bg-transparent text-center">
-        {% if CURRENT_LANGUAGE == language[0] %}
-          <span class="fw-bold text-secondary">{{ language[1] }}</span>
-        {% else %}
-          <a href="{{ url_for('set_language', language=language[0]) }}"
-             class="text-decoration-none fw-normal text-secondary">
-            {{ language[1] }}
-          </a>
-        {% endif %}
-      </div>
-    {% endfor %}
-  </div>
 </nav>
