@@ -1,20 +1,18 @@
 .navbar-brand {
-    width: 266px;
-    height: 80px;
-    margin-left: 1rem;
-    background-size: cover;
-    background-image: url('../images/logos/logo_266x80.png');
+  width: 266px;
+  height: 80px;
+  margin-left: 1rem;
+  background-size: cover;
+  background-image: url('../images/logos/logo_266x80.png');
 
-    @media (max-width: 768px) {
-        width: 36px;
-        background-image: url('../images/logos/logo_36x80.png');
-    }
+  @media (max-width: 768px) {
+    width: 36px;
+    background-image: url('../images/logos/logo_36x80.png');
+  }
 }
 
 .navbar-nav {
-  .nav-link {
-    position: relative;
-    // Set transparent border by default
+  .nav-link-hover {
     border-bottom: 2px solid transparent;
 
     &:hover {
@@ -23,7 +21,6 @@
       transition: border-color 0.3s ease;
       transform: scaleX(1.01); // Scale the border width on hover
     }
-
   }
 
   &.active {
@@ -41,9 +38,9 @@
 }
 
 .navbar {
-    .mode-switch {
-        order: 2; // To push it to the far right
-    }
+  .mode-switch {
+    order: 2; // To push it to the far right
+  }
 }
 
 
