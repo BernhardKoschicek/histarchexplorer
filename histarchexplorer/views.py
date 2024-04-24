@@ -4,6 +4,7 @@ from flask import redirect, render_template, request, session
 from werkzeug import Response
 
 from histarchexplorer import app
+from histarchexplorer.api.parser import Parser
 from histarchexplorer.model.entity import Entity
 
 
@@ -34,15 +35,17 @@ def test() -> str:
 
 @app.route('/test/entity/<int:id_>')
 def test_entity(id_: int) -> str:
-    entity = Entity.get_entity(id_)
+    parser = Parser()
+    entity = Entity.get_entity(id_, parser)
     return render_template('test/entity.html', entity=entity)
 
 
 @app.route('/test/system_class/<class_>')
 def test_system_class(class_: str) -> str:
+    parser = Parser(limit=500, show=['none'], sort='desc')
     return render_template(
         'test/system_class.html',
-        entities=Entity.get_by_system_class(class_))
+        entities=Entity.get_by_system_class(class_, parser))
 
 
 @app.route('/language=<language>')

@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from histarchexplorer.api.api_access import ApiAccess
+from histarchexplorer.api.parser import Parser
 from histarchexplorer.model.depiction import Depiction
 from histarchexplorer.model.relation import Relation
 from histarchexplorer.model.types import Types
@@ -43,13 +44,13 @@ class Entity:
             self.end = format_date(self.end_from, self.end_to)
 
     @staticmethod
-    def get_entity(id_: int):
-        return Entity(ApiAccess.get_entity(id_))
+    def get_entity(id_: int, parser: Parser):
+        return Entity(ApiAccess.get_entity(id_, parser))
 
     @staticmethod
-    def get_by_system_class(class_: str):
+    def get_by_system_class(class_: str, parser: Parser):
         return [
-            Entity(entity) for entity in ApiAccess.get_by_system_class(class_)]
+            Entity(entity) for entity in ApiAccess.get_by_system_class(class_, parser)]
 
     @staticmethod
     def get_alias(data: list[dict[str, str]]) -> str:
