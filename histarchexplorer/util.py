@@ -5,12 +5,15 @@ from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
 
+_('entities')
+_('search')
+_('about')
+
 
 @app.context_processor
 def inject_menu() -> dict[str, Any]:
     navbar = [
-        {'original': 'entities', 'title': _('browse/select/find all entities'), 'translation': _('entities')},
-        {'original': 'search', 'title': _('detailed search'), 'translation': _('search')},
-        {'original': 'about', 'title': _('about the project'), 'translation': _('about')}],
+        {'entities': _('browse/select/find all entities')},
+        {'search': _('detailed search')},
+        {'about': _('about the project')}]
     return {'navbar': navbar}
-
