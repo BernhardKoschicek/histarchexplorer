@@ -1,6 +1,15 @@
+:root {
+  --font-inter: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
 .navbar-brand {
   width: 265px;
   height: 30px;
+  margin-left: 1.5rem;
   background-size: cover;
   background-image: url("../images/logos/logo_260x30.png");
 }
