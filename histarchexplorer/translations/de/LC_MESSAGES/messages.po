@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-24 17:07+0200\n"
+"POT-Creation-Date: 2024-04-25 15:57+0200\n"
 "PO-Revision-Date: 2024-04-24 13:23+0200\n"
 "Last-Translator: \n"
 "Language: de\n"
@@ -18,29 +18,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: util.py:8
-msgid "entities"
-msgstr "Entitäten"
+#: templates/login.html:10
+msgid "username"
+msgstr "Benutzername"
 
-#: util.py:9
-msgid "search"
-msgstr "Suche"
-
-#: util.py:10
-msgid "about"
-msgstr "Über"
-
-#: util.py:16
-msgid "browse/select/find all entities"
-msgstr ""
-
-#: util.py:17
-msgid "detailed search"
-msgstr "Detaillierte Suche"
-
-#: util.py:18
-msgid "about the project"
-msgstr "Über das Projekt"
+#: templates/login.html:14
+msgid "password"
+msgstr "Passwort"
 
 #: templates/navbar.html:3
 msgid "home"
@@ -49,4 +33,28 @@ msgstr "Home"
 #: templates/navbar.html:28 templates/navbar.html:31
 msgid "toggle dark/light mode"
 msgstr "hellen/dunklen modus umschalten"
+
+#: utils/util.py:8
+msgid "entities"
+msgstr "Entitäten"
+
+#: utils/util.py:9
+msgid "search"
+msgstr "Suche"
+
+#: utils/util.py:10
+msgid "about"
+msgstr "Über"
+
+#: utils/util.py:16
+msgid "browse/select/find all entities"
+msgstr "Alle Entitäten durchsuchen/auswählen/finden"
+
+#: utils/util.py:17
+msgid "detailed search"
+msgstr "Detaillierte Suche"
+
+#: utils/util.py:18
+msgid "about the project"
+msgstr "Über das Projekt"
 

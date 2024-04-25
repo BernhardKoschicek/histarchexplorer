@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-24 17:07+0200\n"
+"POT-Creation-Date: 2024-04-25 15:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,28 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: util.py:8
-msgid "entities"
+#: templates/login.html:10
+msgid "username"
 msgstr ""
 
-#: util.py:9
-msgid "search"
-msgstr ""
-
-#: util.py:10
-msgid "about"
-msgstr ""
-
-#: util.py:16
-msgid "browse/select/find all entities"
-msgstr ""
-
-#: util.py:17
-msgid "detailed search"
-msgstr ""
-
-#: util.py:18
-msgid "about the project"
+#: templates/login.html:14
+msgid "password"
 msgstr ""
 
 #: templates/navbar.html:3
@@ -47,5 +31,29 @@ msgstr ""
 
 #: templates/navbar.html:28 templates/navbar.html:31
 msgid "toggle dark/light mode"
+msgstr ""
+
+#: utils/util.py:8
+msgid "entities"
+msgstr ""
+
+#: utils/util.py:9
+msgid "search"
+msgstr ""
+
+#: utils/util.py:10
+msgid "about"
+msgstr ""
+
+#: utils/util.py:16
+msgid "browse/select/find all entities"
+msgstr ""
+
+#: utils/util.py:17
+msgid "detailed search"
+msgstr ""
+
+#: utils/util.py:18
+msgid "about the project"
 msgstr ""
 
