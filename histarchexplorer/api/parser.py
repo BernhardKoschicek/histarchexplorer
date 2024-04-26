@@ -27,3 +27,18 @@ class Parser:
     geometry: list[str] = None
     image_size: str = None
     file_id: int = None
+
+    def __setattr__(self, name, value):
+        if (name in self.__annotations__ and
+                isinstance(getattr(self, name), list)):
+            if getattr(self, name) is None:
+                setattr(self, name, [])
+            if isinstance(value, list):
+                getattr(self, name).extend(value)
+            else:
+                getattr(self, name).append(value)
+        else:
+            super().__setattr__(name, value)
+
+    def __repr__(self) -> str:
+        return str(self.__dict__)

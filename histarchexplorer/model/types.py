@@ -10,3 +10,6 @@ class Types:
         self.description = data['descriptions']
         self.identifier = data['identifier'].rsplit('/', 1)[-1]
         self.root = self.hierarchy.split('>')[0].rstrip()
+
+    def __repr__(self) -> str:
+        return str(self.__dict__)

@@ -18,8 +18,8 @@ class Entity:
         self.system_class = uc_first(data['systemClass'].replace('_', ' '))
         self.types = self.get_types(data['types']) if 'types' in data else None
         self.alias = self.get_alias(data['names']) if 'names' in data else None
-        self.relations = self.get_relations(data['relations']) \
-            if 'relations' in data else None
+        self.relation_class = self.get_relation_class(data.get('relations'))
+        self.relations = self.get_relations() if self.relation_class else None
         self.depictions = self.get_depiction(data['depictions']) \
             if 'depictions' in data else None
         self.reference_systems = data['links'] if 'links' in data else None
@@ -43,14 +43,54 @@ class Entity:
             self.begin = format_date(self.begin_from, self.begin_to)
             self.end = format_date(self.end_from, self.end_to)
 
+    def __repr__(self) -> str:
+        return str(self.__dict__)
+
+    def get_relations(self) -> dict[str, list[Relation]]:
+        relation_dict: dict[str, Any] = {}
+        for relation in self.relation_class:
+            match relation.relation_system_class:
+                case 'file' | 'appellation' | \
+                     'object_location' | 'reference_system':
+                    continue
+                case 'type':
+                    relation_dict.setdefault('types', []).append(relation)
+                case 'source':
+                    relation_dict.setdefault('sources', []).append(relation)
+                case 'source_translation':
+                    (relation_dict.setdefault('source_translations', [])
+                     .append(relation))
+                case 'place' | 'feature' | 'stratigraphic_unit':
+                    relation_dict.setdefault('places', []).append(relation)
+                case 'administrative_unit':
+                    relation_dict.setdefault(
+                        'administrative_unit', []).append(relation)
+                case 'artifact' | 'human_remains':
+                    relation_dict.setdefault('artifacts', []).append(relation)
+                case 'bibliography' | 'edition' | 'external_reference':
+                    relation_dict.setdefault('references', []).append(relation)
+                case 'acquisition' | 'activity' | \
+                     'event' | 'move' | 'production':
+                    relation_dict.setdefault('events', []).append(relation)
+                case 'group' | 'person':
+                    relation_dict.setdefault('actors', []).append(relation)
+                case _:
+                    relation_dict.setdefault('others', []).append(relation)
+        return relation_dict
+
+    @staticmethod
+    def get_relation_class(
+            data: list[dict[str, Any]]) -> Optional[list[Relation]]:
+        return [Relation(relation) for relation in data] if data else None
+
     @staticmethod
     def get_entity(id_: int, parser: Parser):
         return Entity(ApiAccess.get_entity(id_, parser))
 
     @staticmethod
     def get_by_system_class(class_: str, parser: Parser):
-        return [
-            Entity(entity) for entity in ApiAccess.get_by_system_class(class_, parser)]
+        return [Entity(entity) for entity in
+                ApiAccess.get_by_system_class(class_, parser)]
 
     @staticmethod
     def get_alias(data: list[dict[str, str]]) -> str:
@@ -77,7 +117,3 @@ class Entity:
                 return geometry['geometries']
             return geometry
         return None
-
-    @staticmethod
-    def get_relations(data: list[dict[str, Any]]) -> Optional[list[Relation]]:
-        return [Relation(relation) for relation in data] if data else None

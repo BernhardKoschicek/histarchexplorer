@@ -25,10 +25,20 @@ class ApiAccess:
     def get_by_system_class(
             class_: str,
             parser: Parser) -> list[dict[str, Any]]:
-        print(parser.__dict__)
         req = requests.get(
             f"{app.config['API_URL']}system_class/{class_}",
             params=parser.__dict__,
             proxies=PROXIES,
             timeout=60).json()
         return req['results']
+
+    @staticmethod
+    def get_entities_linked_to_entity(
+            id_: int,
+            parser: Parser) -> list[dict[str, Any]]:
+        url = f"{app.config['API_PATH']}/entities_linked_to_entity/"
+        return requests.get(
+            f"{url}{id_}",
+            params=parser.__dict__,
+            proxies=PROXIES,
+            timeout=30).json()['results']
