@@ -36,9 +36,20 @@ class ApiAccess:
     def get_entities_linked_to_entity(
             id_: int,
             parser: Parser) -> list[dict[str, Any]]:
-        url = f"{app.config['API_PATH']}/entities_linked_to_entity/"
+        url = f"{app.config['API_URL']}/entities_linked_to_entity/"
         return requests.get(
             f"{url}{id_}",
             params=parser.__dict__,
             proxies=PROXIES,
             timeout=30).json()['results']
+
+    @staticmethod
+    def get_subunits(
+            id_: int,
+            parser: Parser) -> list[dict[str, Any]]:
+        url = f"{app.config['API_URL']}/subunits/"
+        return requests.get(
+            f"{url}{id_}",
+            params=parser.__dict__,
+            proxies=PROXIES,
+            timeout=30).json()

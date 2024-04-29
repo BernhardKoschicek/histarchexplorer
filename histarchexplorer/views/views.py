@@ -6,6 +6,7 @@ from flask_login import login_required
 from werkzeug import Response
 
 from histarchexplorer import app
+from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.model.entity import Entity
 from histarchexplorer.model.util import get_types_sorted
@@ -43,6 +44,13 @@ def test_entity(id_: int) -> str:
     return render_template('test/entity.html', entity=entity)
 
 
+@app.route('/test/subunit/<int:id_>')
+def test_subunit(id_: int) -> str:
+    parser = Parser()
+    entity = ApiAccess.get_subunits(id_, parser)
+    return render_template('test/entity.html', entity=entity)
+
+
 @app.route('/test/view/entity/<int:id_>')
 def test_entity_view(id_: int) -> str:
     parser = Parser()
@@ -58,7 +66,7 @@ def test_entity_view(id_: int) -> str:
 
 @app.route('/test/system_class/<class_>')
 def test_system_class(class_: str) -> str:
-    parser = Parser(limit=500, show=['none'],  sort='desc')
+    parser = Parser(limit=0, show=['none'],  sort='desc')
     return render_template(
         'test/system_class.html',
         entities=Entity.get_by_system_class(class_, parser))
