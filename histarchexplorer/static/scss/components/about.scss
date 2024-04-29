@@ -5,7 +5,7 @@
 }
 
 .team-card {
-  background: lightgrey;
+  background: var(--light-card);
   color: black;
 
   .col-lg-4 {
@@ -24,5 +24,4 @@
 .sponsor-card, .legal{
   margin-top: 2rem;
   padding-top: 1rem;
-  background: var(bs-light);
-  color: black;}
+ }
