@@ -1,15 +1,14 @@
-.project-card {
-background: lightgrey;
-border-radius: 10px;
-margin: 2rem 0 2rem 0;
-padding: 2rem 2rem 3.5rem 2rem;
-font-color: black;
+.project-card, .team-card {
+  padding-top: 1rem;
+  border-radius: 10px;
+  margin: 2rem 0;
 }
 
 .team-card {
-background: lightgrey;
-border-radius: 10px;
-margin: 2rem 0 2rem 0;
-padding: 2rem 2rem 3.5rem 2rem;
-font-color: black;
+  background: lightgrey;
+  color: black;
+}
+
+.team-card .col-lg-4 {
+  padding-top: 1rem;
 }
