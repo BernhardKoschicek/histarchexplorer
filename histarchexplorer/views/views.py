@@ -1,7 +1,6 @@
 from typing import Optional
 
 from flask import Response, redirect, render_template, request, session
-from flask_login import login_required
 
 from runserver import app
 
@@ -13,17 +12,17 @@ def index():
 
 @app.route('/entities')
 def entities():
-    return render_template('entities.html', current_page='entities')
+    return render_template('entities.html')
 
 
 @app.route('/search')
 def search():
-    return render_template('search.html', current_page='search')
+    return render_template('search.html')
 
 
 @app.route('/about')
 def about():
-    return render_template('about.html', current_page='about')
+    return render_template('about.html')
 
 
 @app.route('/language=<language>')
@@ -31,7 +30,4 @@ def set_language(language: Optional[str] = None) -> Response:
     session['language'] = language
     return redirect(request.referrer)
 
-@app.route('/admin')
-@login_required
-def admin() -> str:
-    return render_template("/admin.html")
+
