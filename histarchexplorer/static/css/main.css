@@ -55,7 +55,8 @@ body {
   padding-top: 1rem;
 }
 .team-card__member {
-  font-size: 1.8em; /* Equivalent to the font size of h3 */
+  font-size: 1.8em;
+  padding-top: 0.5rem;
 }
 
 /*# sourceMappingURL=main.css.map */
