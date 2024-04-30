@@ -8,6 +8,7 @@ body {
 
 :root {
   --light-card: hsl(0, 0%, 85%);
+  --footer-background-dark: hsl (228, 14%, 21%);
   --card-bg: var(--light-card);
 }
 
@@ -86,6 +87,16 @@ body {
 
 .footerimg {
   padding: 1rem;
+}
+
+.footer {
+  background: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .footer {
+    background: var(--footer-bg-dark);
+  }
 }
 
 /*# sourceMappingURL=main.css.map */

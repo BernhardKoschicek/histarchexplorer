@@ -2,7 +2,22 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    //background: grey;
 }
 
 .footerimg{
 padding: 1rem;}
+
+
+
+.footer {
+  background: transparent;
+  }
+
+// Media query to target dark mode
+@media (prefers-color-scheme: dark) {
+  .footer {
+    background: var(--footer-bg-dark);
+}
+}
+
