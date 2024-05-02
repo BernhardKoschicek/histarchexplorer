@@ -18,8 +18,11 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 
 API_URL = 'https://thanados.openatlas.eu/api/'  # Todo: move to instance
 API_PROXY = ''
+OPENATLAS_CASE_STUDY_IDS = []
 
-CLASSES_TO_SKIP = ['object_location', 'type', 'appellation', 'administrative_unit', 'source_translation', 'type_tools', 'reference_system']
+CLASSES_TO_SKIP = [
+    'object_location', 'type', 'appellation', 'administrative_unit',
+    'source_translation', 'type_tools', 'reference_system']
 
 VIEW_CLASSES = {
     'actors': ('person','group'),

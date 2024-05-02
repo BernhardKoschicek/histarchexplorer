@@ -41,3 +41,11 @@ def test_system_class(class_: str) -> str:
     return render_template(
         'test/list_entities.html',
         entities=Entity.get_by_system_class(class_, parser))
+
+
+@app.route('/test/system_class/')
+def test_system_class_count() -> str:
+    parser = Parser(type_id=app.config['OPENATLAS_CASE_STUDY_IDS'])
+    return render_template(
+        'test/system_class_count.html',
+        classes=ApiAccess.get_system_class_count(parser))
