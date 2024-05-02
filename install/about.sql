@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS tng.config (
   	name TEXT,
     description TEXT,
    	address TEXT,
-    config_class TEXT,
+    config_class INT,
     email TEXT,
     orcid_id TEXT,
     image TEXT,
