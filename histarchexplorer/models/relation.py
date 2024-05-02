@@ -1,6 +1,6 @@
 from typing import Any
 
-from histarchexplorer.model.util import format_date, split_date_string
+from histarchexplorer.models.util import format_date, split_date_string
 
 
 class Relation:

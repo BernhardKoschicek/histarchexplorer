@@ -4,8 +4,8 @@ from flask import render_template
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
-from histarchexplorer.model.entity import Entity
-from histarchexplorer.model.util import get_types_sorted
+from histarchexplorer.models.entity import Entity
+from histarchexplorer.models.util import get_types_sorted
 
 
 @app.route('/test')

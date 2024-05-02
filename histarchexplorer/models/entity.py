@@ -2,10 +2,10 @@ from typing import Any, Optional
 
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
-from histarchexplorer.model.depiction import Depiction
-from histarchexplorer.model.relation import Relation
-from histarchexplorer.model.types import Types
-from histarchexplorer.model.util import format_date, split_date_string, \
+from histarchexplorer.models.depiction import Depiction
+from histarchexplorer.models.relation import Relation
+from histarchexplorer.models.types import Types
+from histarchexplorer.models.util import format_date, split_date_string, \
     uc_first
 
 

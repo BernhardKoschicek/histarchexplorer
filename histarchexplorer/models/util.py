@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from histarchexplorer.model.types import Types
+from histarchexplorer.models.types import Types
 
 
 def uc_first(string: str) -> str:

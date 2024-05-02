@@ -2,7 +2,7 @@ from typing import Any
 
 import psycopg2.extras
 
-from flask import Flask, g,  Response, session, request
+from flask import Flask, g, Response, session, request
 from flask_babel import Babel
 
 from psycopg2.extensions import connection
@@ -13,8 +13,9 @@ app.config.from_pyfile('production.py')
 babel = Babel(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
-from histarchexplorer.views import views, login, test
-from histarchexplorer.utils import util
+from histarchexplorer.views import login, test, views
+from histarchexplorer.utils import view_util
+
 
 def connect() -> connection:
     try:
@@ -30,17 +31,20 @@ def connect() -> connection:
         print("Database connection error.")
         raise Exception(e)
 
+
 @babel.localeselector
 def get_locale() -> str:
     if 'language' in session:
         return session['language']
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
 
+
 @app.before_request
 def before_request() -> None:
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     session['language'] = get_locale()
+
 
 @app.context_processor
 def inject_conf_var() -> dict[str, Any]:
