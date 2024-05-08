@@ -2,7 +2,7 @@
 {% block content %}
     <div class="container">
         <div class="py-5 en">
-            <h2>{{ _('Project') }}</h2>
+            <h2>{{ _('Project') |upper }} <span class="text-body-secondary"> | {{project}}</span></h2>
             <p style="margin-top: 10px;"> {{ _('THANADOS (The Anthropological and Archaeological Database of Sepultures) deals
                 with the digital collection and presentation of cemeteries investigated by means of archaeology,
                 anthropology and other related disciplinesWithin THANADOS information on burials is being digitised
@@ -25,7 +25,7 @@
         <div class="team-card">
             <!-- Principal Investigators - 3 Columns  -->
             <div class="row">
-                <h2>Team</h2>
+                <h2>TEAM</h2>
                 <div class="col-lg-4 text-center">
                     <img class="rounded-circle" src="/static/images/team/stefan_eichert_600x600.jpg"
                          alt="Stefan Eicherts Foto" width="140" height="140">
@@ -110,7 +110,7 @@
 
 
         <div class="text-center py-5">
-            <h2>Sponsors</h2>
+            <h2>SPONSORS <span class="text-body-secondary"> | COOPERATIONS</span></h2></h2>
             <a href="https://www.nhm-wien.ac.at/" target="_blank">Natural History Museum Vienna</a>
             <br>
             <a href="https://www.oeaw.ac.at/oeai/" target="_blank">Austrian Archaeological Institute</a>
