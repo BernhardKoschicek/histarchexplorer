@@ -29,7 +29,7 @@ class Parser:
     file_id: int = None
     properties: list[str] = None
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: str | list[str]) -> None:
         if (name in self.__annotations__ and
                 isinstance(getattr(self, name), list)):
             if getattr(self, name) is None:

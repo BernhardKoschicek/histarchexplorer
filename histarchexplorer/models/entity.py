@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
@@ -12,7 +12,7 @@ from histarchexplorer.models.util import format_date, split_date_string, \
 class Entity:
     def __init__(self, json: dict[str, Any]) -> None:
         data = json['features'][0]
-        self.id = data['@id'].rsplit('/', 1)[-1]
+        self.id = int(data['@id'].rsplit('/', 1)[-1])
         self.name = data['properties']['title']
         self.description = self.get_description(data['descriptions'])
         self.system_class = uc_first(data['systemClass'].replace('_', ' '))
@@ -80,8 +80,8 @@ class Entity:
 
     @staticmethod
     def get_relation_class(
-            data: list[dict[str, Any]]) -> Optional[list[Relation]]:
-        return [Relation(relation) for relation in data] if data else None
+            data: list[dict[str, Any]]) -> list[Relation]:
+        return [Relation(relation) for relation in data]
 
     @staticmethod
     def get_entity(id_: int, parser: Parser):

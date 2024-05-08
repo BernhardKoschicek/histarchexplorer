@@ -2,10 +2,11 @@
 # Please see README.md for licensing information
 
 from bcrypt import hashpw
-from flask import Response, flash, render_template, request, url_for
+from flask import flash, render_template, request, url_for
 from flask_login import (
     LoginManager, current_user, login_required, login_user, logout_user)
 from flask_wtf import FlaskForm
+from werkzeug import Response
 from werkzeug.utils import redirect
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import InputRequired
@@ -19,7 +20,7 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id) -> UserMapper:
+def load_user(user_id: int) -> UserMapper:
     return UserMapper.get_by_id(user_id)
 
 
@@ -56,8 +57,8 @@ def login() -> str | Response:
             flash('error username', 'error')
     error_html = ''
     if form and hasattr(form, 'errors'):
-        for fieldName, errorMessages in form.errors.items():
-            error_html += fieldName + ' - ' + errorMessages[0] + '<br />'
+        for field_name, error_messages in form.errors.items():
+            error_html += field_name + ' - ' + error_messages[0] + '<br />'
     return render_template('login.html', form=form, error_html=error_html)
 
 

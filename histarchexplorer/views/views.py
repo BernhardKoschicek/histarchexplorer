@@ -12,17 +12,17 @@ def index() -> str:
 
 
 @app.route('/entities')
-def entities():
+def entities() -> str:
     return render_template('entities.html')
 
 
 @app.route('/search')
-def search():
+def search() -> str:
     return render_template('search.html')
 
 
 @app.route('/about')
-def about():
+def about() -> str:
     return render_template('about.html')
 
 
