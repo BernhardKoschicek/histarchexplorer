@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-14 10:54+0200\n"
+"POT-Creation-Date: 2024-05-14 12:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,8 +67,59 @@ msgstr ""
 msgid "Legal Note"
 msgstr ""
 
+#: templates/about.html:130
+msgid ""
+"The creation, use, and non-commercial distribution of copies in\n"
+"                electronic or printed form are permitted, provided that "
+"the content is\n"
+"                not distorted and the source is acknowledged (source: NHM"
+" Vienna).\n"
+"                Texts, images, and graphics are protected by copyright "
+"and other\n"
+"                protective laws, unless otherwise indicated. Despite the "
+"greatest\n"
+"                possible care in the preparation of this website, the NHM"
+" Vienna cannot\n"
+"                guarantee the absence of errors or the accuracy of the "
+"information\n"
+"                contained therein. The NHM Vienna excludes all liability "
+"for damages\n"
+"                arising directly or indirectly from the use of the "
+"website."
+msgstr ""
+
 #: templates/about.html:142
 msgid "Imprint"
+msgstr ""
+
+#: templates/about.html:143
+msgid "Natural History Museum Vienna"
+msgstr ""
+
+#: templates/about.html:145
+msgid "Austria Tel.: +43 1 52177-0<"
+msgstr ""
+
+#: templates/about.html:149
+msgid "Legal form: Scientific institution under public law"
+msgstr ""
+
+#: templates/about.html:150
+msgid "Commercial register number: FN 236724 z"
+msgstr ""
+
+#: templates/about.html:151
+msgid "Commercial register court: Commercial Court Vienna"
+msgstr ""
+
+#: templates/about.html:153
+msgid "Content and editorial responsibility: Natural History Museum Vienna"
+msgstr ""
+
+#: templates/about.html:154
+msgid ""
+"Competent supervisory authority: Federal Chancellery, Concordiaplatz\n"
+"          2, 1010 Vienna"
 msgstr ""
 
 #: templates/login.html:9

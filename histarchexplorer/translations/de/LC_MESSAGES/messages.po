@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-14 10:54+0200\n"
-"PO-Revision-Date: 2024-05-14 10:56+0200\n"
+"POT-Creation-Date: 2024-05-14 12:38+0200\n"
+"PO-Revision-Date: 2024-05-14 12:40+0200\n"
 "Last-Translator: \n"
 "Language-Team: de <LL@li.org>\n"
 "Language: de\n"
@@ -109,9 +109,79 @@ msgstr "Kooperationen"
 msgid "Legal Note"
 msgstr "Rechtliche Hinweise"
 
+#: templates/about.html:130
+msgid ""
+"The creation, use, and non-commercial distribution of copies in\n"
+"                electronic or printed form are permitted, provided that "
+"the content is\n"
+"                not distorted and the source is acknowledged (source: "
+"NHM Vienna).\n"
+"                Texts, images, and graphics are protected by copyright "
+"and other\n"
+"                protective laws, unless otherwise indicated. Despite the "
+"greatest\n"
+"                possible care in the preparation of this website, the "
+"NHM Vienna cannot\n"
+"                guarantee the absence of errors or the accuracy of the "
+"information\n"
+"                contained therein. The NHM Vienna excludes all liability "
+"for damages\n"
+"                arising directly or indirectly from the use of the "
+"website."
+msgstr ""
+"Die Erstellung, die Verwendung und die nicht kommerzielle Weitergabe von "
+"Kopien\n"
+"in elektronischer oder ausgedruckter Form sind erlaubt, wenn der Inhalt "
+"nicht entstellt\n"
+"und die Quelle angegeben wird (Quelle: NHM Wien). Texte, Bilder und "
+"Grafiken unterliegen\n"
+"dem Schutz des Urheberrechts und anderer Schutzgesetze, soweit nicht "
+"anders angegeben.\n"
+"Trotz größtmöglicher Sorgfalt bei der Erstellung dieser Website kann das "
+"NHM Wien nicht\n"
+"die Fehlerfreiheit und Genauigkeit der enthaltenen Informationen "
+"garantieren.\n"
+"Das NHM Wien schließt jegliche Haftung für Schäden, die direkt oder "
+"indirekt aus der\n"
+"Benutzung der Website entstehen, aus."
+
 #: templates/about.html:142
 msgid "Imprint"
 msgstr "Impressum"
+
+#: templates/about.html:143
+msgid "Natural History Museum Vienna"
+msgstr "Naturhistorisches Museum Wien"
+
+#: templates/about.html:145
+msgid "Austria Tel.: +43 1 52177-0<"
+msgstr "Tel.: +43 1 52177-0"
+
+#: templates/about.html:149
+msgid "Legal form: Scientific institution under public law"
+msgstr "Rechtsform: Wissenschaftliche Anstalt öffentlichen Rechts"
+
+#: templates/about.html:150
+msgid "Commercial register number: FN 236724 z"
+msgstr "Firmenbuchnummer: FN 236724 z"
+
+#: templates/about.html:151
+msgid "Commercial register court: Commercial Court Vienna"
+msgstr "Firmenbuchgericht: Handelsgericht Wien"
+
+#: templates/about.html:153
+msgid "Content and editorial responsibility: Natural History Museum Vienna"
+msgstr ""
+"Inhaltliche und redaktionelle Verantwortung: Naturhistorisches Museum "
+"Wien"
+
+#: templates/about.html:154
+msgid ""
+"Competent supervisory authority: Federal Chancellery, Concordiaplatz\n"
+"          2, 1010 Vienna"
+msgstr ""
+"Zuständige Aufsichtsbehörde: Bundeskanzleramt, Concordiaplatz 2, 1010 "
+"Wien"
 
 #: templates/login.html:9
 msgid "username"
