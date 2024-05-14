@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-14 10:41+0200\n"
+"POT-Creation-Date: 2024-05-14 10:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,60 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: templates/about.html:5
+msgid "Project"
+msgstr ""
+
+#: templates/about.html:6
+msgid ""
+"THANADOS (The Anthropological and Archaeological Database of Sepultures)\n"
+"            deals\n"
+"            with the digital collection and presentation of cemeteries "
+"investigated by means of archaeology,\n"
+"            anthropology and other related disciplinesWithin THANADOS "
+"information on burials is being digitised\n"
+"            according to FAIR principles and presented in English "
+"language. The data are mapped using the CIDOC CRM\n"
+"            and provided online. The information can be explored via a "
+"digital catalogue and within an interactive\n"
+"            map. Cartographic visualisations as well as charts and plots "
+"are created dynamically based on research\n"
+"            data.\n"
+"            It aims at providing a best practice way on how to "
+"disseminate archaeological sources and research in\n"
+"            the 21st century against the background of digital "
+"humanities.\n"
+"            It is based on the OpenAtlas system and entirely built upon "
+"open source technology. It started in 2019\n"
+"            within the projects MEDCEM based at the Czech Academy of "
+"Sciences and THANADOS (Austrian Archaeological\n"
+"            Institute and Natural History Museum Vienna) funded by the "
+"go!digital NextGeneration programme of the\n"
+"            Austrian Academy of Sciences (GDND 2018 039).\n"
+"            In 2022 THANADOS was transformed into a collaborative project"
+" coordinated and hosted by the Natural\n"
+"            History Museum Vienna\n"
+"            With international partners and cooperations based on mutual "
+"agreements the system is developed further\n"
+"            and new data are added continuously."
+msgstr ""
+
+#: templates/about.html:113
+msgid "Sponsors"
+msgstr ""
+
+#: templates/about.html:113
+msgid "Cooperations"
+msgstr ""
+
+#: templates/about.html:129
+msgid "Legal Note"
+msgstr ""
+
+#: templates/about.html:142
+msgid "Imprint"
+msgstr ""
 
 #: templates/login.html:9
 msgid "username"
