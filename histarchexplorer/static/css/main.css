@@ -69,9 +69,30 @@ body {
   border-radius: 10px;
 }
 
-.sponsor-card {
-  margin-top: 2rem;
+.sponsor-container {
   padding-top: 1rem;
+}
+.sponsor-container .row {
+  position: relative;
+}
+.sponsor-container .row > div {
+  padding: 1.5rem;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.sponsor-container .row > div::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0;
+  width: 1px;
+  height: calc(100% - 4rem);
+  background-color: grey;
+}
+.sponsor-container .row > div:last-child::before {
+  display: none;
 }
 
 .footercontent {
