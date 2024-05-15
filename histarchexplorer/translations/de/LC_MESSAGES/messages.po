@@ -152,7 +152,7 @@ msgid "Natural History Museum Vienna"
 msgstr "Naturhistorisches Museum Wien"
 
 #: templates/about.html:145
-msgid "Austria Tel.: +43 1 52177-0<"
+msgid "Austria Tel.: +43 1 52177-0"
 msgstr "Tel.: +43 1 52177-0"
 
 #: templates/about.html:149
