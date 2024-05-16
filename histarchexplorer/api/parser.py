@@ -21,11 +21,11 @@ class Parser:
     first: int = None
     last: int = None
     page: int = None
-    export: str = False
+    export: str = None
     format: str = 'lpx'
     relation_type: int = None
     centroid: bool = False
-    geometry: list[str]= None
+    geometry: list[str] = None
     image_size: str = ''
     file_id: int = None
     properties: list[str] = None
