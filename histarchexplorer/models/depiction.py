@@ -7,6 +7,8 @@ class Depiction:
         self.title = data.get('title')
         self.license = data.get('license')
         self.url = data.get('url')
+        self.mimetype = data.get('mimetype')
+        self.iiif_manifest = data.get('IIIFManifest')
 
     def __repr__(self) -> str:
         return str(self.__dict__)
