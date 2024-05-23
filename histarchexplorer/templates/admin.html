@@ -17,8 +17,8 @@
     <div class="tab-content" id="nav-tabContent">
         {% for tab in tabs %}
         <div class="tab-pane fade{% if loop.first %} show active{% endif %}" id="{{ tab.target }}" role="tabpanel"
-             aria-labelledby="{{ tab.id }}"
-             tabindex="0">
+             aria-labelledby="{{ tab.id }}" tabindex="0">
+             <button type="+" class="btn btn-primary"> + </button>
             <div class="accordion" id="{{tab.label}}accordion">
                 {% for entry in config_data %}
                 {% if entry.config_class in tab.filter %}
@@ -31,24 +31,58 @@
                     </h2>
                     <div id="{{entry.id}}" class="accordion-collapse collapse">
                         <div class="accordion-body">
-                            <strong>This is the first item's accordion body.</strong> It is shown by default, until the
-                            collapse plugin adds the appropriate classes that we use to style each element. These
-                            classes control the overall appearance, as well as the showing and hiding via CSS
-                            transitions. You can modify any of this with custom CSS or overriding our default variables.
-                            It's also worth noting that just about any HTML can go within the
-                            <code>.accordion-body</code>, though the transition does limit overflow.
+                            <form method="POST" action="{{ url_for('add_description') }}" class="projectForm">
+                                <input type="hidden" name="config_id" value="{{entry.id}}">
+                                <div class="mb-3">
+                                    <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
+                                    <input type="text" class="form-control" id="InputDescription{{entry.id}}" name="description" aria-describedby="descriptionHelp{{entry.id}}" value="{{entry.description or ''}}" required>
+                                    <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the project will be displayed in the "ABOUT" section of the webpage.</div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-secondary" id="editButton{{entry.id}}" {% if not entry.description %}disabled{% endif %}>Edit</button>
+                            </form>
+                            <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
                         </div>
                     </div>
                 </div>
-
                 {% endif %}
                 {% endfor %}
-
-
             </div>
-
         </div>
         {% endfor %}
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.projectForm').forEach(form => {
+        var descriptionInput = form.querySelector('input[id^="InputDescription"]');
+        var editButton = form.querySelector('button[id^="editButton"]');
+
+        descriptionInput.addEventListener('input', function() {
+            if (descriptionInput.value.trim() !== '') {
+                editButton.disabled = false;
+            } else {
+                editButton.disabled = true;
+            }
+        });
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the default form submission
+
+            if (descriptionInput.value.trim() !== '') {
+                // Handle the form submission using fetch or AJAX
+                fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this)
+                }).then(response => response.text()).then(result => {
+                    // You can handle the response here if needed
+                    console.log(result);
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+    });
+</script>
+
 {% endblock %}
