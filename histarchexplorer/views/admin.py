@@ -73,6 +73,8 @@ def add_description():
 
     description = request.form.get('description')
     config_id = request.form.get('config_id')
+    current_tab = request.form.get('current_tab')
+    current_entry = request.form.get('current_entry')
 
     if not description:
         flash('Description is required!', 'danger')
@@ -86,4 +88,4 @@ def add_description():
         g.db.rollback()
         flash(f'Error updating description: {str(e)}', 'danger')
 
-    return redirect(url_for('admin'))
+    return redirect('/admin/' + current_tab + '/' + current_entry)
