@@ -5,7 +5,8 @@
     <nav>
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
             {% for tab in tabs %}
-            <button class="nav-link{% if loop.first and not activetab %} active{% endif %} {% if activetab == tab.target %} active {% endif %}" id="{{ tab.id }}" data-bs-toggle="tab"
+            <button class="nav-link{% if loop.first and not activetab %} active{% endif %} {% if activetab == tab.target %} active {% endif %}"
+                    id="{{ tab.id }}" data-bs-toggle="tab"
                     data-bs-target="#{{ tab.target }}" type="button" role="tab" aria-controls="{{ tab.target }}"
                     aria-selected="{{ 'true' if loop.first else 'false' }}">
                 {{ tab.label | upper }}
@@ -15,7 +16,8 @@
     </nav>
     <div class="tab-content" id="nav-tabContent">
         {% for tab in tabs %}
-        <div class="tab-pane fade{% if loop.first and not activetab %} show active{% endif %} {% if activetab == tab.target %} show active {% endif %}" id="{{ tab.target }}" role="tabpanel"
+        <div class="tab-pane fade{% if loop.first and not activetab %} show active{% endif %} {% if activetab == tab.target %} show active {% endif %}"
+             id="{{ tab.target }}" role="tabpanel"
              aria-labelledby="{{ tab.id }}" tabindex="0">
             <button type="+" class="btn btn-primary"> +</button>
             <div class="accordion" id="{{tab.label}}accordion">
@@ -23,46 +25,103 @@
                 {% if entry.config_class in tab.filter %}
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button {% if activeentry != tab.target + entry.id|string  %}collapsed{% endif %}" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#{{ tab.target }}{{entry.id}}" aria-expanded="{{ ((tab.target + entry.id|string == activeentry)|string)|lower }}" aria-controls="{{ tab.target }}{{entry.id}}">
+                        <button class="accordion-button {% if activeentry != tab.target + entry.id|string  %}collapsed{% endif %}"
+                                type="button" data-bs-toggle="collapse"
+                                data-bs-target="#{{ tab.target }}{{entry.id}}"
+                                aria-expanded="{{ ((tab.target + entry.id|string == activeentry)|string)|lower }}"
+                                aria-controls="{{ tab.target }}{{entry.id}}">
                             {{entry.name}}
                         </button>
                     </h2>
-                    <div id="{{ tab.target }}{{entry.id}}" class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string  %} show {% endif %}" data-bs-parent="#{{ tab.label }}accordion">
+                    <div id="{{ tab.target }}{{entry.id}}"
+                         class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string  %} show {% endif %}"
+                         data-bs-parent="#{{ tab.label }}accordion">
                         <div class="accordion-body">
                             <form method="POST" action="{{ url_for('add_description') }}" class="projectForm">
                                 <input type="hidden" name="config_id" value="{{entry.id}}">
                                 <input type="hidden" name="current_tab" value="{{tab.target}}">
                                 <input type="hidden" name="current_entry" value="{{tab.target + entry.id|string}}">
-                                <div class="mb-3">
-                                    <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
-                                    <textarea class="form-control" id="InputDescription{{entry.id}}"
-                                           name="description" aria-describedby="descriptionHelp{{entry.id}}"
-                                              disabled>{{entry.description or ''}}</textarea>
-                                    <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the project
-                                        will be displayed in the "ABOUT" section of the webpage.
-                                    </div>
-                                </div>
 
-                            <!-- Flash messages block -->
-                            {% with messages = get_flashed_messages(with_categories=true) %}
-                            {% if messages %}
-                            <div class="flash-messages">
-                                {% for category, message in messages %}
-                                    {% if category in ["success", "danger"] %}
-                                <div class="alert alert-{{ category }}">
-                                    {{ message }}
-                                </div>
+                                <form class="row g-3 needs-validation" novalidate>
+                                    <div class="col-md-4">
+                                        <label for="InputProjectName{{entry.id}}" class="form-label">Project
+                                            Name</label>
+                                        <input type="text" class="form-control" id="InputProjectName{{entry.id}}"
+                                               name="projectName"
+                                               required aria-describedby="projectNameHelp{{entry.id}}">
+                                        <div id="projectNameHelp{{entry.id}}" class="form-text"></div>
+                                        <div class="invalid-feedback">
+                                            Please provide a project name.
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
+                                        <textarea class="form-control" id="InputDescription{{entry.id}}"
+                                                  name="description" aria-describedby="descriptionHelp{{entry.id}}">{{entry.description or ''}}</textarea>
+                                        <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the
+                                            project
+                                            will be displayed in the "ABOUT" section of the webpage.
+                                        </div>
+                                    </div>
+
+                                    <!-- Flash messages block -->
+                                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                    {% if messages %}
+                                    <div class="flash-messages">
+                                        {% for category, message in messages %}
+                                        {% if category in ["success", "danger"] %}
+                                        <div class="alert alert-{{ category }}">
+                                            {{ message }}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
                                     {% endif %}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                            {% endwith %}
-                                <button type="button" class="btn btn-primary">Edit</button>
-                                <button type="button" class="btn btn-primary">Delete</button>
-                                <button type="submit" class="btn btn-primary d-none">Save</button>
-                                <button type="reset" class="btn btn-primary d-none">Cancel</button>
-                            </form>
+                                    {% endwith %}
+                                    <button type="submit" class="btn btn-primary" id='edit{{entry.id}}'
+                                            value="{{entry.id}}">Edit
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id='delete{{entry.id}}'
+                                            value="{{entry.id}}">Delete
+                                    </button>
+                                    <button type="submit" class="btn btn-primary d-none" id='save{{entry.id}}'
+                                            value="{{entry.id}}">Save
+                                    </button>
+                                    <button type="reset" class="btn btn-primary d-none" id='cancel{{entry.id}}'
+                                            value="{{entry.id}}">Cancel
+                                    </button>
+
+                                    <div class="col-md-6">
+                                        <label for="InputAddress{{entry.id}}" class="form-label">Address</label>
+                                        <textarea class="form-control" id="InputAddress{{entry.id}}" name="address"
+                                                  aria-describedby="addressHelp{{entry.id}}" required></textarea>
+                                        <div id="addressHelp{{entry.id}}" class="form-text"></div>
+                                        <div class="invalid-feedback">Please provide an address.</div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="InputMail{{entry.id}}" class="form-label">E-mail</label>
+                                        <input type="text" class="form-control" id="InputMail{{entry.id}}" name="mail"
+                                               required aria-describedby="nameHelp{{entry.id}}">
+                                        <div id="mailHelp{{entry.id}}" class="form-text"></div>
+                                        <div class="invalid-feedback">Please provide an email-adress.</div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="InputWebsite{{entry.id}}" class="form-label">Website</label>
+                                        <input type="url" class="form-control" id="InputWebsite{{entry.id}}"
+                                               name="website" aria-describedby="websiteHelp{{entry.id}}">
+                                        <div id="websiteHelp{{entry.id}}" class="form-text"></div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="InputOrcid{{entry.id}}" class="form-label">ORCID ID</label>
+                                        <input type="text" class="form-control" id="InputOrcid{{entry.id}}" name="orcid"
+                                               aria-describedby="orcidHelp{{entry.id}}">
+                                        <div id="orcidHelp{{entry.id}}" class="form-text"></div>
+                                    </div>
+                                </form>
                         </div>
                     </div>
                 </div>
