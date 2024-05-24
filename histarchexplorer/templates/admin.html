@@ -32,11 +32,13 @@
                         <div class="accordion-body">
                             <form method="POST" action="{{ url_for('add_description') }}" class="projectForm">
                                 <input type="hidden" name="config_id" value="{{entry.id}}">
+                                <input type="hidden" name="current_tab" value="{{tab.target}}">
+                                <input type="hidden" name="current_entry" value="{{tab.target + entry.id|string}}">
                                 <div class="mb-3">
                                     <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
                                     <textarea class="form-control" id="InputDescription{{entry.id}}"
                                            name="description" aria-describedby="descriptionHelp{{entry.id}}"
-                                              value="{{entry.description or ''}}"></textarea>
+                                              >{{entry.description or ''}}</textarea>
                                     <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the project
                                         will be displayed in the "ABOUT" section of the webpage.
                                     </div>
