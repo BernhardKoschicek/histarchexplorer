@@ -35,8 +35,7 @@
                                 <div class="mb-3">
                                     <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
                                     <textarea class="form-control" id="InputDescription{{entry.id}}"
-                                           name="description" aria-describedby="descriptionHelp{{entry.id}}"
-                                              value="{{entry.description or ''}}"></textarea>
+                                           name="description" aria-describedby="descriptionHelp{{entry.id}}">{{entry.description or ''}}</textarea>
                                     <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the project
                                         will be displayed in the "ABOUT" section of the webpage.
                                     </div>
