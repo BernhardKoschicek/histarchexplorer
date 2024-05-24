@@ -38,7 +38,7 @@
                                     <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
                                     <textarea class="form-control" id="InputDescription{{entry.id}}"
                                            name="description" aria-describedby="descriptionHelp{{entry.id}}"
-                                              >{{entry.description or ''}}</textarea>
+                                              disabled>{{entry.description or ''}}</textarea>
                                     <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the project
                                         will be displayed in the "ABOUT" section of the webpage.
                                     </div>
@@ -58,10 +58,10 @@
                             </div>
                             {% endif %}
                             {% endwith %}
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                                <button type="button" class="btn btn-secondary" id="editButton{{entry.id}}" {% if not
-                                        entry.description %}disabled{% endif %}>Edit
-                                </button>
+                                <button type="button" class="btn btn-primary">Edit</button>
+                                <button type="button" class="btn btn-primary">Delete</button>
+                                <button type="submit" class="btn btn-primary d-none">Save</button>
+                                <button type="reset" class="btn btn-primary d-none">Cancel</button>
                             </form>
                         </div>
                     </div>
