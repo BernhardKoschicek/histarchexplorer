@@ -24,19 +24,19 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#{{entry.id}}" aria-expanded="true" aria-controls="{{entry.id}}">
+                                data-bs-target="#{{ tab.target }}{{entry.id}}" aria-expanded="true" aria-controls="{{ tab.target }}{{entry.id}}">
                             {{entry.name}}
                         </button>
                     </h2>
-                    <div id="{{entry.id}}" class="accordion-collapse collapse">
+                    <div id="{{ tab.target }}{{entry.id}}" class="accordion-collapse collapse">
                         <div class="accordion-body">
                             <form method="POST" action="{{ url_for('add_description') }}" class="projectForm">
                                 <input type="hidden" name="config_id" value="{{entry.id}}">
                                 <div class="mb-3">
                                     <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
-                                    <input type="text" class="form-control" id="InputDescription{{entry.id}}"
+                                    <textarea class="form-control" id="InputDescription{{entry.id}}"
                                            name="description" aria-describedby="descriptionHelp{{entry.id}}"
-                                           value="{{entry.description or ''}}" required>
+                                              value="{{entry.description or ''}}"></textarea>
                                     <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the project
                                         will be displayed in the "ABOUT" section of the webpage.
                                     </div>
@@ -47,9 +47,11 @@
                             {% if messages %}
                             <div class="flash-messages">
                                 {% for category, message in messages %}
+                                    {% if category in ["success", "danger"] %}
                                 <div class="alert alert-{{ category }}">
                                     {{ message }}
                                 </div>
+                                    {% endif %}
                                 {% endfor %}
                             </div>
                             {% endif %}
