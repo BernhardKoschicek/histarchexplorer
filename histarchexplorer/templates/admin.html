@@ -37,7 +37,7 @@
                          class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string  %} show {% endif %}"
                          data-bs-parent="#{{ tab.label }}accordion">
                         <div class="accordion-body">
-                            <form method="POST" action="{{ url_for('add_description') }}" class="projectForm">
+                            <form method="POST" action="{{ url_for('add_description') }}" class="projectForm"id="form{{entry.id}}">
                                 <input type="hidden" name="config_id" value="{{entry.id}}">
                                 <input type="hidden" name="current_tab" value="{{tab.target}}">
                                 <input type="hidden" name="current_entry" value="{{tab.target + entry.id|string}}">
@@ -58,7 +58,8 @@
                                     <div class="mb-3">
                                         <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
                                         <textarea class="form-control" id="InputDescription{{entry.id}}"
-                                                  name="description" aria-describedby="descriptionHelp{{entry.id}}" disabled>{{entry.description or ''}}</textarea>
+                                                  name="description" aria-describedby="descriptionHelp{{entry.id}}"
+                                                  disabled>{{entry.description or ''}}</textarea>
                                         <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the
                                             project
                                             will be displayed in the "ABOUT" section of the webpage.
@@ -79,18 +80,26 @@
                                     </div>
                                     {% endif %}
                                     {% endwith %}
-                                    <button type="submit" class="btn btn-primary" id='edit{{entry.id}}'
-                                            value="{{entry.id}}">Edit
+                                    <!-- Edit Button -->
+                                    <button type="button" class="btn btn-primary" id='edit{{entry.id}}'
+                                            onclick="enableEdit({{entry.id}})">Edit
                                     </button>
+
+                                    <!-- Delete Button -->
                                     <button type="button" class="btn btn-primary" id='delete{{entry.id}}'
                                             value="{{entry.id}}">Delete
                                     </button>
+
+                                    <!-- Save Button (Initially hidden) -->
                                     <button type="submit" class="btn btn-primary d-none" id='save{{entry.id}}'
                                             value="{{entry.id}}">Save
                                     </button>
-                                    <button type="reset" class="btn btn-primary d-none" id='cancel{{entry.id}}'
+
+                                    <!-- Cancel Button (Initially hidden) -->
+                                    <button type="button" class="btn btn-primary d-none" id='cancel{{entry.id}}'
                                             value="{{entry.id}}">Cancel
                                     </button>
+
 
                                     <div class="col-md-6">
                                         <label for="InputAddress{{entry.id}}" class="form-label">Address</label>
@@ -103,7 +112,8 @@
                                     <div class="col-md-4">
                                         <label for="InputMail{{entry.id}}" class="form-label">E-mail</label>
                                         <input type="text" class="form-control" id="InputMail{{entry.id}}" name="mail"
-                                               value="{{entry.mail or ''}}" aria-describedby=" nameHelp{{entry.id}}" disabled>
+                                               value="{{entry.mail or ''}}" aria-describedby=" nameHelp{{entry.id}}"
+                                               disabled>
                                         <div id="mailHelp{{entry.id}}" class="form-text"></div>
                                         <div class="invalid-feedback">Please provide an email-address.</div>
                                     </div>
@@ -135,6 +145,24 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+    // Function to enable editing
+    function enableEdit(entryId) {
+        var form = document.getElementById('form' + entryId);
+        var fields = form.querySelectorAll('input, textarea');
+        fields.forEach(function(field) {
+            field.removeAttribute('disabled');
+        });
+
+        // Show Save and Cancel buttons, hide Edit button
+        document.getElementById('edit' + entryId).classList.add('d-none');
+        document.getElementById('delete' + entryId).classList.add('d-none');
+        document.getElementById('save' + entryId).classList.remove('d-none');
+        document.getElementById('cancel' + entryId).classList.remove('d-none');
+    }
+</script>
+
 
 <!--<script>
     document.querySelectorAll('.projectForm').forEach(form => {
