@@ -75,17 +75,36 @@ def add_description():
     config_id = request.form.get('config_id')
     current_tab = request.form.get('current_tab')
     current_entry = request.form.get('current_entry')
+    project_name = request.form.get('projectName')
+    address = request.form.get('address')
+    mail = request.form.get('mail')
+    website = request.form.get('website')
+    orcid = request.form.get('orcid')
 
-    if not description:
-        flash('Description is required!', 'danger')
-        return redirect('/admin/' + current_tab + '/' + current_entry)
+    # Initialize a dictionary to hold status messages
+    status_messages = {}
 
-    try:
-        g.cursor.execute('UPDATE tng.config SET description = %s WHERE id = %s', (description, config_id))
-        g.db.commit()
-        flash('Description updated successfully!', 'success')
-    except Exception as e:
-        g.db.rollback()
-        flash(f'Error updating description: {str(e)}', 'danger')
+    # Define a function to update a field and store the result in status_messages
+    def update_field(field_name, field_value, column_name):
+        if field_value:
+            try:
+                g.cursor.execute(f'UPDATE tng.config SET {column_name} = %s WHERE id = %s', (field_value, config_id))
+                g.db.commit()
+                status_messages[field_name] = ('success', f'{field_name.capitalize()} updated successfully!')
+            except Exception as e:
+                g.db.rollback()
+                status_messages[field_name] = ('danger', f'Error updating {field_name}: {str(e)}')
+
+    # Update each field and store the corresponding status message
+    update_field('description', description, 'description')
+    update_field('project name', project_name, 'name')
+    update_field('address', address, 'address')
+    update_field('email', mail, 'mail')
+    update_field('website', website, 'website')
+    update_field('orcid-id', orcid, 'orcid')
+
+    # Flash each status message
+    for field, (category, message) in status_messages.items():
+        flash(message, category)
 
     return redirect('/admin/' + current_tab + '/' + current_entry)
