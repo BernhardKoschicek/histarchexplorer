@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import render_template, abort, g, request, redirect, url_for, flash
+from flask import render_template, abort, g, request, redirect, url_for, flash, jsonify
 from flask_login import (
     current_user, login_required)
 
@@ -65,9 +65,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry)
 
 
-@app.route('/add_description', methods=['POST', 'GET'])
+@app.route('/add_formInput', methods=['POST', 'GET'])
 @login_required
-def add_description():
+def add_formInput():
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -114,5 +114,20 @@ def add_description():
                 g.db.rollback()
                 flash(f'Error updating {field_name}: {str(e)}', 'danger')
 
-    # Redirect to the appropriate admin page
+    @app.route('/admin/delete_entry', methods=['POST'])
+    @login_required
+    def delete_entry():
+        if current_user.group not in ['admin', 'manager']:
+            return jsonify({'message': 'Forbidden'}), 403  # Return 403 Forbidden if user is not authorized
+
+        entry_id = request.form.get('entry_id')  # Get the ID of the entry to delete
+        try:
+            g.cursor.execute('DELETE FROM tng.config WHERE id = %s', (entry_id,))
+            g.db.commit()
+            return jsonify({'message': 'Entry deleted successfully'}), 200
+        except Exception as e:
+            g.db.rollback()
+            return jsonify({'error': str(e)}), 500
+
+            # Redirect to the appropriate admin page
     return redirect('/admin/' + current_tab + '/' + current_entry)

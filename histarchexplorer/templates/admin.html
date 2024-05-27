@@ -37,7 +37,7 @@
                          class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string  %} show {% endif %}"
                          data-bs-parent="#{{ tab.label }}accordion">
                         <div class="accordion-body">
-                            <form method="POST" action="{{ url_for('add_description') }}" class="projectForm"
+                            <form method="POST" action="{{ url_for('add_formInput') }}" class="projectForm"
                                   needs-validation
                             " id="form{{entry.id}}" novalidate>
                             <input type="hidden" name="config_id" value="{{entry.id}}">
@@ -107,7 +107,7 @@
 
                             <!-- Delete Button -->
                             <button type="button" class="btn btn-danger" id='delete{{entry.id}}'
-                                    value="{{entry.id}}" onclick="confirmDelete()">Delete
+                                    value="{{entry.id}}" onclick="confirmDelete({{ entry.id }})">Delete
                             </button>
 
                             <!-- Save Button (Initially hidden) -->
@@ -181,23 +181,37 @@
         document.getElementById('cancel' + entryId).classList.add('d-none');
     }
 
-    function confirmDelete() {
+     function confirmDelete(entryId) {
         if (confirm("Are you sure you want to delete the database entry?")) {
-            // Code to delete the entries
-            // You can make an AJAX request to the server to delete the entries here
-            // For demonstration purposes, let's assume a function called deleteEntries() is responsible for deleting the entries
-            deleteEntries();
+            // Make an AJAX request to delete the entry
+            deleteEntry(entryId);
         }
     }
 
-    function deleteEntries() {
-        // Your code to delete the entries from the database
-        // This function should handle the actual deletion of entries
-        // You can use AJAX to send a request to the server to delete the entries
-        // Once the entries are deleted, you can perform any necessary UI updates
+    function deleteEntry(entryId) {
+        // Make an AJAX request to the backend to delete the entry
+        fetch('/admin/delete_entry', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ entry_id: entryId }) // Pass the entry ID in the request body
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            // Handle successful deletion here, such as updating the UI
+            // For example, you can reload the page or remove the deleted entry from the DOM
+            location.reload(); // Reload the page after successful deletion
+        })
+        .catch(error => {
+            console.error('There was a problem with your fetch operation:', error);
+            // Handle errors, such as displaying an error message to the user
+            // For example, you can show an alert to inform the user about the error
+            alert('Failed to delete entry. Please try again later.');
+        });
     }
-
-
 </script>
 
 {% endblock %}
