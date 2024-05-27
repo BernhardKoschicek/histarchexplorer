@@ -85,26 +85,34 @@ def add_description():
     status_messages = {}
 
     # Define a function to update a field and store the result in status_messages
-    def update_field(field_name, field_value, column_name):
+    # Initialize a list to keep track of updated fields
+    updated_fields = []
+
+    # Define a function to get the previous value of a field from the database
+    def get_previous_value(column_name):
+        g.cursor.execute(f'SELECT {column_name} FROM tng.config WHERE id = %s', (config_id,))
+        return g.cursor.fetchone()[0]
+
+    # Update each field and store the corresponding status message
+    for field_name, field_value, column_name in [
+        ('description', description, 'description'),
+        ('project name', project_name, 'name'),
+        ('address', address, 'address'),
+        ('email', mail, 'email'),
+        ('website', website, 'website'),
+        ('orcid-id', orcid, 'orcid')
+    ]:
         if field_value:
+            previous_value = get_previous_value(column_name)
             try:
                 g.cursor.execute(f'UPDATE tng.config SET {column_name} = %s WHERE id = %s', (field_value, config_id))
                 g.db.commit()
-                status_messages[field_name] = ('success', f'{field_name.capitalize()} updated successfully!')
+                if previous_value != field_value:  # Check if the value has changed
+                    updated_fields.append(field_name)  # Add the field name to the list of updated fields
+                    flash(f'{field_name.capitalize()} updated successfully!', 'success')
             except Exception as e:
                 g.db.rollback()
-                status_messages[field_name] = ('danger', f'Error updating {field_name}: {str(e)}')
+                flash(f'Error updating {field_name}: {str(e)}', 'danger')
 
-    # Update each field and store the corresponding status message
-    update_field('description', description, 'description')
-    update_field('project name', project_name, 'name')
-    update_field('address', address, 'address')
-    update_field('email', mail, 'email')
-    update_field('website', website, 'website')
-    update_field('orcid-id', orcid, 'orcid')
-
-    # Flash each status message
-    for field, (category, message) in status_messages.items():
-        flash(message, category)
-
+    # Redirect to the appropriate admin page
     return redirect('/admin/' + current_tab + '/' + current_entry)

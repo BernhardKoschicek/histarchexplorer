@@ -65,21 +65,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Flash messages block -->
-                                {% with messages = get_flashed_messages(with_categories=true) %}
-                                {% if messages %}
-                                <div class="flash-messages">
-                                    {% for category, message in messages %}
-                                    {% if category in ["success", "danger"] %}
-                                    <div class="alert alert-{{ category }}">
-                                        {{ message }}
-                                    </div>
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                                {% endwith %}
-
                                 <div class="col-md-6">
                                     <label for="InputAddress{{entry.id}}" class="form-label">Address</label>
                                     <textarea class="form-control" id="InputAddress{{entry.id}}" name="address"
@@ -113,6 +98,22 @@
                                     <div id="orcidHelp{{entry.id}}" class="form-text"></div>
                                 </div>
                             </div>
+
+                            <!-- Flash messages block -->
+                                {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                <div class="flash-messages">
+                                    {% for category, message in messages %}
+                                    {% if category in ["success", "danger"] %}
+                                    <div class="alert alert-{{ category }}">
+                                        {{ message }}
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% endwith %}
+
                             <!-- Edit Button -->
                             <button type="button" class="btn btn-primary" id='edit{{entry.id}}'
                                     onclick="enableEdit({{entry.id}})">Edit
