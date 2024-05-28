@@ -1,11 +1,8 @@
 from typing import Optional
 
 from flask import render_template, abort, g, request, redirect, url_for, flash, jsonify
-from flask_login import (
-    current_user, login_required)
-
+from flask_login import current_user, login_required
 from histarchexplorer import app
-
 
 @app.route('/admin/')
 @app.route('/admin/<tab>')
@@ -64,7 +61,25 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry)
 
+@app.route('/admin/delete_entry', methods=['POST'])
+@login_required
+def delete_entry():
+    if current_user.group not in ['admin', 'manager']:
+        return jsonify({'message': 'Forbidden'}), 403
 
+    data = request.get_json()  # Get the JSON data from the request
+    entry_id = data.get('entry_id')  # Extract the entry_id from the JSON data
+
+    if not entry_id:
+        return jsonify({'error': 'Entry ID is required'}), 400
+
+    try:
+        g.cursor.execute('DELETE FROM tng.config WHERE id = %s', (entry_id,))
+        g.db.commit()
+        return jsonify({'message': 'Entry deleted successfully'}), 200
+    except Exception as e:
+        g.db.rollback()
+        return jsonify({'error': str(e)}), 500
 @app.route('/add_formInput', methods=['POST', 'GET'])
 @login_required
 def add_formInput():
@@ -114,20 +129,6 @@ def add_formInput():
                 g.db.rollback()
                 flash(f'Error updating {field_name}: {str(e)}', 'danger')
 
-    @app.route('/admin/delete_entry', methods=['POST'])
-    @login_required
-    def delete_entry():
-        if current_user.group not in ['admin', 'manager']:
-            return jsonify({'message': 'Forbidden'}), 403  # Return 403 Forbidden if user is not authorized
-
-        entry_id = request.form.get('entry_id')  # Get the ID of the entry to delete
-        try:
-            g.cursor.execute('DELETE FROM tng.config WHERE id = %s', (entry_id,))
-            g.db.commit()
-            return jsonify({'message': 'Entry deleted successfully'}), 200
-        except Exception as e:
-            g.db.rollback()
-            return jsonify({'error': str(e)}), 500
 
             # Redirect to the appropriate admin page
     return redirect('/admin/' + current_tab + '/' + current_entry)

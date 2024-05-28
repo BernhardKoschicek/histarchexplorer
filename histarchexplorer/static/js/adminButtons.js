@@ -39,22 +39,24 @@
     }
 
     function deleteEntry(entryId) {
-        // Request to the backend to delete the entry
-        fetch('/admin/delete_entry', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ entry_id: entryId }) // Pass the entry ID in the request body
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+    fetch('/admin/delete_entry', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ entry_id: entryId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
             location.reload(); // Reload the page after successful deletion
-        })
-        .catch(error => {
-            console.error('There was a problem with your fetch operation:', error);
-            alert('Failed to delete entry. Please try again later.');
-        });
-    }
+        } else if (data.error) {
+            throw new Error(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('There was a problem with your fetch operation:', error);
+        alert('Failed to delete entry. Please try again later.');
+    });
+}
