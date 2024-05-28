@@ -61,25 +61,17 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry)
 
-@app.route('/admin/delete_entry', methods=['POST'])
+@app.route('/admin/delete_entry')
+@app.route('/admin/delete_entry/<id>/<tab>')
 @login_required
-def delete_entry():
+def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         return jsonify({'message': 'Forbidden'}), 403
 
-    data = request.get_json()  # Get the JSON data from the request - to identify entry to delete
-    entry_id = data.get('entry_id')  # Extract the entry_id from the JSON data
 
-    if not entry_id:
-        return jsonify({'error': 'Entry ID is required'}), 400 #Necessary?
+    g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s', {'id':int(id)})
+    return redirect('/admin/'+ tab)
 
-    try:
-        g.cursor.execute('DELETE FROM tng.config WHERE id = %s', (entry_id,))
-        g.db.commit()
-        return jsonify({'message': 'Entry deleted successfully'}), 200 #return message - remove 127.... says
-    except Exception as e:
-        g.db.rollback()
-        return jsonify({'error': str(e)}), 500
 @app.route('/add_formInput', methods=['POST', 'GET'])
 @login_required
 def add_formInput():
