@@ -75,7 +75,6 @@ def delete_entry():
 
     try:
         g.cursor.execute('DELETE FROM tng.config WHERE id = %s', (entry_id,))
-        g.db.commit()
         return jsonify({'message': 'Entry deleted successfully'}), 200 #return message - remove 127.... says
     except Exception as e:
         g.db.rollback()
@@ -121,7 +120,6 @@ def add_formInput():
             previous_value = get_previous_value(column_name)
             try:
                 g.cursor.execute(f'UPDATE tng.config SET {column_name} = %s WHERE id = %s', (field_value, config_id))
-                g.db.commit()
                 if previous_value != field_value:  # Check if the value has changed
                     updated_fields.append(field_name)  # Add the field name to the list of updated fields
                     flash(f'{field_name.capitalize()} updated successfully!', 'success')
