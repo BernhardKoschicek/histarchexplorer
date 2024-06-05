@@ -63,14 +63,14 @@
 
                                                 <div class="row g-3 needs-validation" novalidate>
                                                     <div class="col-md-4">
-                                                        <label for="InputProjectName{{ entry.id }}" class="form-label">Project
+                                                        <label for="InputName{{ entry.id }}" class="form-label">Project
                                                             Name</label>
                                                         <input type="text" class="form-control"
-                                                               id="InputProjectName{{ entry.id }}"
-                                                               name="projectName" value="{{ entry.name or '' }}"
-                                                               aria-describedby="projectNameHelp{{ entry.id }}"
+                                                               id="InputName{{ entry.id }}"
+                                                               name="name" value="{{ entry.name or '' }}"
+                                                               aria-describedby="NameHelp{{ entry.id }}"
                                                                disabled>
-                                                        <div id="projectNameHelp{{ entry.id }}" class="form-text"></div>
+                                                        <div id="NameHelp{{ entry.id }}" class="form-text"></div>
                                                         <div class="invalid-feedback">Please provide a project name.
                                                         </div>
                                                     </div>

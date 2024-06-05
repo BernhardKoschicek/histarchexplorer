@@ -34,9 +34,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     tabs = [
         {
-            'id': 'nav-project-tab',
+            'id': 'nav-projects-tab',
             'label': 'projects',
-            'target': 'nav-project',
+            'target': 'nav-projects',
             'filter': projects
         },
         {
@@ -126,7 +126,7 @@ def edit_entry():
     config_id = request.form.get('config_id')
     current_tab = request.form.get('current_tab')
     current_entry = request.form.get('current_entry')
-    project_name = request.form.get('projectName')
+    name = request.form.get('name')
     address = request.form.get('address')
     mail = request.form.get('mail')
     website = request.form.get('website')
@@ -147,11 +147,11 @@ def edit_entry():
         g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s', {'id': int(config_id)})
         result = g.cursor.fetchone()
         if result:
-            g.cursor.execute(editsql, {'description': description, 'name': project_name, 'address': address, 'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id})
-            flash(f'"{project_name}" updated successfully', 'success')
+            g.cursor.execute(editsql, {'description': description, 'name': name, 'address': address, 'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id})
+            flash(f'"{name}" updated successfully', 'success')
         else:
-            flash(f'Error updating {project_name}', 'danger')
+            flash(f'Error updating {name}', 'danger')
     except Exception as e:
-        flash(f'Error updating {project_name}: {str(e)}', 'danger')
+        flash(f'Error updating {name}: {str(e)}', 'danger')
 
     return redirect(url_for('admin') + current_tab + '/' + current_entry)
