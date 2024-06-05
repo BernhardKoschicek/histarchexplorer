@@ -61,6 +61,51 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry)
 
+@app.route('/admin/add_entry', methods=['POST'])
+@login_required
+def add_entry():
+    original_tab_label = request.form.get(
+        'tab')  # Get the tab label from the form with the 'nav-' prefix - to determine the config class of the entry being added based on the tab from which the form was submitted
+    print("Received tab label:", original_tab_label)
+    tab_label = original_tab_label.replace('nav-', '')  # Remove 'nav-' prefix from the tab label
+
+    current_tab = request.form.get('current_tab')
+    name = request.form.get('name')
+    description = request.form.get('description')
+    address = request.form.get('address')
+    mail = request.form.get('mail')
+    website = request.form.get('website')
+    orcid = request.form.get('orcid')
+
+    # Dictionary to classify the type of entry being added
+    config_class_map = {
+        'projects': 1,
+        'persons': 3,
+        'institutions': 5,
+        'attributes': 4
+    }
+
+    new_entry_id = None  # Initialize new_entry_id to None
+
+    try:
+        # Get the config class corresponding to the tab label
+        tab_config_class = config_class_map.get(tab_label)
+        if tab_config_class is None:
+            raise ValueError('Invalid tab label')
+
+        # Insert the entry into the database
+        g.cursor.execute('''
+                   INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id
+               ''', (name, description, address, mail, website, orcid, tab_config_class))
+        new_entry_id = g.cursor.fetchone()[0]
+        flash('Entry added successfully!', 'success')
+    except Exception as e:
+        g.db.rollback()  # reverts changes during transaction if any error ocurrs
+        flash(f'Error adding entry: {str(e)}', 'danger')
+
+    return redirect(f'/admin/{current_tab}/{current_tab}{new_entry_id}')
+
 @app.route('/admin/delete_entry/<id>/<tab>')
 @login_required
 def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:

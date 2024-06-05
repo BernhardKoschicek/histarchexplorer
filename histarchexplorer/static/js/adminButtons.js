@@ -39,3 +39,30 @@
     }
 
 
+document.addEventListener('DOMContentLoaded', function () {
+    // Toggle Add Form
+    window.toggleAddForm = function(tabTarget) {
+        var addForm = document.getElementById("addForm" + tabTarget);
+        if (addForm.style.display === "none") {
+            addForm.style.display = "block";
+        } else {
+            addForm.style.display = "none";
+        }
+    };
+
+    // Example: Form validation handling
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+});
+

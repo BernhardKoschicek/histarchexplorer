@@ -35,7 +35,7 @@
                 <div class="tab-pane fade{% if loop.first and not activetab %} show active{% endif %} {% if activetab == tab.target %} show active {% endif %}"
                      id="{{ tab.target }}" role="tabpanel"
                      aria-labelledby="{{ tab.id }}" tabindex="0">
-                    <button type="+" class="btn btn-primary"> +</button>
+                    <button type="+" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEntryModal" data-tab-target="{{ tab.target }}"> +</button>
                     <div class="accordion" id="{{ tab.label }}accordion">
                         {% for entry in config_data %}
                             {% if entry.config_class in tab.filter %}
@@ -191,6 +191,56 @@
         </div>
     </div>
 
+<!-- Modal for Add Entry Form -->
+<div class="modal fade" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEntryModalLabel">Add Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('add_entry') }}" class="needs-validation" novalidate>
+                    <input type="hidden" name="current_tab" id="modalCurrentTab" value="{{ activetab }}">
+                    <input type="hidden" name="current_entry" id="modalCurrentEntry" value="{{ activeentry }}">
+                    <input type="hidden" name="tab" id="modalTabTarget">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="InputNameModal" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="InputNameModal" name="name" required>
+                            <div class="invalid-feedback">Please provide a name.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="InputDescriptionModal" class="form-label">Description</label>
+                            <textarea class="form-control" id="InputDescriptionModal" name="description"></textarea>
+                            <div class="invalid-feedback">Please provide a description.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="InputAddressModal" class="form-label">Address</label>
+                            <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
+                            <div class="invalid-feedback">Please provide an address.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="InputMailModal" class="form-label">E-mail</label>
+                            <input type="email" class="form-control" id="InputMailModal" name="mail">
+                            <div class="invalid-feedback">Please provide an email address.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="InputWebsiteModal" class="form-label">Website</label>
+                            <input type="url" class="form-control" id="InputWebsiteModal" name="website">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="InputOrcidModal" class="form-label">ORCID-ID</label>
+                            <input type="text" class="form-control" id="InputOrcidModal" name="orcid">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Entry</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
     <script>
         function deleteEntry(id, name, tab) {
             console.log('delete?')
@@ -201,6 +251,21 @@
             confirmedDelete.setAttribute("href", deleteUrl)
         }
     </script>
+<script src="{{ url_for('static', filename='js/adminButtons.js') }}"></script>
+<script>
+    var addEntryModal = document.getElementById('addEntryModal');
+    addEntryModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var tabTarget = button.getAttribute('data-tab-target');
+        var modalTabTarget = document.getElementById('modalTabTarget');
+        modalTabTarget.value = tabTarget;
+
+        var modalCurrentTab = document.getElementById('modalCurrentTab');
+        var modalCurrentEntry = document.getElementById('modalCurrentEntry');
+        modalCurrentTab.value = tabTarget;
+        modalCurrentEntry.value = tabTarget + (button.getAttribute('data-entry-id') || "");
+    });
+</script>
 
     <script src="{{ url_for('static', filename='js/adminButtons.js') }}"></script>
 
