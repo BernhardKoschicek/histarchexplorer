@@ -38,25 +38,12 @@
         }
     }
 
-    function deleteEntry(entryId) {
-    fetch('/admin/delete_entry', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ entry_id: entryId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message) {
-            alert(data.message);
-            location.reload(); // Reload the page after successful deletion
-        } else if (data.error) {
-            throw new Error(data.error);
-        }
-    })
-    .catch(error => {
-        console.error('There was a problem with your fetch operation:', error);
-        alert('Failed to delete entry. Please try again later.');
-    });
+
+function deleteEntry(id, name, tab) {
+    console.log('delete?')
+    deleteName = document.getElementById('deleteName')
+    deleteName.innerHTML = name
+    confirmedDelete = document.getElementById('confirmedDelete')
+        const deleteUrl = "delete_entry/" + id + "/" + tab
+    confirmedDelete.setAttribute("href", deleteUrl)
 }
