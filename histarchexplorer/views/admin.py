@@ -4,6 +4,7 @@ from flask import render_template, abort, g, request, redirect, url_for, flash, 
 from flask_login import current_user, login_required
 from histarchexplorer import app
 
+
 @app.route('/admin/')
 @app.route('/admin/<tab>')
 @app.route('/admin/<tab>/<entry>')
@@ -61,6 +62,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry)
 
+
 @app.route('/admin/add_entry', methods=['POST'])
 @login_required
 def add_entry():
@@ -82,7 +84,7 @@ def add_entry():
 
     # Dictionary to classify the type of entry being added
     config_class_map = {
-        'projects': 1, #option for config_class=2 project vs 1=main_project?
+        'projects': 1,  # option for config_class=2 project vs 1=main_project?
         'persons': 3,
         'institutions': 5,
         'attributes': 4
@@ -93,21 +95,27 @@ def add_entry():
     try:
         # Get the config class corresponding to the tab label
         tab_config_class = config_class_map.get(tab_label)
-        #if tab_config_class is None:
-        #   raise ValueError('Invalid tab label')
 
         # Insert the entry into the database
         g.cursor.execute('''
                    INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id
+                   VALUES (
+                    NULLIF(%s, ''),
+                    NULLIF(%s, ''),
+                    NULLIF(%s, ''),
+                    NULLIF(%s, ''),
+                    NULLIF(%s, ''),
+                    NULLIF(%s, ''),
+                    %s
+                ) RETURNING id
                ''', (name, description, address, mail, website, orcid, tab_config_class))
         new_entry_id = g.cursor.fetchone()[0]
         flash('Entry added successfully!', 'success')
-    except Exception as e:
-        g.db.rollback()  # reverts changes during transaction if any error ocurrs
-        flash(f'Error adding entry: {str(e)}', 'danger')
+        except Exception as e:
+        flash(f'Error adding entry! {name}: {str(e)}', 'danger')
 
     return redirect(f'/admin/{current_tab}/{current_tab}{new_entry_id}')
+
 
 @app.route('/admin/delete_entry/<id>/<tab>')
 @login_required
@@ -115,9 +123,9 @@ def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
+    g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s', {'id': int(id)})
+    return redirect('/admin/' + tab)
 
-    g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s', {'id':int(id)})
-    return redirect('/admin/'+ tab)
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
@@ -135,7 +143,6 @@ def edit_entry():
     website = request.form.get('website')
     orcid = request.form.get('orcid')
 
-
     editsql = """
         UPDATE  tng.config SET 
             description = NULLIF(%(description)s, ''),
@@ -150,7 +157,8 @@ def edit_entry():
         g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s', {'id': int(config_id)})
         result = g.cursor.fetchone()
         if result:
-            g.cursor.execute(editsql, {'description': description, 'name': name, 'address': address, 'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id})
+            g.cursor.execute(editsql, {'description': description, 'name': name, 'address': address, 'email': mail,
+                                       'website': website, 'orcid_id': orcid, 'id': config_id})
             flash(f'"{name}" updated successfully', 'success')
         else:
             flash(f'Error updating {name}', 'danger')
