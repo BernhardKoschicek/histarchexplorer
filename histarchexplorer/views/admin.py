@@ -116,7 +116,8 @@ def add_formInput():
                 g.db.commit()
                 if previous_value != field_value:  # Check if the value has changed
                     updated_fields.append(field_name)  # Add the field name to the list of updated fields
-                    flash(f'{field_name.capitalize()} updated successfully!', 'success')
+                    #flash(f'{field_name.capitalize()} updated successfully!', 'success')
+                    flash('Updated successfully!', 'success')
             except Exception as e:
                 g.db.rollback()
                 flash(f'Error updating {field_name}: {str(e)}', 'danger')

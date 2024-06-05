@@ -135,8 +135,13 @@
                                                     id='cancel{{ entry.id }}'
                                                     onclick="cancelEdit({{ entry.id }})">Cancel
                                             </button>
-
-                                            <!-- Flash messages block -->
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        <!-- Flash messages block -->
                                             {% with messages = get_flashed_messages(with_categories=true) %}
                                                 {% if messages %}
                                                     <div class="flash-messages">
@@ -150,12 +155,6 @@
                                                     </div>
                                                 {% endif %}
                                             {% endwith %}
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
                     </div>
                 </div>
             {% endfor %}
