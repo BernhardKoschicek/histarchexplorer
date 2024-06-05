@@ -61,20 +61,19 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry)
 
-@app.route('/admin/delete_entry')
 @app.route('/admin/delete_entry/<id>/<tab>')
 @login_required
 def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
-        return jsonify({'message': 'Forbidden'}), 403
+        abort(403)
 
 
     g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s', {'id':int(id)})
     return redirect('/admin/'+ tab)
 
-@app.route('/add_formInput', methods=['POST', 'GET'])
+@app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
-def add_formInput():
+def edit_entry():
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -88,40 +87,26 @@ def add_formInput():
     website = request.form.get('website')
     orcid = request.form.get('orcid')
 
-    # Initialize a dictionary to hold status messages
-    status_messages = {}
 
-    # Define a function to update a field and store the result in status_messages
-    # Initialize a list to keep track of updated fields
-    updated_fields = []
+    editsql = """
+        UPDATE  tng.config SET 
+            description = NULLIF(%(description)s, ''),
+            name = NULLIF(%(name)s, ''),
+            address = NULLIF(%(address)s, ''),
+            email = NULLIF(%(email)s, ''),
+            website = NULLIF(%(website)s, ''),
+            orcid_id = NULLIF(%(orcid_id)s, '')
+        WHERE  id = %(id)s
+    """
+    try:
+        g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s', {'id': int(config_id)})
+        result = g.cursor.fetchone()
+        if result:
+            g.cursor.execute(editsql, {'description': description, 'name': project_name, 'address': address, 'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id})
+            flash(f'"{project_name}" updated successfully', 'success')
+        else:
+            flash(f'Error updating {project_name}', 'danger')
+    except Exception as e:
+        flash(f'Error updating {project_name}: {str(e)}', 'danger')
 
-    # Define a function to get the previous value of a field from the database
-    def get_previous_value(column_name):
-        g.cursor.execute(f'SELECT {column_name} FROM tng.config WHERE id = %s', (config_id,))
-        return g.cursor.fetchone()[0]
-
-    # Update each field and store the corresponding status message
-    for field_name, field_value, column_name in [
-        ('description', description, 'description'),
-        ('project name', project_name, 'name'),
-        ('address', address, 'address'),
-        ('email', mail, 'email'),
-        ('website', website, 'website'),
-        ('orcid-id', orcid, 'orcid_id')
-    ]:
-        if field_value:
-            previous_value = get_previous_value(column_name)
-            try:
-                g.cursor.execute(f'UPDATE tng.config SET {column_name} = %s WHERE id = %s', (field_value, config_id))
-                g.db.commit()
-                if previous_value != field_value:  # Check if the value has changed
-                    updated_fields.append(field_name)  # Add the field name to the list of updated fields
-                    #flash(f'{field_name.capitalize()} updated successfully!', 'success')
-                    flash('Updated successfully!', 'success')
-            except Exception as e:
-                g.db.rollback()
-                flash(f'Error updating {field_name}: {str(e)}', 'danger')
-
-
-            # Redirect to the appropriate admin page
-    return redirect('/admin/' + current_tab + '/' + current_entry)
+    return redirect(url_for('admin') + current_tab + '/' + current_entry)

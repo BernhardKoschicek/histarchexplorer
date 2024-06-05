@@ -39,11 +39,3 @@
     }
 
 
-function deleteEntry(id, name, tab) {
-    console.log('delete?')
-    deleteName = document.getElementById('deleteName')
-    deleteName.innerHTML = name
-    confirmedDelete = document.getElementById('confirmedDelete')
-        const deleteUrl = "delete_entry/" + id + "/" + tab
-    confirmedDelete.setAttribute("href", deleteUrl)
-}
