@@ -183,8 +183,30 @@
                                 {% for link in links_data %}
                                 {% if link.start_name == entry.name or link.end_name == entry.name %}
                                 <li>
-                                    {{ link.start_name }} - {{ link.config_property }} - {{ link.end_name }} {% if
-                                    link.role %}({{ link.role }}){% endif %}
+                                    <div class="row">
+                                        <div class="col">
+                                            <select class="form-select" aria-label="Disabled select example" disabled>
+                                                <option selected>{{ link.start_name }}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <select class="form-select" aria-label="Disabled select example" disabled>
+                                                <option selected>{{ link.config_property }}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <select class="form-select" aria-label="Disabled select example" disabled>
+                                                <option selected>{{ link.end_name }}</option>
+                                            </select>
+                                        </div>
+                                        {% if link.role %}
+                                        <div class="col">
+                                            <select class="form-select" aria-label="Disabled select example" disabled>
+                                                <option selected>{{ link.role }}</option>
+                                            </select>
+                                        </div>
+                                        {% endif %}
+                                    </div>
                                 </li>
                                 {% endif %}
                                 {% endfor %}
