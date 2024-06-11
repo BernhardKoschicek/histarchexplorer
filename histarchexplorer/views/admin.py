@@ -19,6 +19,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     g.cursor.execute('SELECT * FROM tng.config_classes')
     config_classes = g.cursor.fetchall()
 
+    g.cursor.execute('SELECT DISTINCT name FROM tng.config_properties')
+    config_properties = [row[0] for row in g.cursor.fetchall()]
+
     projects = []
     persons = []
     institutions = []
@@ -78,7 +81,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     links_data = g.cursor.fetchall()
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_data)
+                           links_data=links_data, config_properties=config_properties)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -143,7 +146,7 @@ def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
 
 
 # Delete Links
-@app.route('/admin/delete_link/<link_id>/<tab>')
+@app.route('/admin/delete_link/<link_id>/<tab>', methods=['GET', 'POST'])
 @login_required
 def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
@@ -154,6 +157,20 @@ def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None) -> str
 
     g.cursor.execute('DELETE FROM tng.links WHERE id = %(link_id)s', {'link_id': int(link_id)})
     flash('Link deleted successfully!', 'success')
+    return redirect(url_for('admin') + current_tab + '/' + current_entry)
+
+
+# Add Links
+@app.route('/admin/add_link', methods=['GET', 'POST'])
+@login_required
+def add_link():
+    if current_user.group not in ['admin', 'manager']:
+        abort(403)
+
+    current_tab = request.form.get('current_tab')
+    current_entry = request.form.get('current_entry')
+
+
     return redirect(url_for('admin') + current_tab + '/' + current_entry)
 
 

@@ -234,6 +234,27 @@
                                 {% endfor %}
                             </ul>
 
+                            <!-- Add Link Form -->
+                            <h5>Add Link:</h5>
+                            <form action="{{ url_for('add_link') }}" method="post">
+                                <input type="hidden" name="current_tab" value="{{ activetab }}">
+                                <input type="hidden" name="current_entry" value="{{ activeentry }}">
+
+                                <select id="configPropertySelect" name="config_property"
+                                        class="form-select linked-select">
+                                    {% for property in config_properties %}
+                                    <option value="{{ property }}">{{ property }}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <!-- Placeholder for dynamic select elements -->
+                                <div id="dynamicSelects" style="margin-top: 20px;">
+                                    <!-- Select elements will be appended here by JavaScript -->
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mt-3">Add Link</button>
+                            </form>
+
                         </div>
                     </div>
                 </div>
@@ -313,6 +334,8 @@
         </div>
     </div>
 </div>
+
+<script src="{{ url_for('static', filename='js/addLink.js') }}"></script>
 
 <script>
     function deleteEntry(id, name, tab) {
