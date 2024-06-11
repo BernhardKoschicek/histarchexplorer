@@ -221,12 +221,12 @@
                                         {% endif %}
                                         <!-- Delete Link Button -->
                                         <button class="btn btn-danger"
-                                            id='delete{{ link.id }}'
-                                            value="{{ link.id }}"
-                                            onclick="deleteLink('{{ link.link_id }}', '{{ tab.id }}', '{{ link.start_name }}', '{{ link.config_property }}', '{{ link.end_name }}')"
+                                                id='delete{{ link.id }}'
+                                                value="{{ link.id }}"
+                                                onclick="deleteLink('{{ link.link_id }}', '{{ tab.id }}', '{{ link.start_name }}', '{{ link.config_property }}', '{{ link.end_name }}')"
 
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal">Delete
-                                    </button>
+                                                data-bs-toggle="modal" data-bs-target="#deleteModal">Delete
+                                        </button>
 
                                     </div>
                                 </li>
@@ -327,7 +327,7 @@
 
 
 <script>
-    function deleteLink(linkId, tab, startName, configProperty, endName) {
+    function deleteLink(linkId, tab, startName, configProperty, endName, currentTab, currentEntry) {
     const deleteName = document.getElementById('deleteName');
     deleteName.textContent = "the link: " + startName + " - " + configProperty + " - " + endName + "?";
     const confirmedDelete = document.getElementById('confirmedDelete');

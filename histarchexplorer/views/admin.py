@@ -141,16 +141,20 @@ def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
     flash('Entry deleted successfully!', 'success')
     return redirect(url_for('admin') + tab)
 
-#Delete Links
+
+# Delete Links
 @app.route('/admin/delete_link/<link_id>/<tab>')
 @login_required
 def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
+    current_tab = request.form.get('current_tab')
+    current_entry = request.form.get('current_entry')
+
     g.cursor.execute('DELETE FROM tng.links WHERE id = %(link_id)s', {'link_id': int(link_id)})
     flash('Link deleted successfully!', 'success')
-    return redirect(url_for('admin') + tab) #irgendwie in den entry und net in den tab
+    return redirect(url_for('admin') + current_tab + '/' + current_entry)
 
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
