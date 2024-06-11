@@ -22,6 +22,15 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     g.cursor.execute('SELECT DISTINCT name FROM tng.config_properties')
     config_properties = [row[0] for row in g.cursor.fetchall()]
 
+    g.cursor.execute("SELECT id, name FROM tng.config WHERE config_class IN (5)")  # Adjust query for institutions
+    institutions_data = g.cursor.fetchall()
+
+    g.cursor.execute("SELECT id, name FROM tng.config WHERE config_class IN (3)")  # Adjust query for persons
+    persons_data = g.cursor.fetchall()
+
+    g.cursor.execute("SELECT id, name FROM tng.config WHERE config_class IN (4)")  # Adjust query for roles
+    roles_data = g.cursor.fetchall()
+
     projects = []
     persons = []
     institutions = []
@@ -81,7 +90,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     links_data = g.cursor.fetchall()
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_data, config_properties=config_properties)
+                           links_data=links_data, config_properties=config_properties, institutions_data=institutions_data,
+                           persons_data=persons_data,
+                           roles_data=roles_data)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
