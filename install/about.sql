@@ -107,16 +107,14 @@ INSERT INTO tng.config (name, config_class, description, address, email, website
 INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Austrian Centre for Digital Humanities & Cultural Heritage', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
 
 
-
 INSERT INTO tng.links (domain_id,range_id,property,"attribute") VALUES
-	 (52,57,2,NULL),
-	 (53,57,2,NULL),
-	 (41,35,1,NULL),
-	 (41,56,1,NULL),
-	 (53,112,2,NULL),
-	 (52,112,2,NULL),
-	 (35,112,2,72);
-
+	 (1,18,2,NULL),
+	 (2,18,2,NULL),
+	 (3,19,2,NULL),
+	 (15,1,1,7),
+	 (15,2,1,6),
+	 (16,3,1,5),
+	 (1,19,2,NULL);
 
 
 
