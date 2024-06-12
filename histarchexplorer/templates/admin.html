@@ -347,11 +347,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const rolesData = {{ roles_data | tojson | safe }};
 
         configPropertySelect.addEventListener('change', function() {
-            console.log('Selected value:', this.value); //not printing this
+            console.log('Selected value:', this.value);
             // Clear existing dynamic selects
             dynamicSelectsDiv.innerHTML = '';
 
-            if (this.value === 'has_member') {
+            if (this.value === 'has member') {
                 console.log('Creating new select elements');
                 // Create select elements for startName, endName, and role/attribute
 

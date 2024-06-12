@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Clear existing dynamic selects
             dynamicSelectsDiv.innerHTML = '';
 
-            if (this.value === 'has_member' || this.value === 'has_affiliation' || this.value === 'has_translation') {
+            if (this.value === 'has_member') {
                 // Create select elements for startName, endName, and role/attribute
 
                 const startNameSelect = createSelectElement('start_name', 'form-select linked-select me-2', institutionsData);
