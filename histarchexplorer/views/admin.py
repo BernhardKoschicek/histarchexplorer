@@ -19,8 +19,11 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     g.cursor.execute('SELECT * FROM tng.config_classes')
     config_classes = g.cursor.fetchall()
 
-    g.cursor.execute('SELECT DISTINCT name FROM tng.config_properties')
-    config_properties = [row[0] for row in g.cursor.fetchall()]
+    g.cursor.execute('''
+        SELECT id, name, domain, range, 'direct' AS direction  FROM tng.config_properties
+        UNION ALL
+        SELECT id, name_inv, range,domain, 'inverse' AS direction FROM tng.config_properties''')
+    config_properties = g.cursor.fetchall()
 
     g.cursor.execute("SELECT id, name FROM tng.config WHERE config_class IN (5)")  # Adjust query for institutions
     institutions_data = g.cursor.fetchall()
@@ -50,42 +53,66 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             'id': 'nav-projects-tab',
             'label': 'projects',
             'target': 'nav-projects',
-            'filter': projects
+            'filter': projects,
+            'id': 2
+
         },
         {
             'id': 'nav-persons-tab',
             'label': 'persons',
             'target': 'nav-persons',
-            'filter': persons
+            'filter': persons,
+            'id': 3
         },
         {
             'id': 'nav-institutions-tab',
             'label': 'institutions',
             'target': 'nav-institutions',
-            'filter': institutions
+            'filter': institutions,
+            'id': 5
         },
         {
             'id': 'nav-attributes-tab',
             'label': 'attributes',
             'target': 'nav-attributes',
-            'filter': roles
+            'filter': roles,
+            'id': 4
         }
     ]
 
     # Fetch linked entries
     g.cursor.execute("""
-        SELECT 
-            l.id AS link_id, 
-            s.name AS start_name, 
-            e.name AS end_name, 
-            cp.name AS config_property, 
-            cp.name_inv AS config_property_inv, 
-            r.name AS role
-        FROM tng.links l
-        JOIN tng.config s ON l.domain_id = s.id
-        JOIN tng.config e ON l.range_id = e.id
-        JOIN tng.config_properties cp ON l.property = cp.id
-        LEFT JOIN tng.config r ON l.attribute = r.id
+               SELECT l.id     AS link_id,
+       s.id     AS start_id,
+       s.name   AS start_name,
+       cp.name  AS config_property,
+       cp.id    AS property_id,
+       'direct' AS direction,
+       e.name   AS end_name,
+       e.id     AS end_id,
+       r.name   AS role,
+       r.id     AS role_id
+FROM tng.links l
+         JOIN tng.config s ON l.domain_id = s.id
+         JOIN tng.config e ON l.range_id = e.id
+         JOIN tng.config_properties cp ON l.property = cp.id
+         LEFT JOIN tng.config r ON l.attribute = r.id
+UNION ALL
+SELECT l.id        AS link_id,
+       s.id        AS start_id,
+       s.name      AS start_name,
+       cp.name_inv AS config_property,
+       cp.id       AS property_id,
+       'inverse'   AS direction,
+       e.name      AS end_name,
+       e.id        AS end_id,
+       r.name      AS role,
+       r.id        AS role_id
+FROM tng.links l
+         JOIN tng.config s ON l.range_id = s.id
+         JOIN tng.config e ON l.domain_id = e.id
+         JOIN tng.config_properties cp ON l.property = cp.id
+         LEFT JOIN tng.config r ON l.attribute = r.id
     """)
     links_data = g.cursor.fetchall()
 
@@ -157,18 +184,15 @@ def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
 
 
 # Delete Links
-@app.route('/admin/delete_link/<link_id>/<tab>', methods=['GET', 'POST'])
+@app.route('/admin/delete_link/<link_id>/<tab>/<entry>')
 @login_required
-def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None) -> str:
+def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
-    current_tab = request.form.get('current_tab')
-    current_entry = request.form.get('current_entry')
-
     g.cursor.execute('DELETE FROM tng.links WHERE id = %(link_id)s', {'link_id': int(link_id)})
     flash('Link deleted successfully!', 'success')
-    return redirect(url_for('admin') + tab)
+    return redirect(url_for('admin') + tab + '/' + entry)
 
 
 # Add Links
