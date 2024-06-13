@@ -98,9 +98,9 @@ INSERT INTO tng.config (name, config_class, description, address, email, website
 INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('partner', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, 'https://example.exampe');
 
 
-INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('THANADOS', (SELECT id from tng.config_classes WHERE name = 'main_project'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
-INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('RELIC', (SELECT id from tng.config_classes WHERE name = 'main_project'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
-INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('REPLICO', (SELECT id from tng.config_classes WHERE name = 'main_project'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('THANADOS', (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('RELIC', (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('REPLICO', (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
 
 INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('NHM', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
 INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('University of Vienna', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
