@@ -179,8 +179,6 @@
                                             </form>
                                             {% if tab.id != 4 %}
                                                 <hr>
-                                                <h5>Connections:</h5>
-
                                                 {% for link in links_data %}
                                                     {% if link.start_id == entry.id %}
                                                         <div class="d-flex mb-2">
@@ -229,6 +227,7 @@
                                                     <select class="link-role form-select me-2 connection-select"
                                                             aria-label="Select role" disabled>
                                                         <option selected>Select role</option>
+                                                                <option value="0">not specified</option>
                                                         {% for row in config_data %}
                                                             {% if row.config_class == 4 %}
                                                                 <option value="{{ row.id }}">{{ row.name }}</option>
@@ -236,7 +235,9 @@
                                                         {% endfor %}
                                                     </select>
                                                     <button data-domain="" data-range="" data-property=""
-                                                            data-direction="" data-role="" class="btn btn-primary"
+                                                            data-direction="" data-role="" data-tab="{{ tab.target }}"
+                                                            data-entry="{{ tab.target }}{{ entry.id }}"
+                                                            class="btn btn-primary" onclick="saveLinkValues(this)"
                                                             style="min-width: 75px" disabled>
                                                         Save
                                                     </button>
@@ -378,14 +379,14 @@
                 const selectNode = thisElement.nextElementSibling; // next sibling = select node dropdown
                 const configClassToShow = `config-class-${info.getAttribute('data-range')}`;
 
-                    Array.from(selectNode.options).forEach((option, i) => {
+                Array.from(selectNode.options).forEach((option, i) => {
 
-                        if (option.classList.contains(configClassToShow) || i === 0) {
-                            option.classList.remove('d-none');
-                        } else {
-                            option.classList.add('d-none');
-                        }
-                    });
+                    if (option.classList.contains(configClassToShow) || i === 0) {
+                        option.classList.remove('d-none');
+                    } else {
+                        option.classList.add('d-none');
+                    }
+                });
 
 
             }
@@ -395,6 +396,20 @@
             if (classList_.contains('link-role')) {
                 saveButton.setAttribute('data-role', info.value)
             }
+        }
+
+        function saveLinkValues(button) {
+            console.log(button)
+            let domain = button.getAttribute('data-domain')
+            let range = button.getAttribute('data-range')
+            if (button.getAttribute('data-direction') !== 'direct') {
+                domain = button.getAttribute('data-range')
+                range = button.getAttribute('data-domain')
+            }
+            const property = button.getAttribute('data-property')
+            const role = button.getAttribute('data-role')
+
+            window.location.href = `/admin/add_link/${domain}/${range}/${property}/${role}/${button.getAttribute('data-tab')}/${button.getAttribute('data-entry')}`
         }
 
 

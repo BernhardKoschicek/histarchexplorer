@@ -196,17 +196,14 @@ def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None, entry:
 
 
 # Add Links
-@app.route('/admin/add_link', methods=['GET', 'POST'])
+@app.route('/admin/add_link/<domain>/<range>/<prop>/<role>/<tab>/<entry>', methods=['GET', 'POST'])
 @login_required
-def add_link():
+def add_link(domain: Optional[int] = None, range: Optional[int] = None, prop: Optional[int] = None, role: Optional[int] = None, tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
-
-    current_tab = request.form.get('current_tab')
-    current_entry = request.form.get('current_entry')
-
-
-    return redirect(url_for('admin') + current_tab + '/' + current_entry)
+    g.cursor.execute(f'INSERT INTO tng.links (domain_id, range_id, property, attribute) VALUES ({domain}, {range}, {prop}, NULLIF({role}, 0))')
+    flash('Link added successfully', 'success')
+    return redirect(url_for('admin') + tab + '/' + entry)
 
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
