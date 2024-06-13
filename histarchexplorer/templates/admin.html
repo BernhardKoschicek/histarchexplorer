@@ -202,7 +202,7 @@
                                                     {% endif %}
                                                 {% endfor %}
                                                 <div class="d-flex mb-2">
-                                                    <select class="form-select me-2" aria-label="Select connection">
+                                                    <select class="form-select me-2" aria-label="Select connection" id="selectConnection">
                                                         <option selected>Select connection</option>
                                                         {% for row in config_properties %}
                                                             {% if tab.id == row.domain %}
@@ -210,14 +210,14 @@
                                                             {% endif %}
                                                         {% endfor %}
                                                     </select>
-                                                    <select class="form-select me-2" aria-label="Select node" disabled>
+                                                    <select class="form-select me-2" aria-label="Select node" id="selectNode" disabled>
                                                         <option selected>Select node</option>
                                                         {% for row in config_data %}
                                                             <option class="config-class-{{ row.config_class }} d-none"
                                                                     value="{{ row.id }}">{{ row.name }}</option>
                                                         {% endfor %}
                                                     </select>
-                                                    <select class="form-select me-2" aria-label="Select node" disabled>
+                                                    <select class="form-select me-2" aria-label="Select role" id="selectRole" disabled>
                                                         <option selected>Select role</option>
                                                         {% for row in config_data %}
                                                             {% if row.config_class == 4 %}
@@ -333,6 +333,36 @@
         }
 
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectConnection = document.getElementById('selectConnection');
+        const selectNode = document.getElementById('selectNode');
+
+        selectConnection.addEventListener('change', function () {
+            const selectedOption = selectConnection.options[selectConnection.selectedIndex];
+            //const isHasMember = selectedOption.text === 'has member'; - why doesnt this work?
+            const isHasMember = selectedOption.text.toLowerCase() === 'has member';
+
+            // Enable/disable the selectNode dropdown
+            selectNode.disabled = !isHasMember;
+
+            // Show or hide options based on config_class
+            const nodeOptions = selectNode.querySelectorAll('option');
+            nodeOptions.forEach(option => {
+                if (option.classList.contains('config-class-3')) {
+                    option.classList.toggle('d-none', !isHasMember);
+                } else {
+                    option.classList.add('d-none');
+                }
+            });
+
+            // Reset the node dropdown to its default state
+            selectNode.selectedIndex = 0;
+        });
+    });
+</script>
+
 
     <script src="{{ url_for('static', filename='js/adminButtons.js') }}"></script>
 {% endblock %}
