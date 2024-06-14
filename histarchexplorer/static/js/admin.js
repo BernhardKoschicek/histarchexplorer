@@ -57,6 +57,12 @@ function addEntry(category) {
     });
 })();
 
+document.getElementById('resetButton').addEventListener('click', function () {
+    if (confirm('Are you sure you want to reset the settings?')) {
+        window.location.href = '/reset';
+    }
+});
+
 
 function deleteEntry(id, name, tab) {
     const deleteName = document.getElementById('deleteName');
@@ -102,7 +108,7 @@ connectionSelects.forEach(selectConnection => {
 });
 
 function setSaveValues(classList, saveButton, info, thisElement) {
-    const { value } = info;
+    const {value} = info;
 
     if (classList.contains('link-type')) {
         saveButton.dataset.domain = info.getAttribute('data-entry');
@@ -137,7 +143,7 @@ function saveLinkValues(button) {
         [domain, range] = [range, domain];
     }
 
-    const { property, role, tab, entry } = button.dataset;
+    const {property, role, tab, entry} = button.dataset;
 
     // Construct URL and navigate
     window.location.href = `/admin/add_link/${domain}/${range}/${property}/${role}/${tab}/${entry}`;

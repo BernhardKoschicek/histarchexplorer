@@ -18,6 +18,9 @@
                 </div>
             {% endif %}
         {% endwith %}
+
+        <button id="resetButton" class="btn btn-danger">reset</button>
+
         <nav>
             <div class="nav nav-pills mb-2" id="nav-tab" role="tablist">
                 {% for tab in tabs %}
@@ -298,13 +301,15 @@
                                 <label for="InputMailModal" class="form-label">E-mail</label>
                                 <input type="email" class="form-control" id="InputMailModal" name="mail">
                                 <div class="invalid-feedback">Please provide a valid
-                                                                email-address: someone@somemail.com</div>
+                                    email-address: someone@somemail.com
+                                </div>
                             </div>
                             <div class="col-md-6 institutions-show projects-show modal-input">
                                 <label for="InputWebsiteModal" class="form-label">Website</label>
                                 <input type="url" class="form-control" id="InputWebsiteModal" name="website">
                                 <div class="invalid-feedback">Please provide a valid
-                                                                website url: https://someurl.com</div>
+                                    website url: https://someurl.com
+                                </div>
                             </div>
                             <div class="col-md-4 persons-show modal-input">
                                 <label for="InputOrcidModal" class="form-label">ORCID-ID</label>
