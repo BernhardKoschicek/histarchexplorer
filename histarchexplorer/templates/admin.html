@@ -3,6 +3,17 @@
 
 
 <div class="container py-5 en">
+    <h3>{{ _('Admin options') |upper }} <span class="text-body-secondary"> | DB Interface</span></h3>
+
+    <div class="team-card">
+        <!-- Principal Investigators - 3 Columns  -->
+        <div class="row">
+            <h5>{{ _('Mysterious buttons section') |upper }} </h5>
+        </div>
+         <button id="resetButton" class="btn btn-danger">Reset</button>
+    </div>
+
+
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="flash-messages mt-5 mb-5">
@@ -19,10 +30,10 @@
     {% endif %}
     {% endwith %}
 
-    <button id="resetButton" class="btn btn-danger">reset</button>
+
 
     <nav>
-        <div class="nav nav-pills mb-2" id="nav-tab" role="tablist">
+        <div class="nav nav-pills mt-3 mb-2" id="nav-tab" role="tablist">
             {% for tab in tabs %}
             <button class="nav-link{% if loop.first and not activetab %} active{% endif %} {% if activetab == tab.target %} active {% endif %}"
                     id="{{ tab.id }}" data-bs-toggle="tab"
