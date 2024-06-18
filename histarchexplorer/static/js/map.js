@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
 //        var accessToken = 'V2rWGMya8xJMEMpkjnXgkkPXM17NNEk3cNum1RvNUKMU6nspY9Bdi02PSyns93EA';
 //
 //        // Initialize the map
-//        var map = L.map('map').setView([47.5162, 14.5501], 6);
+//        var map = L.map('map', {zoomControl: false,}).setView([47.5162, 14.5501], 6);
 //
 //        // Define Jawg Light tile layer
 //        var Jawg_Light = L.tileLayer('https://tile.jawg.io/jawg-light/{z}/{x}/{y}{r}.png?access-token=' + accessToken, {

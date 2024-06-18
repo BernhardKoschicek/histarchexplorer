@@ -142,16 +142,17 @@ body {
 }
 
 #counters {
-  bottom: var(--logo-height);
   left: 0;
   right: 0;
+  bottom: 0;
   background-color: var(--counters-bg);
-  position: fixed;
+  position: absolute;
   z-index: 2;
 }
 
 #home-map {
   height: calc(100vh - var(--logo-height) - var(--navbar-height));
+  position: relative;
 }
 
 #map {
@@ -166,6 +167,12 @@ body {
 .map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
   -webkit-filter: grayscale(100%) opacity(0.9);
   filter: grayscale(100%) opacity(0.9);
+}
+
+#other-content {
+  overflow-y: auto; /* Enable vertical scrolling */
+  /* Optional: Add padding or margin as needed */
+  padding: 20px;
 }
 
 /*# sourceMappingURL=main.css.map */
