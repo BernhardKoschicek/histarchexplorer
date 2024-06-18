@@ -1,10 +1,10 @@
 @use '../globals' as *;
 
 #counters {
-  position: fixed;
-  bottom: rem(100);
+  bottom: var(--logo-height);
   left: 0;
   right: 0;
   background-color: var(--counters-bg-light);
+  position: fixed;
   z-index: 2;
 }
