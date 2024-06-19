@@ -7,20 +7,10 @@
 <!-- Leaflet JavaScript -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Custom JavaScript -->
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 
 
-<style>
-    #index-image {
-        background-image: url('/../static/images/index_map_bg/Blank_map_of_Europe_central_network.png');
-        opacity: 0.5;
-        background-size: cover;
-        background-position: center;
-        width: 100%;
-        max-height: 100%;
-    }
-</style>
+
+
 <div id="index-container">
     <div id="map" class="map-gray"></div>
     <div id="index-image">
@@ -47,7 +37,7 @@
             <p>Artifacts</p>
         </div>
         <div class="col-6 col-sm">
-            <h5 class="statistic-counter">6169</h4>
+            <h5 class="statistic-counter">6169</h5>
             <p>Sources</p>
         </div>
     </div>
@@ -55,5 +45,6 @@
 
 {% include 'footer.html' %}
 
-
+<!-- Custom JavaScript -->
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}

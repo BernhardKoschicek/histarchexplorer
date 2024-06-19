@@ -1,37 +1,12 @@
-document.addEventListener('DOMContentLoaded', function () {
-    function initializeMap() {
+const map = L.map('map', {
+    zoom: 13,
+    zoomControl: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    dragging: false,
+    tap: false
+}).setView([47.5162, 14.5501], 7);
 
-        // Initialize the map
-        var map = L.map('map', {zoomControl: false,}).setView([47.5162, 14.5501], 7);
+const Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {});
 
-        // Define OSM_HOT tile layer
-        var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 16
-        });
-
-        Esri_WorldGrayCanvas.addTo(map);
-    }
-
-    initializeMap();
-});
-
-
-//document.addEventListener('DOMContentLoaded', function () {
-//    function initializeMap() {
-//        var accessToken = 'V2rWGMya8xJMEMpkjnXgkkPXM17NNEk3cNum1RvNUKMU6nspY9Bdi02PSyns93EA';
-//
-//        // Initialize the map
-//        var map = L.map('map', {zoomControl: false,}).setView([47.5162, 14.5501], 6);
-//
-//        // Define Jawg Light tile layer
-//        var Jawg_Light = L.tileLayer('https://tile.jawg.io/jawg-light/{z}/{x}/{y}{r}.png?access-token=' + accessToken, {
-//            attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-//            minZoom: 0,
-//            maxZoom: 22
-//        });
-//
-//        // Add Jawg Light tile layer to the map
-//        Jawg_Light.addTo(map);
-//    }
-//    initializeMap();
-//});
+Esri_WorldGrayCanvas.addTo(map);

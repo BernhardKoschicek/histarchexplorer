@@ -9,7 +9,8 @@ from histarchexplorer import app
 
 @app.route('/')
 def index() -> str:
-    return render_template('index.html')
+    default_image = '/../static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
+    return render_template('index.html', default_image=default_image)
 
 
 @app.route('/entities')
