@@ -362,6 +362,7 @@ def reset():
         INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has affiliation', 'is affiliation of', (SELECT id FROM tng.config_classes WHERE name = 'person'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
         INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has translation', 'has translation', NULL, NULL);
         INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has core member', 'is core member of', (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
+        INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has core institution', 'is core institution of', (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
         
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Main Project', (SELECT id from tng.config_classes WHERE name = 'main-project'), NULL, NULL, NULL, NULL);
         
