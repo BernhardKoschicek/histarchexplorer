@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
     <div class="py-5 en">
-        <h2>{{ _('Project') |upper }} <span class="text-body-secondary"> | {{project.name}}</span></h2>
+        <h2>{{ _('Project') |upper }} <span class="text-body-secondary"> | {{project.name|upper}}</span></h2>
         <p style="margin-top: 10px;"> {{project.description}}
         </p>
     </div>
@@ -12,71 +12,21 @@
             <h2>TEAM <span class="text-body-secondary"> | ABOUT US</h2>
             {% for person in persons %}
             <div class="col-lg-4 text-center">
-                <img class="rounded-circle" src="{{person.image if person.image else '/static/images/team/cool_dude2.jpg'}}"
+                <img class="rounded-circle"
+                     src="{{person.image if person.image else '/static/images/team/cool_dude2.jpg'}}"
                      alt="{{person.name}}'s Foto" width="140" height="140">
                 <div class="team-card__member">
                     <p>{{ person.name }}</p>
                 </div>
-                <p>{{ person.role }}</p>
+                 <ul class="list-unstyled">
+                    {% for role in person.roles %}
+                    <li>{{ role }}</li>
+                    {% endfor %}
+                </ul>
             </div>
             {% endfor %}
         </div>
     </div>
-
-
-    <div class="row"> <!-- Wrap the col-lg-4 elements inside a row -->
-        <div class="col-lg-4 text-center">
-            <img class="rounded-circle"
-                 src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
-                 alt="Mimi Mitzekatzes Foto" width="100" height="100">
-            <div class="team-card__member">
-                <p>Mimi Mitzekatze</p>
-            </div>
-            <p>Main Coordinator, Principal Investigator, Design and Programming.</p>
-        </div>
-        <div class="col-lg-4 text-center">
-            <img class="rounded-circle"
-                 src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
-                 alt="Karl Karlovacs Foto" width="100" height="100">
-            <div class="team-card__member">
-                <p>Karl Karlovac</p>
-            </div>
-            <p>Principal Investigator, Bioarchaeology, Digitisation and Translations.</p>
-        </div>
-        <div class="col-lg-4 text-center">
-            <img class="rounded-circle"
-                 src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
-                 alt="Fabian Fancys Foto" width="100" height="100">
-            <div class="team-card__member">
-                <p>Fabian Fancy</p>
-            </div>
-            <p>Principal Investigator, Bioarchaeology, Digitisation and Translations.</p>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-4 text-center">
-            <img class="rounded-circle"
-                 src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
-                 alt="Henry Hasenfußs Foto" width="100" height="100">
-            <div class="team-card__member">
-                <p>Henry Hasenfuß</p>
-            </div>
-            <p>Principal Investigator, Bioarchaeology, Digitisation and Translations.</p>
-        </div>
-
-        <div class="col-lg-4 text-center">
-            <img class="rounded-circle"
-                 src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
-                 alt="Nina Niemandslands Foto" width="100" height="100">
-            <div class="team-card__member">
-                <p>Nina Niemandsland</p>
-            </div>
-            <p>Principal Investigator, Bioarchaeology, Digitisation and Translations.</p>
-        </div>
-    </div>
-
-</div>
 
 <div class="text-center py-5">
     <h2>{{ _('Sponsors')|upper }} <span class="text-body-secondary"> | {{ _('Cooperations')|upper }}</span></h2>
@@ -84,7 +34,7 @@
     <div class="sponsor-container">
         <div class="row">
             {% for institution in institutions %}
-            <div class="col-sm-4">
+            <div class="col-sm-4 text-center">
                 <h5>{{institution.name}}</h5>
                 <p> {{institution.address}}</p>
                 <a href="{{institution.website}}" target="_blank">Website</a>
@@ -93,39 +43,18 @@
         </div>
     </div>
 
-
-<div class="row legal">
-    <div class="col-md-7 legal-card">
-        <h4>{{ _('Legal Note') |upper }}</h4>
-        <p>{{ _('The creation, use, and non-commercial distribution of copies in
-            electronic or printed form are permitted, provided that the content is
-            not distorted and the source is acknowledged (source: NHM Vienna).
-            Texts, images, and graphics are protected by copyright and other
-            protective laws, unless otherwise indicated. Despite the greatest
-            possible care in the preparation of this website, the NHM Vienna cannot
-            guarantee the absence of errors or the accuracy of the information
-            contained therein. The NHM Vienna excludes all liability for damages
-            arising directly or indirectly from the use of the website.') }}</p>
-    </div>
-    <div class="col-md-5 team-card">
+    <div class="row legal">
+        <div class="col-md-7 legal-card">
+            <h4>{{ _('Legal Note') |upper }}</h4>
+            <p>{{project.legal_notice}}</p>
+        </div>
+        <div class="col-md-5 team-card">
             <span class="en" style="display: block;">
           <h4>{{ _('Imprint') |upper }}</h4>
-          {{ _('Natural History Museum Vienna') }}<br>
-          Burgring 7, 1010 Wien<br>
-          {{ _('Austria Tel.: +43 1 52177-0<') }}<br>
-          Fax: +43 1 52177-578<br>
-          Web: www.nhm-wien.ac.at<br>
-          E-Mail: info@nhm-wien.ac.at<br><br>
-          {{ _('Legal form: Scientific institution under public law') }}<br>
-          {{ _('Commercial register number: FN 236724 z') }}<br>
-          {{ _('Commercial register court: Commercial Court Vienna') }}<br>
-          UID No.: ATU38020609<br>
-          {{ _('Content and editorial responsibility: Natural History Museum Vienna') }}<br>
-          {{ _('Competent supervisory authority: Federal Chancellery, Concordiaplatz
-          2, 1010 Vienna') }}
+                <p>{{project.imprint}}</p>
         </span>
+        </div>
     </div>
-</div>
 </div>
 {% include 'footer.html' %}
 {% endblock %}

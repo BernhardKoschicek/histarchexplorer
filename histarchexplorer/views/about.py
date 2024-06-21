@@ -10,6 +10,7 @@ def about() -> str:
         WHERE config_class = '5'
     """
 
+
     g.cursor.execute(project_sql)
     project_result = g.cursor.fetchone()
 
@@ -56,12 +57,17 @@ def about() -> str:
     g.cursor.execute(persons_sql)
     persons_result = g.cursor.fetchall()
 
-    persons = []
+    persons = {}
     for row in persons_result:
-        persons.append({
-            'name': row[0],
-            'role': row[1],
-            'image': row[2]
-        })
+        person_name = row[0]
+        if person_name not in persons:
+            persons[person_name] = {
+                'name': row[0],
+                'roles': [],
+                'image': row[2]
+            }
+        persons[person_name]['roles'].append(row[1])
 
-    return render_template('about.html', project=project, institutions=institutions, persons=persons)
+    persons_list = list(persons.values())
+
+    return render_template('about.html', project=project, institutions=institutions, persons=persons_list)
