@@ -21,9 +21,10 @@ def about() -> str:
     }
 
     institutions_sql = """
-        SELECT c.name, c.address, c.website
+        SELECT c.name, c.address, c.website, r.name AS role
         FROM tng.links l
         JOIN tng.config c ON l.range_id = c.id
+        LEFT JOIN tng.config r ON l.attribute = r.id AND r.config_class = '3'
         WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5')
         AND c.config_class = '4'
     """
@@ -36,29 +37,30 @@ def about() -> str:
         institutions.append({
             'name': row[0],
             'address': row[1],
-            'website': row[2]
+            'website': row[2],
+            'role': row[3] if row[3] else "No role"  # Do we need this?
         })
 
-        persons_sql = """
-               SELECT p.name, r.name AS role
-               FROM tng.links l
-               JOIN tng.config p ON l.range_id = p.id
-               JOIN tng.config_properties cp ON l.property = cp.id
-               JOIN tng.config r ON l.attribute = r.id
-               WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5')
-               AND p.config_class = '2'
-               AND cp.id = 4  -- Assuming 'has core member' property ID is 4
-               AND r.config_class = '3'  -- Roles are in tng.config with config_class = '3'
-           """
+    persons_sql = """
+        SELECT p.name, r.name AS role
+        FROM tng.links l
+        JOIN tng.config p ON l.range_id = p.id
+        JOIN tng.config_properties cp ON l.property = cp.id
+        JOIN tng.config r ON l.attribute = r.id
+        WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5')
+        AND p.config_class = '2'
+        AND cp.id = 4 
+        AND r.config_class = '3' 
+    """
 
-        g.cursor.execute(persons_sql)
-        persons_result = g.cursor.fetchall()
+    g.cursor.execute(persons_sql)
+    persons_result = g.cursor.fetchall()
 
-        persons = []
-        for row in persons_result:
-            persons.append({
-                'name': row[0],
-                'role': row[1]
-            })
+    persons = []
+    for row in persons_result:
+        persons.append({
+            'name': row[0],
+            'role': row[1]
+        })
 
     return render_template('about.html', project=project, institutions=institutions, persons=persons)

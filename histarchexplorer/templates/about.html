@@ -13,7 +13,7 @@
     <ul>
         {% for institution in institutions %}
             <li>
-                <strong>{{ institution.name }}</strong><br>
+                <strong>{{ institution.name }} - {{ institution.role }}</strong><br>
                 <a href="{{ institution.website }}">{{ institution.website }}</a><br>
                 <p>{{ institution.address }}</p>
             </li>
