@@ -21,7 +21,7 @@ def about() -> str:
     }
 
     institutions_sql = """
-        SELECT c.name, c.description
+        SELECT c.name, c.address, c.website
         FROM tng.links l
         JOIN tng.config c ON l.range_id = c.id
         WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5')
@@ -35,7 +35,8 @@ def about() -> str:
     for row in institutions_result:
         institutions.append({
             'name': row[0],
-            'description': row[1]
+            'address': row[1],
+            'website': row[2]
         })
 
         persons_sql = """

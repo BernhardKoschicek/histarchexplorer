@@ -14,8 +14,8 @@
         {% for institution in institutions %}
             <li>
                 <strong>{{ institution.name }}</strong><br>
-                <a href="{{ institution.url }}">{{ institution.url }}</a><br>
-                <p>{{ institution.description }}</p>
+                <a href="{{ institution.website }}">{{ institution.website }}</a><br>
+                <p>{{ institution.address }}</p>
             </li>
         {% endfor %}
     </ul>
