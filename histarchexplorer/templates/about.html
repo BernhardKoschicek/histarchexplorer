@@ -28,10 +28,8 @@
         </div>
     </div>
 
-    <div class="text-center py-5">
-        <h2>{{ _('Sponsors')|upper }} <span class="text-body-secondary"> | {{ _('Cooperations')|upper }}</span></h2>
-
-        <div class="sponsor-container">
+        <div class="sponsor-container text-center py-5">
+            <h2>{{ _('Sponsors')|upper }} <span class="text-body-secondary "> | {{ _('Cooperations')|upper }}</span></h2>
             <div class="row">
                 {% for institution in institutions %}
                 <div class="col-sm-4 text-center">
@@ -56,6 +54,5 @@
             </div>
         </div>
     </div>
-</div>
 {% include 'footer.html' %}
 {% endblock %}
