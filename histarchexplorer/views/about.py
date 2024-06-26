@@ -1,12 +1,16 @@
 from flask import render_template, g
 from histarchexplorer import app
+from typing import Dict, Any, Tuple
 
-def capitalize_first(value):
+
+def capitalize_first(value: str) -> str:
     if not value:
         return ''
     return value[0].upper() + value[1:]
 
+
 app.jinja_env.filters['capitalize_first'] = capitalize_first
+
 
 @app.route('/about')
 def about() -> str:
@@ -16,10 +20,8 @@ def about() -> str:
         WHERE config_class = '5'
     """
 
-
     g.cursor.execute(project_sql)
     project_result = g.cursor.fetchone()
-
 
     project = {
         'name': project_result[0],
@@ -81,7 +83,7 @@ def about() -> str:
         print(f"Person: {person['name']}, Roles: {person['roles']}")
 
     # Sort the persons_list - main coordinator and principal investigator first
-    def prioritize_roles(person):
+    def prioritize_roles(person: Dict[str, Any]) -> Tuple[int, str]:
         roles_priority = {"main coordinator": 0, "principal investigator": 1}
         priority = min((roles_priority.get(role.lower(), 99) for role in person['roles']), default=99)
         return (priority, person['name'].lower())
