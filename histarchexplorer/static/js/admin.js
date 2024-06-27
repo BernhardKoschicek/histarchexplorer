@@ -186,10 +186,20 @@ document.addEventListener('DOMContentLoaded', function () {
             }));
 
             console.log('New order:', sortedItems);
+            saveSortOrder(sortedItems)
 
         }
     });
 
 });
 
+function saveSortOrder(items) {
+    fetch('/sortlinks', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ criteria: items }),
+    })
+}
 

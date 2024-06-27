@@ -1,7 +1,9 @@
+from datetime import datetime
 from typing import Optional
 
 from flask import render_template, abort, g, request, redirect, url_for, flash, jsonify
 from flask_login import current_user, login_required
+
 from histarchexplorer import app
 
 
@@ -157,7 +159,6 @@ def add_entry():
             flash(f'Error adding entry {name}: Only one main project allowed', 'danger')
             return redirect(url_for('admin') + current_tab)
 
-
         g.cursor.execute('''
                    INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class)
                    VALUES (
@@ -195,7 +196,6 @@ def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
         flash('Main Project cannot be deleted', 'danger')
         return redirect(url_for('admin') + tab)
 
-
     g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s', {'id': int(id)})
     flash('Entry deleted successfully!', 'success')
     return redirect(url_for('admin') + tab)
@@ -214,10 +214,12 @@ def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None, entry:
 
 @app.route('/admin/add_link/<domain>/<range>/<prop>/<role>/<tab>/<entry>', methods=['GET', 'POST'])
 @login_required
-def add_link(domain: Optional[int] = None, range: Optional[int] = None, prop: Optional[int] = None, role: Optional[int] = None, tab: Optional[str] = None, entry: Optional[str] = None) -> str:
+def add_link(domain: Optional[int] = None, range: Optional[int] = None, prop: Optional[int] = None,
+             role: Optional[int] = None, tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
-    g.cursor.execute(f'INSERT INTO tng.links (domain_id, range_id, property, attribute) VALUES ({domain}, {range}, {prop}, NULLIF({role}, 0))')
+    g.cursor.execute(
+        f'INSERT INTO tng.links (domain_id, range_id, property, attribute) VALUES ({domain}, {range}, {prop}, NULLIF({role}, 0))')
     flash('Link added successfully', 'success')
     return redirect(url_for('admin') + tab + '/' + entry)
 
@@ -257,7 +259,8 @@ def edit_entry():
         result = g.cursor.fetchone()
         if result:
             g.cursor.execute(editsql, {'description': description, 'name': name, 'address': address, 'email': mail,
-                                       'website': website, 'orcid_id': orcid, 'id': config_id, 'legal_note': legal_note, 'imprint': imprint})
+                                       'website': website, 'orcid_id': orcid, 'id': config_id, 'legal_note': legal_note,
+                                       'imprint': imprint})
             flash(f'"{name}" updated successfully', 'success')
         else:
             flash(f'Error updating {name}', 'danger')
@@ -265,6 +268,7 @@ def edit_entry():
         flash(f'Error updating {name}: {str(e)}', 'danger')
 
     return redirect(url_for('admin') + current_tab + '/' + current_entry)
+
 
 @app.route('/reset')
 @login_required
@@ -402,3 +406,20 @@ def reset():
 
     return redirect(url_for('admin'))
 
+
+@app.route('/sortlinks', methods=['POST'])
+def sortlinks() -> str:
+    @login_required
+    def reset():
+        if current_user.group not in ['admin', 'manager']:
+            abort(403)
+
+    data = request.get_json()
+    criteria = data['criteria']
+
+    print(criteria)
+    for row in criteria:
+        print(row['order'])
+        g.cursor.execute('UPDATE tng.links SET sortorder = %(order)s  WHERE id = %(id)s',
+                         {'id': row['id'], 'order': row['order']})
+    return jsonify({'status': 'ok'})
