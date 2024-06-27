@@ -3,7 +3,7 @@
 <div class="container">
     <div class="py-5 en">
         <h2>{{ _('Project') |upper }} <span class="text-body-secondary"> | {{project.name|upper}}</span></h2>
-        <p style="margin-top: 10px;"> {{project.description}}
+        <p style="margin-top: 10px;"> {{project.description | replace("\n", "<br>") | safe }}
         </p>
     </div>
     <div class="team-card">
@@ -58,7 +58,7 @@
             {% for institution in institutions %}
             <div class="col-sm-3 text-center">
                 <h5>{{institution.name}}</h5>
-                <p> {{institution.address}}</p>
+                <p> {{institution.address | replace("\n", "<br>") | safe }}</p>
                 <a href="{{institution.website}}" target="_blank">Website</a>
             </div>
             {% endfor %}
@@ -68,7 +68,7 @@
     <div class="row legal py-5">
         <div class="col-md-7 legal-card">
             <h4>{{ _('Legal Note') |upper }}</h4>
-            <p>{{project.legal_notice}}</p>
+            <p>{{project.legal_notice | replace("\n", "<br>") | safe }}</p>
         </div>
         <div class="col-md-5 team-card">
             <span class="en" style="display: block;">
