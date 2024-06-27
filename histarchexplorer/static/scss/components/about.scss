@@ -1,5 +1,5 @@
 .team-card {
-  padding: 1.5rem 1.5rem;
+  padding: 1.5rem;
   border-radius: 10px;
   background: var(--card-bg);
   color: black;
@@ -19,7 +19,7 @@
 }
 
 .legal-card {
-  padding: 1rem 1rem;
+  padding: 1rem;
   border-radius: 10px;
 }
 
@@ -33,9 +33,8 @@
       padding: 1.5rem;
       text-align: left;
       position: relative;
-      overflow: hidden; // Hide overflow to prevent border from overflowing
+      overflow: hidden;
 
-      // pseudo-element for border
       &::before {
         content: "";
         position: absolute;
@@ -46,11 +45,23 @@
         height: calc(100% - 4rem); // Border spans the height of the text
         background-color: grey;
       }
-    }
 
-    // Remove border from the last column
-    > div:last-child::before {
-      display: none;
+
+      &:nth-child(4n)::before {
+        display: none;
+      }
+
+      @media (max-width: 575px) {
+        &::before {
+          display: none;
+        }
+        border-bottom: 1px solid grey;
+
+        &:last-child {
+          border-bottom: none;
+
+        }
+      }
     }
   }
 

@@ -69,7 +69,7 @@ body {
 }
 
 .team-card {
-  padding: 1.5rem 1.5rem;
+  padding: 1.5rem;
   border-radius: 10px;
   background: var(--card-bg);
   color: black;
@@ -86,7 +86,7 @@ body {
 }
 
 .legal-card {
-  padding: 1rem 1rem;
+  padding: 1rem;
   border-radius: 10px;
 }
 
@@ -112,8 +112,19 @@ body {
   height: calc(100% - 4rem);
   background-color: grey;
 }
-.sponsor-container .row > div:last-child::before {
+.sponsor-container .row > div:nth-child(4n)::before {
   display: none;
+}
+@media (max-width: 575px) {
+  .sponsor-container .row > div {
+    border-bottom: 1px solid grey;
+  }
+  .sponsor-container .row > div::before {
+    display: none;
+  }
+  .sponsor-container .row > div:last-child {
+    border-bottom: none;
+  }
 }
 .sponsor-container a {
   color: grey; /* Set the color to grey */
