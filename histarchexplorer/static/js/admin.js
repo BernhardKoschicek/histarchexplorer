@@ -150,18 +150,46 @@ function saveLinkValues(button) {
 }
 
 
-
 document.addEventListener('DOMContentLoaded', function () {
-        var accordionContainer = document.getElementById('mapsAccordion');
+    var accordionContainer = document.getElementById('mapsAccordion');
 
-        new Sortable(accordionContainer, {
-            animation: 150,
-            handle: '.accordion-button', // Specify the handle for sorting
-            onEnd: function (evt) {
-                // This function runs when sorting is done
-                var items = Array.from(accordionContainer.getElementsByClassName('accordion-item'));
-                console.log('New order:', items.map(item => item.id));
-                // Optional: Save the new order in localStorage or any other storage
-            }
-        });
+    new Sortable(accordionContainer, {
+        animation: 150,
+        handle: '.accordion-button', // Specify the handle for sorting
+        onEnd: function (evt) {
+            // This function runs when sorting is done
+            var items = Array.from(accordionContainer.getElementsByClassName('accordion-item'));
+            console.log('New order:', items.map(item => item.id));
+            // Optional: Save the new order in localStorage or any other storage
+        }
     });
+
+
+    let linksSort = document.getElementById('nav-main-project-links');
+    console.log(linksSort)
+    let sortedItems= [];
+
+    new Sortable(linksSort, {
+        animation: 150,
+        handle: '.d-flex', // Specify the handle for sorting
+        onEnd: function (evt) {
+            const items = Array.from(linksSort.getElementsByClassName('d-flex'));
+             // Update order attribute based on visual sorting
+            items.forEach((item, index) => {
+                item.setAttribute("data-order", index + 1);
+            });
+
+            // Map items to array of objects with order and id
+            sortedItems = items.map(item => ({
+                order: item.getAttribute("data-order"),
+                id: item.getAttribute("data-id")
+            }));
+
+            console.log('New order:', sortedItems);
+
+        }
+    });
+
+});
+
+

@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container">
-    <div class="py-5 en">
+    <div class="py-5">
         <h2>{{ _('Project') |upper }} <span class="text-body-secondary"> | {{project.name|upper}}</span></h2>
-        <p style="margin-top: 10px;"> {{project.description | replace("\n", "<br>") | safe }}
+        <p class = "mt-2"> {{project.description | replace("\n", "<br>") | safe }}
         </p>
     </div>
     <div class="team-card">

@@ -87,7 +87,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     ]
 
     g.cursor.execute("""
-               SELECT l.id     AS link_id,
+               SELECT l.id     AS link_id, 
+               l.sortorder AS sortorder,
        s.id     AS start_id,
        s.name   AS start_name,
        cp.name  AS config_property,
@@ -103,7 +104,8 @@ FROM tng.links l
          JOIN tng.config_properties cp ON l.property = cp.id
          LEFT JOIN tng.config r ON l.attribute = r.id
 UNION ALL
-SELECT l.id        AS link_id,
+SELECT l.id        AS link_id, 
+        l.sortorder AS sortorder,
        s.id        AS start_id,
        s.name      AS start_name,
        cp.name_inv AS config_property,
@@ -118,6 +120,7 @@ FROM tng.links l
          JOIN tng.config e ON l.domain_id = e.id
          JOIN tng.config_properties cp ON l.property = cp.id
          LEFT JOIN tng.config r ON l.attribute = r.id
+         ORDER BY sortorder
     """)
     links_data = g.cursor.fetchall()
 
@@ -307,7 +310,8 @@ def reset():
             domain_id INT,
             range_id  INT,
             property  INT,
-            attribute INT
+            attribute INT,
+            sortorder INT
         );
         
         CREATE TABLE IF NOT EXISTS tng.config_classes
