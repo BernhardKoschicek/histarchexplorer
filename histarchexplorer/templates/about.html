@@ -37,17 +37,25 @@
     </div>
 
     <div class="sponsor-container text-center py-5">
-        <h2>{{ _('Sponsors')|upper }} <span class="text-body-secondary "> | {{ _('Cooperations')|upper }}</span></h2>
+        <h2>{{ _('Sponsors')|upper }} <span class="text-body-secondary"> | {{ _('Cooperations')|upper }}</span></h2>
         <div class="row">
             {% for institution in institutions %}
             <div class="col-sm-3 text-center">
-                <h5>{{institution.name}}</h5>
-                <p> {{institution.address | replace("\n", "<br>") | safe }}</p>
-                <a href="{{institution.website}}" target="_blank">Website</a>
+                {% if institution.image %}
+                <a href="{{ institution.website }}" target="_blank">
+                    <img src="{{ institution.image }}" alt="{{ institution.name }}'s Logo"
+                         style="max-height: 68px; width: auto;">
+                </a>
+                {% else %}
+                <h5 class="py-3">{{ institution.name }}</h5>
+                <a href="{{ institution.website }}" target="_blank">Website</a>
+                {% endif %}
+                <p class="py-3">{{ institution.address | replace("\n", "<br>") | safe }}</p>
             </div>
             {% endfor %}
         </div>
     </div>
+
 
     <div class="row legal py-5">
         <div class="col-md-7 legal-card">

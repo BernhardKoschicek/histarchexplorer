@@ -31,7 +31,7 @@ def about() -> str:
     }
 
     institutions_sql = """
-        SELECT c.name, c.address, c.website, role.name AS role
+        SELECT c.name, c.address, c.website, c.image, role.name AS role
         FROM tng.links l
         JOIN tng.config c ON l.range_id = c.id
         LEFT JOIN tng.config role ON l.attribute = role.id AND role.config_class = '3' --role name & config class
@@ -42,14 +42,19 @@ def about() -> str:
     g.cursor.execute(institutions_sql)
     institutions_result = g.cursor.fetchall()
 
+
     institutions = []
     for row in institutions_result:
         institutions.append({
             'name': row[0],
-            'address': row[1],
+            'address': row[1] if row[1] else " ",
             'website': row[2],
-            'role': row[3] if row[3] else "No role"  # Do we need this?
+            'role': row[4] if row[4] else "No role",
+            'image': row[3]
         })
+
+        for institution in institutions:
+            print(f"Name: {institution['name']}, Image: {institution['image']}")
 
     persons_sql = """
 SELECT p.name, p.image, COALESCE(b.name, '') AS role, COALESCE(a.name, '') AS affiliation, COALESCE(a.website, '') AS website
