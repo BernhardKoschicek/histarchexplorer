@@ -57,7 +57,7 @@ def about() -> str:
             print(f"Name: {institution['name']}, Image: {institution['image']}")
 
     persons_sql = """
-SELECT p.name, p.image, COALESCE(b.name, '') AS role, COALESCE(a.name, '') AS affiliation, COALESCE(a.website, '') AS website
+SELECT p.name, p.image, COALESCE(b.name, '') AS role, COALESCE(a.name, '') AS affiliation, COALESCE(a.website, '') AS website, COALESCE(p.email, '') AS email
 FROM tng.links l
 JOIN tng.config p ON l.range_id = p.id
 JOIN tng.config_properties cp ON l.property = cp.id
@@ -80,10 +80,11 @@ ORDER BY l.sortorder, l.id;
         if person_name not in persons:
             persons[person_name] = {
                 'name': row[0],
-                'roles': [],
+                'roles': [] ,
                 'image': row[1],
                 'affiliation': row[3],
-                'website': row[4]
+                'website': row[4],
+                'email': row[5]
             }
         persons[person_name]['roles'].append(row[2])
 
