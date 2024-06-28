@@ -37,6 +37,7 @@ def about() -> str:
         LEFT JOIN tng.config role ON l.attribute = role.id AND role.config_class = '3' --role name & config class
         WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5') -- only links concerning main-project
         AND c.config_class = '4'
+        ORDER BY l.sortorder, l.id;
     """
 
     g.cursor.execute(institutions_sql)

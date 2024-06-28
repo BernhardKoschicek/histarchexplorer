@@ -48,17 +48,17 @@
         <div class="row">
             {% for institution in institutions %}
             <div class="col-sm-3 text-center">
+                <h6 class="pt-3 text-decoration-underline">{{ institution.role | upper }}</h6>
                 {% if institution.image %}
                 <a href="{{ institution.website }}" target="_blank">
-                    <img src="{{ institution.image }}" alt="{{ institution.name }}'s Logo"
-                         style="max-height: 68px; width: auto;">
+                    <img src="{{ institution.image }}" alt="{{ institution.name }}'s Logo">
                 </a>
                 <h6 class="pt-3 text-body-secondary">{{ institution.name }}</h6>
                 {% else %}
                 <h5 class="py-3">{{ institution.name }}</h5>
                 <a href="{{ institution.website }}" target="_blank">Website</a>
                 {% endif %}
-                <p class="text-body-secondary">{{ institution.address | replace("\n", "<br>") | safe }}</p>
+                <p class="text-body-secondary text-wrap">{{ institution.address | replace("\n", "<br>") | safe }}</p>
             </div>
             {% endfor %}
         </div>

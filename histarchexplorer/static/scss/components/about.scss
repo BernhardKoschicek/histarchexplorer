@@ -27,7 +27,17 @@
   padding-top: 1rem;
 
   .row {
-    position: relative;
+    > .col-sm-3 {
+      img {
+        max-width: 100%;
+        height: auto;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(0.9);
+        }
+      }
+    }
 
     > div {
       padding: 1.5rem;
@@ -38,14 +48,13 @@
       &::before {
         content: "";
         position: absolute;
-        top: 50%; // Position the border vertically centered
-        transform: translateY(-50%); // Adjust to vertically center the border
+        top: 50%;
+        transform: translateY(-50%);
         right: 0;
         width: 1px;
-        height: calc(100% - 4rem); // Border spans the height of the text
+        height: calc(100% - 4rem);
         background-color: grey;
       }
-
 
       &:nth-child(4n)::before {
         display: none;
@@ -59,15 +68,8 @@
 
         &:last-child {
           border-bottom: none;
-
         }
       }
     }
-  }
-
-  // Styles for sponsor links
-  a {
-    color: grey; /* Set the color to grey */
-    text-decoration: underline; /* Add underline */
   }
 }

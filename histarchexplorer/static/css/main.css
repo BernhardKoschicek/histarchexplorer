@@ -93,8 +93,13 @@ body {
 .sponsor-container {
   padding-top: 1rem;
 }
-.sponsor-container .row {
-  position: relative;
+.sponsor-container .row > .col-sm-3 img {
+  max-width: 100%;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+.sponsor-container .row > .col-sm-3 img:hover {
+  transform: scale(0.9);
 }
 .sponsor-container .row > div {
   padding: 1.5rem;
@@ -125,10 +130,6 @@ body {
   .sponsor-container .row > div:last-child {
     border-bottom: none;
   }
-}
-.sponsor-container a {
-  color: grey; /* Set the color to grey */
-  text-decoration: underline; /* Add underline */
 }
 
 .footercontent {
