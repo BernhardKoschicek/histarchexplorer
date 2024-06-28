@@ -58,7 +58,7 @@
                 <h5 class="py-3">{{ institution.name }}</h5>
                 <a href="{{ institution.website }}" target="_blank">Website</a>
                 {% endif %}
-                <p class="text-body-secondary text-wrap">{{ institution.address | replace("\n", "<br>") | safe }}</p>
+                <p class="text-body-secondary">{{ institution.address | replace("\n", "<br>") | safe }}</p>
             </div>
             {% endfor %}
         </div>
