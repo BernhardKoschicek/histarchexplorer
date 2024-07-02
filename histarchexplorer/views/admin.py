@@ -278,32 +278,30 @@ def edit_map():
         abort(403)
 
     name = request.form.get('name')
-    display_name = request.form.get('display_name')
-    order = request.form.get('order')
-    tilestring = request.form.get('tilestring')
+    display_name = request.form.get('displayname')
+    sortorder = request.form.get('inputorder') if request.form.get('inputorder') else ''
+    tilestring = request.form.get('description')
     current_tab = request.form.get('current_tab')
-    map_id = request.form.get('map_id')  # Assuming map_id is passed in the form
+    map_id = request.form.get('map_id')
 
     editsql = """
-        UPDATE tng.map SET
+        UPDATE tng.maps SET
             name = NULLIF(%(name)s, ''),
             display_name = NULLIF(%(display_name)s, ''),
-            `order` = NULLIF(%(order)s, ''),  -- `order` is a reserved keyword, so use backticks
-            tilestring = NULLIF(%(tilestring)s, ''),
-            current_tab = NULLIF(%(current_tab)s, '')
+            sortorder = CASE WHEN %(sortorder)s = '' THEN NULL ELSE CAST(%(sortorder)s AS integer) END,
+            tilestring = NULLIF(%(tilestring)s, '')
         WHERE id = %(map_id)s
     """
 
     try:
-        g.cursor.execute('SELECT id FROM tng.map WHERE id = %(map_id)s', {'map_id': map_id})
+        g.cursor.execute('SELECT id FROM tng.maps WHERE id = %(map_id)s', {'map_id': map_id})
         result = g.cursor.fetchone()
         if result:
             g.cursor.execute(editsql, {
                 'name': name,
                 'display_name': display_name,
-                'order': order,
+                'sortorder': sortorder,
                 'tilestring': tilestring,
-                'current_tab': current_tab,
                 'map_id': map_id
             })
             flash(f'Map updated successfully', 'success')
@@ -312,8 +310,7 @@ def edit_map():
     except Exception as e:
         flash(f'Error updating map {map_id}: {str(e)}', 'danger')
 
-    return redirect(url_for('admin') + current_tab + '/' + name)
-
+    return redirect(url_for('admin'))
 
 
 @app.route('/reset')
