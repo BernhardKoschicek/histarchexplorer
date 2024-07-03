@@ -91,6 +91,15 @@ function deleteEntry(id, name, tab) {
     confirmedDelete.href = `/admin/delete_entry/${id}/${tab}`;
 }
 
+function deleteMap(id, name) {
+    const deleteName = document.getElementById('deleteName');
+    deleteName.textContent = name;
+
+    const confirmedDelete = document.getElementById('confirmedDelete');
+    confirmedDelete.href = `/admin/delete_map/${id}`;
+}
+
+
 function deleteLink(linkId, startName, configProperty, endName, tab, entry) {
     const deleteName = document.getElementById('deleteName');
     deleteName.textContent = `${startName} - ${configProperty} - ${endName} ?`;

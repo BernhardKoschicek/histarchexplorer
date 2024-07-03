@@ -343,9 +343,23 @@ def add_map():
         flash(f'Error adding map {name}: {str(e)}', 'map danger')
         return redirect(url_for('admin') + '/maps')
 
-    # This line should not be reached due to the redirects in try and except blocks
     return redirect(url_for('admin'))
 
+from flask import flash, redirect, url_for
+
+@app.route('/admin/delete_map/<int:map_id>')
+@login_required
+def delete_map(map_id: int) -> str:
+    if current_user.group not in ['admin', 'manager']:
+        abort(403)
+
+    try:
+        g.cursor.execute('DELETE FROM tng.maps WHERE id = %(map_id)s', {'map_id': map_id})
+        flash('Map deleted successfully!', 'map success')
+    except Exception as e:
+        flash(f'Error deleting map: {str(e)}', 'map danger')
+
+    return redirect(url_for('admin') + '/maps')
 
 @app.route('/reset')
 @login_required
