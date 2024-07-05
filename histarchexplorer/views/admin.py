@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from flask import render_template, abort, g, request, redirect, url_for, flash, jsonify
+from flask import render_template, abort, g, request, redirect, url_for, flash, jsonify, session
 from flask_login import current_user, login_required
 
 from histarchexplorer import app
@@ -275,7 +275,6 @@ def edit_entry():
     return redirect(url_for('admin') + current_tab + '/' + current_entry)
 
 
-
 @app.route('/edit_map', methods=['POST'])
 @login_required
 def edit_map():
@@ -317,6 +316,7 @@ def edit_map():
 
     return redirect(url_for('admin'))
 
+
 @app.route('/admin/add_map', methods=['POST'])
 @login_required
 def add_map():
@@ -345,7 +345,9 @@ def add_map():
 
     return redirect(url_for('admin'))
 
+
 from flask import flash, redirect, url_for
+
 
 @app.route('/admin/delete_map/<int:map_id>')
 @login_required
@@ -360,6 +362,30 @@ def delete_map(map_id: int) -> str:
         flash(f'Error deleting map: {str(e)}', 'map danger')
 
     return redirect(url_for('admin') + '/maps')
+
+
+@app.route('/choose_indexBg', methods=['POST'])
+def choose_index_bg():
+    default_image = '/../static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
+    selected_map_id = request.form.get('mapSelection')
+
+    # Fetch maps from database
+    g.cursor.execute('SELECT id, display_name, tilestring FROM tng.maps ORDER BY sortorder')
+    maps = g.cursor.fetchall()
+
+    if selected_map_id == 'default_image':
+        selected_map = default_image
+    else:
+        selected_map = next((map.tilestring for map in maps if map.id == selected_map_id), None)
+        if not selected_map:
+            selected_map = default_image
+
+    session['selected_map'] = selected_map
+    print(f"Selected Map ID: {selected_map_id}")
+
+    return redirect(url_for('index'))
+
+
 
 @app.route('/reset')
 @login_required
@@ -513,5 +539,5 @@ def sortlinks() -> str:
     for row in criteria:
         print(row['order'])
         g.cursor.execute(f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(id)s',
-                         {'id': row['id'], 'order': row['order'], 'table':table})
+                         {'id': row['id'], 'order': row['order'], 'table': table})
     return jsonify({'status': 'ok'})

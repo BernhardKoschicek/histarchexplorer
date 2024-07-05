@@ -580,13 +580,13 @@
         </div>
     </div>
 
-    <form method="POST" action="/process_selection">
+    <form method="POST" action="/choose_indexBg">
         <div class="card mt-5 mb-5">
             <div class="card-body">
                 <h5 class="card-title">{{ _('Index Page Options') | upper }}</h5>
                 <div class="form-group">
-                    <label for="selection">Select Map Background</label>
-                    <select class="form-control" id="selectMap" name="selection">
+                    <label for="mapSelection">Select Map Background</label>
+                    <select class="form-control" id="selectMap" name="mapSelection">
                         <option value="default_image">Default Image</option>
                         {% for map in maps %}
                         <option value="{{ map.id }}" data-tilestring="{{ map.tilestring }}">{{ map.display_name }}</option>
