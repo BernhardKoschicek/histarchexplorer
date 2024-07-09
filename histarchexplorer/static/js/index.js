@@ -16,8 +16,8 @@ function renderMap(selected_map) {
             tap: false
         }).setView([47.5162, 14.5501], 7);
 
-        const tileLayer = L.tileLayer(selected_map, {});
-        tileLayer.addTo(map);
+        const chosenMap = L.tileLayer(selected_map);
+        chosenMap.addTo(map);
 
         mapContainer.style.display = 'block';
         indexImageContainer.style.display = 'none';
