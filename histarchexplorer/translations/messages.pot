@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-14 12:41+0200\n"
+"POT-Creation-Date: 2024-07-15 12:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,105 +21,183 @@ msgstr ""
 msgid "Project"
 msgstr ""
 
-#: templates/about.html:6
-msgid ""
-"THANADOS (The Anthropological and Archaeological Database of Sepultures)\n"
-"            deals\n"
-"            with the digital collection and presentation of cemeteries "
-"investigated by means of archaeology,\n"
-"            anthropology and other related disciplinesWithin THANADOS "
-"information on burials is being digitised\n"
-"            according to FAIR principles and presented in English "
-"language. The data are mapped using the CIDOC CRM\n"
-"            and provided online. The information can be explored via a "
-"digital catalogue and within an interactive\n"
-"            map. Cartographic visualisations as well as charts and plots "
-"are created dynamically based on research\n"
-"            data.\n"
-"            It aims at providing a best practice way on how to "
-"disseminate archaeological sources and research in\n"
-"            the 21st century against the background of digital "
-"humanities.\n"
-"            It is based on the OpenAtlas system and entirely built upon "
-"open source technology. It started in 2019\n"
-"            within the projects MEDCEM based at the Czech Academy of "
-"Sciences and THANADOS (Austrian Archaeological\n"
-"            Institute and Natural History Museum Vienna) funded by the "
-"go!digital NextGeneration programme of the\n"
-"            Austrian Academy of Sciences (GDND 2018 039).\n"
-"            In 2022 THANADOS was transformed into a collaborative project"
-" coordinated and hosted by the Natural\n"
-"            History Museum Vienna\n"
-"            With international partners and cooperations based on mutual "
-"agreements the system is developed further\n"
-"            and new data are added continuously."
-msgstr ""
-
-#: templates/about.html:113
+#: templates/about.html:47
 msgid "Sponsors"
 msgstr ""
 
-#: templates/about.html:113
+#: templates/about.html:47
 msgid "Cooperations"
 msgstr ""
 
-#: templates/about.html:129
+#: templates/about.html:70
 msgid "Legal Note"
 msgstr ""
 
-#: templates/about.html:130
-msgid ""
-"The creation, use, and non-commercial distribution of copies in\n"
-"                electronic or printed form are permitted, provided that "
-"the content is\n"
-"                not distorted and the source is acknowledged (source: NHM"
-" Vienna).\n"
-"                Texts, images, and graphics are protected by copyright "
-"and other\n"
-"                protective laws, unless otherwise indicated. Despite the "
-"greatest\n"
-"                possible care in the preparation of this website, the NHM"
-" Vienna cannot\n"
-"                guarantee the absence of errors or the accuracy of the "
-"information\n"
-"                contained therein. The NHM Vienna excludes all liability "
-"for damages\n"
-"                arising directly or indirectly from the use of the "
-"website."
-msgstr ""
-
-#: templates/about.html:142
+#: templates/about.html:75
 msgid "Imprint"
 msgstr ""
 
-#: templates/about.html:143
-msgid "Natural History Museum Vienna"
+#: templates/admin.html:6
+msgid "admin options"
 msgstr ""
 
-#: templates/about.html:145
-msgid "Austria Tel.: +43 1 52177-0<"
+#: templates/admin.html:6
+msgid "DB Interface"
 msgstr ""
 
-#: templates/about.html:149
-msgid "Legal form: Scientific institution under public law"
+#: templates/admin.html:10
+msgid "tools"
 msgstr ""
 
-#: templates/about.html:150
-msgid "Commercial register number: FN 236724 z"
+#: templates/admin.html:12
+msgid "Reset"
 msgstr ""
 
-#: templates/about.html:151
-msgid "Commercial register court: Commercial Court Vienna"
+#: templates/admin.html:19
+msgid "maps"
 msgstr ""
 
-#: templates/about.html:153
-msgid "Content and editorial responsibility: Natural History Museum Vienna"
+#: templates/admin.html:28 templates/admin.html:42 templates/admin.html:168
+msgid "close"
 msgstr ""
 
-#: templates/about.html:154
-msgid ""
-"Competent supervisory authority: Federal Chancellery, Concordiaplatz\n"
-"          2, 1010 Vienna"
+#: templates/admin.html:74 templates/admin.html:224 templates/admin.html:482
+#: templates/admin.html:531
+msgid "name"
+msgstr ""
+
+#: templates/admin.html:80 templates/admin.html:91 templates/admin.html:230
+#: templates/admin.html:484 templates/admin.html:534
+msgid "Please provide a name"
+msgstr ""
+
+#: templates/admin.html:85 templates/admin.html:487
+msgid "Display Name"
+msgstr ""
+
+#: templates/admin.html:96 templates/admin.html:493
+msgid "order"
+msgstr ""
+
+#: templates/admin.html:102 templates/admin.html:496
+msgid "Please provide an order"
+msgstr ""
+
+#: templates/admin.html:109
+msgid "Leaflet Tile Layer String"
+msgstr ""
+
+#: templates/admin.html:121
+msgid "edit"
+msgstr ""
+
+#: templates/admin.html:129
+msgid "delete"
+msgstr ""
+
+#: templates/admin.html:133
+msgid "cancel"
+msgstr ""
+
+#: templates/admin.html:138 templates/admin.html:427 templates/admin.html:622
+msgid "save"
+msgstr ""
+
+#: templates/admin.html:151 templates/admin.html:440 templates/admin.html:523
+#: templates/admin.html:577
+msgid "add entry"
+msgstr ""
+
+#: templates/admin.html:159
+msgid "About Section content"
+msgstr ""
+
+#: templates/admin.html:236 templates/admin.html:537
+msgid "description"
+msgstr ""
+
+#: templates/admin.html:248 templates/admin.html:544
+msgid "address"
+msgstr ""
+
+#: templates/admin.html:254
+msgid "Please provide an address"
+msgstr ""
+
+#: templates/admin.html:262 templates/admin.html:548
+msgid "e-mail"
+msgstr ""
+
+#: templates/admin.html:269 templates/admin.html:550
+msgid "Please provide a valid mail address: someone@somemail.com"
+msgstr ""
+
+#: templates/admin.html:278
+msgid "website"
+msgstr ""
+
+#: templates/admin.html:285 templates/admin.html:556
+msgid "Please provide a valid website url: https://someurl.com"
+msgstr ""
+
+#: templates/admin.html:307 templates/admin.html:566
+msgid "imprint"
+msgstr ""
+
+#: templates/admin.html:315 templates/admin.html:570
+msgid "legal notice"
+msgstr ""
+
+#: templates/admin.html:329
+msgid "Edit"
+msgstr ""
+
+#: templates/admin.html:337 templates/admin.html:377
+msgid "Delete"
+msgstr ""
+
+#: templates/admin.html:341 templates/admin.html:461
+msgid "Cancel"
+msgstr ""
+
+#: templates/admin.html:346
+msgid "Save"
+msgstr ""
+
+#: templates/admin.html:389
+msgid "select connection"
+msgstr ""
+
+#: templates/admin.html:402
+msgid "select node"
+msgstr ""
+
+#: templates/admin.html:412
+msgid "select role"
+msgstr ""
+
+#: templates/admin.html:413
+msgid "not specified"
+msgstr ""
+
+#: templates/admin.html:454 templates/admin.html:462
+msgid "Confirm Delete"
+msgstr ""
+
+#: templates/admin.html:458
+msgid "Are you sure you want to delete"
+msgstr ""
+
+#: templates/admin.html:474 templates/admin.html:508
+msgid "Add Map"
+msgstr ""
+
+#: templates/admin.html:490
+msgid "Please provide a display name"
+msgstr ""
+
+#: templates/admin.html:589
+msgid "Index Page Options"
 msgstr ""
 
 #: templates/login.html:9
@@ -138,27 +216,55 @@ msgstr ""
 msgid "toggle dark/light mode"
 msgstr ""
 
-#: utils/util.py:8
+#: utils/view_util.py:8
 msgid "entities"
 msgstr ""
 
-#: utils/util.py:9
+#: utils/view_util.py:9
 msgid "search"
 msgstr ""
 
-#: utils/util.py:10
+#: utils/view_util.py:10
 msgid "about"
 msgstr ""
 
-#: utils/util.py:16
+#: utils/view_util.py:11
+msgid "test"
+msgstr ""
+
+#: utils/view_util.py:17
 msgid "browse/select/find all entities"
 msgstr ""
 
-#: utils/util.py:17
+#: utils/view_util.py:18
 msgid "detailed search"
 msgstr ""
 
-#: utils/util.py:18
+#: utils/view_util.py:19
 msgid "about the project"
+msgstr ""
+
+#: utils/view_util.py:20
+msgid "look at what is possible"
+msgstr ""
+
+#: views/admin.py:55
+msgid "main-project"
+msgstr ""
+
+#: views/admin.py:63
+msgid "projects"
+msgstr ""
+
+#: views/admin.py:71
+msgid "persons"
+msgstr ""
+
+#: views/admin.py:78
+msgid "institutions"
+msgstr ""
+
+#: views/admin.py:85
+msgid "attributes"
 msgstr ""
 

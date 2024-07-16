@@ -3,6 +3,7 @@ from typing import Optional
 
 from flask import render_template, abort, g, request, redirect, url_for, flash, jsonify, session
 from flask_login import current_user, login_required
+from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
 
@@ -15,7 +16,13 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
-    g.cursor.execute('SELECT * FROM tng.config ORDER BY name')
+    language = session.get(
+        'language',
+        request.accept_languages.best_match(
+            app.config['LANGUAGES'].keys()))
+
+
+    g.cursor.execute(f"SELECT * FROM tng.config ORDER BY (name->>'{language}')")
     config_data = g.cursor.fetchall()
 
     g.cursor.execute('SELECT * FROM tng.maps ORDER BY sortorder')
@@ -51,7 +58,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     tabs = [
         {
             'id': 'nav-main-project-tab',
-            'label': 'main-project',
+            'label': _('main-project'),
             'target': 'nav-main-project',
             'filter': mainproject,
             'id': 5
@@ -59,7 +66,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         },
         {
             'id': 'nav-projects-tab',
-            'label': 'projects',
+            'label': _('projects'),
             'target': 'nav-projects',
             'filter': projects,
             'id': 1
@@ -67,21 +74,21 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         },
         {
             'id': 'nav-persons-tab',
-            'label': 'persons',
+            'label': _('persons'),
             'target': 'nav-persons',
             'filter': persons,
             'id': 2
         },
         {
             'id': 'nav-institutions-tab',
-            'label': 'institutions',
+            'label': _('institutions'),
             'target': 'nav-institutions',
             'filter': institutions,
             'id': 4
         },
         {
             'id': 'nav-attributes-tab',
-            'label': 'attributes',
+            'label': _('attributes'),
             'target': 'nav-attributes',
             'filter': roles,
             'id': 3
@@ -153,7 +160,10 @@ FROM tng.links l
 def add_entry():
     if current_user.group not in ['admin', 'manager']:
         abort(403)
-
+    language = session.get(
+            'language',
+            request.accept_languages.best_match(
+                app.config['LANGUAGES'].keys()))
     category = request.form.get('category')
     current_tab = 'nav-' + category
     name = request.form.get('name')
@@ -413,22 +423,21 @@ def reset():
         );
         
         INSERT INTO tng.maps (name, display_name, tilestring, sortorder) 
-            VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: "&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors"});', 1);
+            VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1);
         
         CREATE TABLE IF NOT EXISTS tng.config
         (
             id           SERIAL PRIMARY KEY,
-            name         TEXT,
-            description  TEXT,
-            address      TEXT,
+            name         JSONB,
+            description  JSONB,
+            address      JSONB,
             config_class INT,
             email        TEXT,
             orcid_id     TEXT,
             image        TEXT,
             website      TEXT,
-            legal_notice TEXT,
-            imprint      TEXT,
-            language     TEXT DEFAULT 'en'
+            legal_notice JSONB,
+            imprint      JSONB
         );
         
         CREATE TABLE IF NOT EXISTS tng.links
@@ -451,9 +460,9 @@ def reset():
         CREATE TABLE IF NOT EXISTS tng.config_properties
         (
             id          SERIAL PRIMARY KEY,
-            name        TEXT,
-            name_inv    TEXT,
-            description TEXT,
+            name        JSONB,
+            name_inv    JSONB,
+            description JSONB,
             domain      INT,
             range       INT
         );
@@ -493,38 +502,88 @@ def reset():
         INSERT INTO tng.config_classes (name) VALUES ('main-project');
         INSERT INTO tng.config_classes (name) VALUES ('language_code');
         
-        INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has member', 'is member of', (SELECT id FROM tng.config_classes WHERE name = 'project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
-        INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has affiliation', 'is affiliation of', (SELECT id FROM tng.config_classes WHERE name = 'person'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
-        INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has translation', 'has translation', NULL, NULL);
-        INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has core member', 'is core member of', (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
-        INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has core institution', 'is core institution of', (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
+        INSERT INTO tng.config_properties (name, name_inv, domain, range)
+            VALUES ('{"de": "hat Mitglied", "en": "has member"}'::jsonb, '{"de": "ist Mitglied von", "en": "is member of"}'::jsonb, 
+                    (SELECT id FROM tng.config_classes WHERE name = 'project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
+            
+            INSERT INTO tng.config_properties (name, name_inv, domain, range)
+            VALUES ('{"de": "hat Zugehörigkeit", "en": "has affiliation"}'::jsonb, '{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}'::jsonb, 
+                    (SELECT id FROM tng.config_classes WHERE name = 'person'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
+            
+            INSERT INTO tng.config_properties (name, name_inv, domain, range)
+            VALUES ('{"de": "hat Übersetzung", "en": "has translation"}'::jsonb, '{"de": "hat Übersetzung", "en": "has translation"}'::jsonb, NULL, NULL);
+            
+            INSERT INTO tng.config_properties (name, name_inv, domain, range)
+            VALUES ('{"de": "hat Kernmitglied", "en": "has core member"}'::jsonb, '{"de": "ist Kernmitglied von", "en": "is core member of"}'::jsonb, 
+                    (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
+            
+            INSERT INTO tng.config_properties (name, name_inv, domain, range)
+            VALUES ('{"de": "hat Kerninstitution", "en": "has core institution"}'::jsonb, '{"de": "ist Kerninstitution von", "en": "is core institution of"}'::jsonb, 
+                    (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Main Project', (SELECT id from tng.config_classes WHERE name = 'main-project'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Hauptprojekt", "en": "Main Project"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'main-project'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Stefan Eichert', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Lisa Aldrian', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('David Ruß', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Stefan Eichert", "en": "Stefan Eichert"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('principial investigator', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('main coordinator', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('project researcher', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('software developer', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('design & programming', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('archaeologist', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('anthropologist', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('data acquisition', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('historian', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Lisa Aldrian", "en": "Lisa Aldrian"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('sponsor', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, 'https://example.exampe');
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('partner', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, 'https://example.exampe');
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "David Ruß", "en": "David Ruß"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('THANADOS', (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('RELIC', (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('REPLICO', (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Projektleitung", "en": "Principal Investigator"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('NHM', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('University of Vienna', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
-        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Austrian Centre for Digital Humanities & Cultural Heritage', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Hauptkoordinator", "en": "Main Coordinator"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Forscher", "en": "Researcher"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Softwareentwickler", "en": "Software Developer"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Design & Programmierung", "en": "Design & Programming"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Archäologe", "en": "Archaeologist"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Anthropologe", "en": "Anthropologist"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Datenaufnahme", "en": "Data Acquisition"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Historiker", "en": "Historian"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Sponsor", "en": "Sponsor"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'https://example.example', NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Partner", "en": "Partner"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'https://example.example', NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "THANADOS", "en": "THANADOS"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "RELIC", "en": "RELIC"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "REPLICO", "en": "REPLICO"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "NHM", "en": "NHM"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"de": "Universität Wien", "en": "University of Vienna"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website)
+        VALUES ('{"en": "Austrian Centre for Digital Humanities & Cultural Heritage"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
+
         
         CREATE TABLE IF NOT EXISTS tng.settings
         (
