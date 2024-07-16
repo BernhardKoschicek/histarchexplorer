@@ -314,7 +314,7 @@
                                             <div class="col-lg col-md-4">
                                                 <label for="InputImage" class="form-label">Image URL</label>
                                                 <input type="text" class="form-control" id="InputImage" name="image"
-                                                       placeholder="Please provide a square image for Team members"
+                                                       placeholder="Please provide a square image"
                                                        value="{{ entry.image or '' }}" disabled>
                                                 {% if entry.image %}
                                                 <img class="mt-2" src="{{ entry.image }}" alt="{{ entry.name }}'s Logo" width="140" height="140">
@@ -568,7 +568,7 @@
                                     <label for="InputAddressModal" class="form-label">Address</label>
                                     <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
                                     <label for="InputImageModal" class="form-label">Image URL</label>
-                                    <input type="text" class="form-control" id="InputImageModal" name="image">
+                                    <input type="text" class="form-control" id="InputImageModal" name="image"  placeholder="Please provide a square image for team members and a logo with a height of 68px for institutions">
                                 </div>
                             </div>
 
