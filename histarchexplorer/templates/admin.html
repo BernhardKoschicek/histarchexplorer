@@ -254,6 +254,17 @@
                                                 <div class="invalid-feedback">Please provide an
                                                     address.
                                                 </div>
+                                                <div class="col-lg col-md-12 mt-4">
+                                                    <label for="InputImage" class="form-label">Image URL</label>
+                                                    <input type="text" class="form-control" id="InputImage" name="image"
+                                                           placeholder="Please provide a logo with 68px height"
+                                                           value="{{ entry.image or '' }}" disabled>
+                                                    {% if entry.image %}
+                                                    <img class="mt-2" src="{{ entry.image }}"
+                                                         alt="{{ entry.name }}'s Logo">
+                                                    {% endif %}
+                                                    </a>
+                                                </div>
                                             </div>
                                             {% endif %}
 
@@ -270,15 +281,6 @@
                                                 <div class="invalid-feedback">Please provide a valid
                                                     email-address: someone@somemail.com
                                                 </div>
-                                            </div>
-                                            <div class="col-lg col-md-12">
-                                                <label for="InputImage" class="form-label">Image URL</label>
-                                                <input type="text" class="form-control" id="InputImage" name="image"
-                                                       value="{{ entry.image or '' }}" disabled>
-                                                {% if entry.image %}
-                                                <img class="mt-2" src="{{ entry.image }}" alt="{{ entry.name }}'s Logo">
-                                                {% endif %}
-                                                </a>
                                             </div>
                                             {% endif %}
 
@@ -308,6 +310,16 @@
                                                        value="{{ entry.orcid_id or '' }}"
                                                        aria-describedby="orcidHelp{{ entry.id }}"
                                                        disabled>
+                                            </div>
+                                            <div class="col-lg col-md-4">
+                                                <label for="InputImage" class="form-label">Image URL</label>
+                                                <input type="text" class="form-control" id="InputImage" name="image"
+                                                       placeholder="Please provide a square image for Team members"
+                                                       value="{{ entry.image or '' }}" disabled>
+                                                {% if entry.image %}
+                                                <img class="mt-2" src="{{ entry.image }}" alt="{{ entry.name }}'s Logo" width="140" height="140">
+                                                {% endif %}
+                                                </a>
                                             </div>
                                             {% endif %}
                                         </div>
