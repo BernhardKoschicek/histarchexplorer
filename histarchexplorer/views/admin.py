@@ -189,8 +189,9 @@ def add_entry():
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
-                    NULLIF(%s, ''),
-                    %s
+                    %s,
+                    NULLIF(%s, '')
+                   
                 ) RETURNING id
                ''', (name, description, address, mail, website, orcid, tab_config_class, image))
 
