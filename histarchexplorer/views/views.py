@@ -19,7 +19,18 @@ def index():
 
 @app.route('/entities')
 def entities() -> str:
-    return render_template('entities.html')
+    g.cursor.execute('''
+        SELECT openatlas_class_name, COUNT(*) as count
+        FROM tng.entity
+        GROUP BY openatlas_class_name
+        ORDER BY count DESC
+    ''')
+
+    entities = g.cursor.fetchall()
+    # list of tuples to dictionary (entities_dict); keys = entities; values = associated IDs.
+    entities_dict = {entity[0]: entity[1] for entity in entities}
+
+    return render_template('entities.html', entities=entities_dict)
 
 
 @app.route('/search')
