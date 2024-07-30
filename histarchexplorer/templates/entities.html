@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
 
-hello ennts
-
 <section class="container entity-cards">
 {% for class_name, count in entities.items() %}
 <div id="{{ class_name | lower }}s-card" class="entity-card entity-card--{{ class_name | lower }}s">
