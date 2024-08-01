@@ -2,12 +2,28 @@
 $nav-link-color: #559f55;
 $nav-pills-link-active-bg: #559f55;
 
-//.my-custom-button {
-//  @include button-variant(#559f55, darken(#559f55, 10%), white);
-//}
-
 .accordion-button:not(.collapsed) {
 $accordion-active-color: #559f55;
 $accordion-active-bg: #559f55;}
 
+
+
 @import '../../node_modules/bootstrap/scss/bootstrap';
+
+$btn-bg: #559f55;
+
+.btn-primary {
+  background-color: $btn-bg;
+  color: white;
+  border-color: darken($btn-bg, 10%);
+
+  &:hover {
+    background-color: darken($btn-bg, 10%);
+    border-color: darken($btn-bg, 15%);
+  }
+}
+
+
+.my-custom-button {
+  @include button-variant(#559f55, darken(#559f55, 10%), white);
+}
