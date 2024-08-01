@@ -12063,6 +12063,7 @@ textarea.form-control-lg {
 .entity-card {
   position: relative;
   overflow: hidden;
+  margin: 1.25rem;
   background: var(--card-bg);
   color: var(--text-color2);
   text-align: center;
@@ -12070,6 +12071,12 @@ textarea.form-control-lg {
   border-radius: 0.3125rem;
   transition: backbround 150ms ease-in-out;
   cursor: pointer;
+}
+@media (max-width: 31.188em) {
+  .entity-card {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 .entity-card:hover {
   background: var(--card-hover);

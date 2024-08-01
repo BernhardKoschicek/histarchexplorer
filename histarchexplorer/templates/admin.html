@@ -21,7 +21,7 @@
                         <ul class="dropdown-menu" aria-labelledby="entityDropdown">
 
                             {% for view_class in view_classes %}
-                            <li><h6 class="dropdown-header">{{view_class}}</h6></li>
+                            <li><h6 class="dropdown-header">{{view_class |upper}}</h6></li>
                             {% for category in (view_classes[view_class]): %}
                             <li>
                                 <div class="form-check ms-3">

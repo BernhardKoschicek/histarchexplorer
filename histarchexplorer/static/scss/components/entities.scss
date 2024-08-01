@@ -20,6 +20,7 @@
 .entity-card {
   position: relative;
   overflow: hidden;
+  margin: rem(20);
   background: var(--card-bg);
   color: var(--text-color2);
   text-align: center;
@@ -27,6 +28,10 @@
   border-radius: rem(5);
   transition: backbround 150ms ease-in-out;
   cursor: pointer;
+
+  @include breakpoint-down('mini') {
+    margin-left: 0;
+    margin-right: 0;}
 
 
   &:hover {
