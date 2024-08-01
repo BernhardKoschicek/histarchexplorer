@@ -39,7 +39,8 @@
 
   }
 
-  &--persons {
+
+  &--actors {
     border-top: rem(5) solid var(--pink);
 
   }
@@ -49,7 +50,7 @@
 
   }
 
-  &--artifacts {
+  &--items {
     border-top: rem(5) solid var(--light-orange);
 
   }
@@ -59,7 +60,7 @@
 
   }
 
-  &--references {
+  &--files {
     border-top: rem(5) solid var(--dark-greyblue);
 
   }

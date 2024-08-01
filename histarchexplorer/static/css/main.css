@@ -12077,19 +12077,19 @@ textarea.form-control-lg {
 .entity-card--places {
   border-top: 0.3125rem solid var(--limegreen);
 }
-.entity-card--persons {
+.entity-card--actors {
   border-top: 0.3125rem solid var(--pink);
 }
 .entity-card--events {
   border-top: 0.3125rem solid var(--blue);
 }
-.entity-card--artifacts {
+.entity-card--items {
   border-top: 0.3125rem solid var(--light-orange);
 }
 .entity-card--sources {
   border-top: 0.3125rem solid var(--reddish-brown);
 }
-.entity-card--references {
+.entity-card--files {
   border-top: 0.3125rem solid var(--dark-greyblue);
 }
 .entity-card__icon img {

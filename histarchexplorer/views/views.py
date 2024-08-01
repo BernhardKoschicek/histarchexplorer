@@ -17,20 +17,7 @@ def index():
 
     return render_template('index.html', map=map.tilestring, img=data.index_img, img_map=data.img_map, greyscale=data.greyscale)
 
-@app.route('/entities')
-def entities() -> str:
-    g.cursor.execute('''
-        SELECT openatlas_class_name, COUNT(*) as count
-        FROM tng.entity
-        GROUP BY openatlas_class_name
-        ORDER BY count DESC
-    ''')
 
-    entities = g.cursor.fetchall()
-    # list of tuples to dictionary (entities_dict); keys = entities; values = associated IDs.
-    entities_dict = {entity[0]: entity[1] for entity in entities}
-
-    return render_template('entities.html', entities=entities_dict)
 
 
 @app.route('/search')
