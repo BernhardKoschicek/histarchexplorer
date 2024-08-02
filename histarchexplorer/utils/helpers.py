@@ -2,7 +2,6 @@ from flask import request, session
 from histarchexplorer import app
 
 def get_translation(item):
-    print(item)
     language = session.get(
         'language',
         request.accept_languages.best_match(

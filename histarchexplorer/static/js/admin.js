@@ -199,14 +199,19 @@ new Sortable(accordionContainer, {
 });
 
 
-const linksSort = document.getElementById('nav-main-project-links');
+const sortableDivs = Array.from(document.getElementsByClassName('link-divs'))
 let sortedItems = [];
 
-new Sortable(linksSort, {
+sortableDivs.forEach((item) => {
+            makeSortables(item)
+        });
+
+function makeSortables(containerDiv) {
+new Sortable(containerDiv, {
     animation: 150,
     handle: '.d-flex', // Specify the handle for sorting
     onEnd: function (evt) {
-        const items = Array.from(linksSort.getElementsByClassName('d-flex'));
+        const items = Array.from(containerDiv.getElementsByClassName('d-flex'));
         // Update order attribute based on visual sorting
         items.forEach((item, index) => {
             item.setAttribute("data-order", index + 1);
@@ -220,7 +225,7 @@ new Sortable(linksSort, {
         saveSortOrder(sortedItems, 'links')
     }
 });
-
+}
 
 function saveSortOrder(items, table) {
     fetch('/sortlinks', {
