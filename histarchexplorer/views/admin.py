@@ -1,4 +1,4 @@
-from datetime import datetime
+import json
 from typing import Optional
 
 from flask import render_template, abort, g, request, redirect, url_for, flash, jsonify, session
@@ -7,6 +7,22 @@ from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
 
+
+def update_jsonb_column(column_name, value, language, config_id):
+    if value != '':
+        value_to_be_inserted_json = json.dumps(value)
+        update_query = f"""
+            UPDATE tng.config
+            SET {column_name} = jsonb_set(COALESCE({column_name}, '{{}}'), '{{{language}}}', '{value_to_be_inserted_json}', true)
+            WHERE id = {int(config_id)}
+        """
+    else:
+        update_query = f"""
+            UPDATE tng.config
+            SET {column_name} = COALESCE({column_name}, '{{}}') - '{language}'
+            WHERE id = {int(config_id)}
+        """
+    g.cursor.execute(update_query)
 
 @app.route('/admin/')
 @app.route('/admin/<tab>')
@@ -21,9 +37,32 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         request.accept_languages.best_match(
             app.config['LANGUAGES'].keys()))
 
+    preferred_lan = app.config['PREFERRED_LANGUAGE']
+
+    def get_translation(item):
+        for key in item:
+            if key == language:
+                return {'language':key, 'label':item[key]}
+        for key in item:
+            if key == preferred_lan:
+                return {'language':key, 'label':item[key]}
+        return { 'language': next(iter(item)), 'label': item[next(iter(item))]}
 
     g.cursor.execute(f"SELECT * FROM tng.config ORDER BY (name->>'{language}')")
     config_data = g.cursor.fetchall()
+
+    entities = []
+    for item in config_data:
+        entity = {'id':item.id, 'config_class': item.config_class, 'website': item.website, 'email': item.email, 'orcid_id': item.orcid_id, 'image': item.image}
+
+        for column in ['name','description','imprint','address','legal_notice']:
+            entity[column] = {}
+            if getattr(item, column):
+                for key, value in getattr(item, column).items():
+                    entity[column][key] = value
+                entity[column]['display'] = get_translation(entity[column])
+
+        entities.append(entity)
 
     g.cursor.execute('SELECT * FROM tng.maps ORDER BY sortorder')
     map_data = g.cursor.fetchall()
@@ -36,6 +75,14 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         UNION ALL
         SELECT id, name_inv, range,domain, 'inverse' AS direction FROM tng.config_properties''')
     config_properties = g.cursor.fetchall()
+
+    colnames = [desc[0] for desc in g.cursor.description]
+
+    config_list = [dict(zip(colnames, row)) for row in config_properties]
+
+
+    for row in config_list:
+        row['name'] = get_translation(row['name'])
 
     mainproject = []
     projects = []
@@ -131,7 +178,21 @@ FROM tng.links l
          LEFT JOIN tng.config r ON l.attribute = r.id
          ORDER BY sortorder
     """)
+
     links_data = g.cursor.fetchall()
+
+    colnames = [desc[0] for desc in g.cursor.description]
+
+    links_list = [dict(zip(colnames, row)) for row in links_data]
+
+
+    for row in links_list:
+        row['start_name'] = get_translation(row['start_name'])
+        row['end_name'] = get_translation(row['end_name'])
+        row['config_property'] = get_translation(row['config_property'])
+        row['role'] = get_translation(row['role'])
+
+
     map_id = request.args.get('map_id')
 
     if map_id:
@@ -150,9 +211,9 @@ FROM tng.links l
     else:
         settings['not_sel'] = 'image'
 
-    return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_data, config_properties=config_properties, maps=map_data, map=map,
-                           settings=settings)
+    return render_template("/admin.html", config_data=entities, tabs=tabs, activetab=tab, activeentry=entry,
+                           links_data=links_list, config_properties=config_list, maps=map_data, map=map,
+                           settings=settings, entities=entities)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -166,12 +227,14 @@ def add_entry():
                 app.config['LANGUAGES'].keys()))
     category = request.form.get('category')
     current_tab = 'nav-' + category
-    name = request.form.get('name')
     description = request.form.get('description')
+    name = request.form.get('name')
     address = request.form.get('address')
     mail = request.form.get('mail')
     website = request.form.get('website')
     orcid = request.form.get('orcid')
+    legal_notice = request.form.get('legalnotice')
+    imprint = request.form.get('imprint')
 
     config_class_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
@@ -188,19 +251,26 @@ def add_entry():
             return redirect(url_for('admin') + current_tab)
 
         g.cursor.execute('''
-                   INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class)
+                   INSERT INTO tng.config (name, email, website, orcid_id, config_class)
                    VALUES (
-                    NULLIF(%s, ''),
-                    NULLIF(%s, ''),
-                    NULLIF(%s, ''),
+                    '{"de": "Stefan Eichert", "en": "Stefan Eichert"}'::jsonb,
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
                     %s
                 ) RETURNING id
-               ''', (name, description, address, mail, website, orcid, tab_config_class))
+               ''', (mail, website, orcid, tab_config_class))
 
         new_entry_id = g.cursor.fetchone()[0]
+        config_id = new_entry_id
+
+        update_jsonb_column('name', name, language, config_id)
+        update_jsonb_column('address', address, language, config_id)
+        update_jsonb_column('description', description, language, config_id)
+        update_jsonb_column('imprint', imprint, language, config_id)
+        update_jsonb_column('legal_notice', legal_notice, language, config_id)
+
+
 
         flash('Entry added successfully!', 'success')
         return redirect(url_for('admin') + current_tab + '/' + current_tab + str(new_entry_id))
@@ -258,6 +328,11 @@ def edit_entry():
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
+    language = session.get(
+        'language',
+        request.accept_languages.best_match(
+            app.config['LANGUAGES'].keys()))
+
     description = request.form.get('description')
     config_id = request.form.get('config_id')
     current_tab = request.form.get('current_tab')
@@ -267,33 +342,34 @@ def edit_entry():
     mail = request.form.get('mail')
     website = request.form.get('website')
     orcid = request.form.get('orcid')
-    legal_note = request.form.get('legalnotice')
+    legal_notice = request.form.get('legalnotice')
     imprint = request.form.get('imprint')
 
     editsql = """
         UPDATE  tng.config SET 
-            description = NULLIF(%(description)s, ''),
-            name = NULLIF(%(name)s, ''),
-            address = NULLIF(%(address)s, ''),
             email = NULLIF(%(email)s, ''),
             website = NULLIF(%(website)s, ''),
-            orcid_id = NULLIF(%(orcid_id)s, ''),
-            legal_notice = NULLIF(%(legal_note)s, ''),
-            imprint = NULLIF(%(imprint)s, '')
-        WHERE  id = %(id)s
+            orcid_id = NULLIF(%(orcid_id)s, '')            
+        WHERE  id = %(id)s;
     """
     try:
         g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s', {'id': int(config_id)})
         result = g.cursor.fetchone()
         if result:
-            g.cursor.execute(editsql, {'description': description, 'name': name, 'address': address, 'email': mail,
-                                       'website': website, 'orcid_id': orcid, 'id': config_id, 'legal_note': legal_note,
-                                       'imprint': imprint})
+            g.cursor.execute(editsql, {'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id})
             flash(f'"{name}" updated successfully', 'success')
         else:
             flash(f'Error updating {name}', 'danger')
     except Exception as e:
         flash(f'Error updating {name}: {str(e)}', 'danger')
+
+    update_jsonb_column('address', address, language, config_id)
+    update_jsonb_column('description', description, language, config_id)
+    update_jsonb_column('imprint', imprint, language, config_id)
+    update_jsonb_column('legal_notice', legal_notice, language, config_id)
+
+
+
 
     return redirect(url_for('admin') + current_tab + '/' + current_entry)
 
@@ -615,9 +691,7 @@ def sortlinks() -> str:
     criteria = data['criteria']
     table = data['table']
 
-    print(criteria)
     for row in criteria:
-        print(row['order'])
         g.cursor.execute(f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(id)s',
                          {'id': row['id'], 'order': row['order'], 'table': table})
     return jsonify({'status': 'ok'})

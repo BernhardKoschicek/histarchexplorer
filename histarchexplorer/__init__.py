@@ -49,6 +49,7 @@ def before_request() -> None:
 def inject_conf_var() -> dict[str, Any]:
     return {
         'AVAILABLE_LANGUAGES': app.config['LANGUAGES'],
+        'PREFERRED_LANGUAGE': app.config['PREFERRED_LANGUAGE'],
         'CURRENT_LANGUAGE': session.get(
             'language',
             request.accept_languages.best_match(

@@ -1,6 +1,7 @@
 # Don't edit this file. To override settings please use instance/production.py
 VERSION = '0.1.0'
 LANGUAGES = {'de': 'Deutsch', 'en': 'English'}
+PREFERRED_LANGUAGE = 'en'
 DEBUG = True
 SECRET_KEY = 'secretkey'
 
