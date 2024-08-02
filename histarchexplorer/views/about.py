@@ -14,13 +14,23 @@ app.jinja_env.filters['capitalize_first'] = capitalize_first
 
 @app.route('/about')
 def about() -> str:
-    project_sql = """
-        SELECT name, description, legal_notice, imprint
-        FROM tng.config
-        WHERE config_class = '5'
-    """
 
-    g.cursor.execute(project_sql)
+    def build_object(id):
+        g.cursor.execute('SELECT * FROM tng.config WHERE id = %s', (id,))
+        object_data = g.cursor.fetchone()
+        object = {}
+        column_names = [description[0] for description in g.cursor.description]
+        for column_name, column_value in zip(column_names, object_data):
+            if column_value:
+                object[column_name] = column_value
+        print(object)
+
+    def build_connections(id):
+        g.cursor.execute('SELECT range_id, property, attribute FROM tng.links WHERE domain_id = %s', (id,))
+
+    build_object(1)
+
+    g.cursor.execute('SELECT name, description, legal_notice, imprint FROM tng.config WHERE id = 1')
     project_result = g.cursor.fetchone()
 
     project = {
@@ -71,6 +81,7 @@ ORDER BY l.sortorder, l.id;
 
     g.cursor.execute(persons_sql)
     persons_result = g.cursor.fetchall()
+    print(persons_result)
 
     persons = {}
     for row in persons_result:
@@ -88,5 +99,6 @@ ORDER BY l.sortorder, l.id;
         persons[person_name]['roles'].append((helpers.get_translation(row[2]))['label'])
 
     persons_list = list(persons.values())
+    print(persons_list)
 
     return render_template('about.html', project=project, institutions=institutions, persons=persons_list)
