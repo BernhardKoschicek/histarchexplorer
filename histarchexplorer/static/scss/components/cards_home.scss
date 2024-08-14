@@ -17,9 +17,13 @@
   background: rgba(255, 255, 255, 0.65);
   margin: 0;
 
+ @media (max-width: 61.9375em) {
+    grid-template-columns: repeat(3, minmax(135px, 1fr));
+  }
 @media (max-width: 47.9375em) {
     grid-template-columns: repeat(2, minmax(135px, 1fr));
   }
+
 
   @include breakpoint-down('mini') {
     grid-template-columns: 1fr;

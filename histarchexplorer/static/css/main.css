@@ -12175,6 +12175,12 @@ textarea.form-control-lg {
   background: rgba(255, 255, 255, 0.65);
   margin: 0;
 }
+@media (max-width: 61.9375em) {
+  #counters:hover ~ .cards_home,
+  .cards_home:hover {
+    grid-template-columns: repeat(3, minmax(135px, 1fr));
+  }
+}
 @media (max-width: 47.9375em) {
   #counters:hover ~ .cards_home,
   .cards_home:hover {
