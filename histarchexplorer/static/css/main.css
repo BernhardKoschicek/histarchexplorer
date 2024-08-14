@@ -12105,7 +12105,7 @@ textarea.form-control-lg {
   transition: backbround 150ms ease-in-out;
   cursor: pointer;
 }
-@media (max-width: 36em) {
+@media (max-width: 35.9375em) {
   .entity-card {
     margin-left: 0;
     margin-right: 0;
@@ -12166,7 +12166,7 @@ textarea.form-control-lg {
 #counters:hover ~ .cards_home,
 .cards_home:hover {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   width: 100%;
   align-items: center;
   align-self: auto;
@@ -12175,7 +12175,13 @@ textarea.form-control-lg {
   background: rgba(255, 255, 255, 0.65);
   margin: 0;
 }
-@media (max-width: 36em) {
+@media (max-width: 47.9375em) {
+  #counters:hover ~ .cards_home,
+  .cards_home:hover {
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+  }
+}
+@media (max-width: 35.9375em) {
   #counters:hover ~ .cards_home,
   .cards_home:hover {
     grid-template-columns: 1fr;
