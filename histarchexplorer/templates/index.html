@@ -5,7 +5,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    const chosenMap = {{map | safe}}
+    const chosenMap = {{ map | safe }}
     const imgString = '{{ img|safe }}'
     const imgOrMap = '{{ img_map|safe }}'
 </script>
@@ -19,7 +19,7 @@
 <div id="counters" class="text-center pt-3">
     <div class="row gx-0">
         {% for view_class, details in view_classes.items() %}
-        <div class="col-6 col-sm">
+        <div class="col-sm">
             <h5 class="statistic-counter">{{ details['count'] }}</h5>
             <p>{{view_class | capitalize_first}}</p>
         </div>
@@ -29,55 +29,17 @@
 
 <!-- Hover cards_home-->
 <div class="cards_home">
-    <div class="card_home card_home--places">
-      <div class="card_home__icon">
-        <img src="/images/places_550.png" alt="Places">
-      </div>
-      <div class="card_home__label">Places</div>
-      <div class="card_home__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat sit integer
-        non. Nisl blandit at scelerisque id arcu nisi nisl lacus.
-      </div>
+    {% for view_class, details in view_classes.items() %}
+    <div id="{{ view_class | lower }}-card" class="entity-card entity-card--{{ view_class | lower }}">
+        <div class="entity-card__icon">
+            <img src="/static/images/entity_icons/{{ view_class | lower }}_550.png" alt="{{ view_class }}">
+        </div>
+        <div class="entity-card__label">{{ view_class | capitalize_first }}</div>
+        <div class="entity-card__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat
+            sit integer non. Nisl blandit at scelerisque id arcu nisi nisl lacus.
+        </div>
     </div>
-
-    <div class="card_home card_home--actors">
-      <div class="card_home__icon">
-        <img src="/images/actors_550.png" alt="Actors">
-      </div>
-      <div class="card_home__label">Actors</div>
-      <div class="card_home__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat sit integer
-        non. Nisl blandit at scelerisque id arcu nisi nisl lacus.
-      </div>
-    </div>
-
-    <div class="card_home card_home--events">
-      <div class="card_home__icon">
-        <img src="/images/events_550.png" alt="Events">
-      </div>
-      <div class="card_home__label">Events</div>
-      <div class="card_home__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat sit integer
-        non. Nisl blandit at scelerisque id arcu nisi nisl lacus.
-      </div>
-    </div>
-
-    <div class="card_home card_home--artifacts">
-      <div class="card_home__icon">
-        <img src="/images/artifacts_550.png" alt="Artifacts">
-      </div>
-      <div class="card_home__label">Artifacts</div>
-      <div class="card_home__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat sit integer
-        non. Nisl blandit at scelerisque id arcu nisi nisl lacus.
-      </div>
-    </div>
-
-    <div class="card_home card_home--sources">
-      <div class="card__icon">
-        <img src="/images/sources_550.png" alt="Sources">
-      </div>
-      <div class="card_home__label">Sources</div>
-      <div class="card_home__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat sit integer
-        non. Nisl blandit at scelerisque id arcu nisi nisl lacus.
-      </div>
-    </div>
+    {% endfor %}
 </div>
 
 

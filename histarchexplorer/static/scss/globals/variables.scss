@@ -10,6 +10,8 @@
 
   --counters-bg-light: hsla(208, 34%, 60%, 0.75);
   --counters-bg-dark: hsla(208, 24%, 44%, 0.74);
+  --light-text1: hsl(0, 0%, 0%);
+  --light-text2: hsl(230, 17%, 14%);
 
   --logo-height: 132px;
   --navbar-height: 96px;
@@ -19,7 +21,12 @@
   --light-orange: hsl(37, 97%, 70%);
   --pink: hsl(329, 70%, 58%);
   --reddish-brown: hsl(349, 19%, 29%);
+
   --dark-greyblue: hsl(232, 19%, 15%);
+  --text-color1: var(--light-text2);
+  --text-color2: var(--light-text1);
+  --card-bg: var(--light-card);
+  --card-hover: var(--light-card-hover);
 }
 
 
