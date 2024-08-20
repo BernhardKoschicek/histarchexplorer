@@ -12095,7 +12095,6 @@ textarea.form-control-lg {
 
 .entity-card {
   position: relative;
-  overflow: hidden;
   margin: 1vw;
   background: var(--card-bg);
   color: var(--text-color2);
@@ -12159,6 +12158,7 @@ textarea.form-control-lg {
 }
 
 .cards_home {
+  bottom: 14.1875rem;
   z-index: auto;
   display: none;
 }
@@ -12171,7 +12171,8 @@ textarea.form-control-lg {
   align-items: center;
   align-self: auto;
   position: absolute;
-  bottom: 227px;
+  overflow-y: auto;
+  max-height: 80vh;
   background: rgba(255, 255, 255, 0.65);
   margin: 0;
 }

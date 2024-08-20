@@ -1,6 +1,7 @@
 @use '../globals' as *;
 
 .cards_home {
+  bottom: rem(227);
   z-index: auto;
   display: none; // Initially hide the cards_home section
 }
@@ -13,7 +14,9 @@
   align-items: center;
   align-self: auto;
   position: absolute;
-  bottom: 227px; // Corrected from +227px to 227px
+  overflow-y: auto;
+  max-height: 80vh;
+
   background: rgba(255, 255, 255, 0.65);
   margin: 0;
 
@@ -23,7 +26,6 @@
 @media (max-width: 47.9375em) {
     grid-template-columns: repeat(2, minmax(135px, 1fr));
   }
-
 
   @include breakpoint-down('mini') {
     grid-template-columns: 1fr;
