@@ -24,7 +24,7 @@
   text-align: center;
   padding: rem(20);
   border-radius: rem(5);
-  transition: backbround 150ms ease-in-out;
+  transition: background 150ms ease-in-out;
   cursor: pointer;
 
   @include breakpoint-down('mini') {
