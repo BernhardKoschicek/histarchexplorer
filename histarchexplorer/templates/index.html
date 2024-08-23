@@ -14,9 +14,8 @@
 
 <div id="index-container">
     <div class="button-container">
-        <a id="entities_mobile" class="line-fade line-fade-m fadeabout text-center" href="#entititesMobile" style="opacity: 1.026;">
-            <i class="bi bi-box-arrow-in-right me-1"></i>
-            <span>Entities</span>
+        <a id="entities_mobile" class="line-fade line-fade-m fadeabout text-center" href="#mobileAnchor" style="opacity: 1.026;">
+            <i class="bi bi-arrow-down-circle-fill"></i>
         </a>
     </div>
     <div id="index-image"></div>
@@ -35,7 +34,7 @@
 </div>
 
 <!-- Hover cards_home-->
-<div class="cards_home">
+<div id="mobileAnchor" class="cards_home">
     {% for view_class, details in view_classes.items() %}
     <div id="{{ view_class | lower }}-card" class="entity-card entity-card--{{ view_class | lower }}">
         <div class="entity-card__icon">
@@ -48,6 +47,7 @@
     </div>
     {% endfor %}
 </div>
+
 
 
 {% include 'footer.html' %}

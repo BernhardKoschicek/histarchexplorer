@@ -208,6 +208,8 @@ body {
 @media (max-width: 47.9375em) {
   #counters {
     display: none;
+    pointer-events: none;
+    visibility: hidden;
   }
 }
 
@@ -232,22 +234,6 @@ body {
   background-size: cover;
   background-position: center;
   max-height: 100%;
-}
-
-#entities_mobile {
-  display: none;
-  background-color: rgb(85, 159, 85);
-  color: white;
-  text-decoration: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: opacity 0.3s ease;
-}
-@media (max-width: 47.9375em) {
-  #entities_mobile {
-    display: inline-block;
-  }
 }
 
 /*!
@@ -12197,33 +12183,52 @@ textarea.form-control-lg {
   z-index: auto;
   display: none;
 }
-
-#counters:hover ~ .cards_home,
-.cards_home:hover {
-  display: grid;
-  opacity: 1;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  width: 100%;
-  align-items: center;
-  align-self: auto;
-  position: absolute;
-  bottom: 14.1875rem;
-  background: rgba(255, 255, 255, 0.65);
-  margin: 0;
+@media (max-width: 47.9375em) {
+  .cards_home {
+    display: grid;
+    grid-template-columns: 1fr;
+    position: sticky;
+    overflow-y: auto;
+  }
 }
-@media (max-width: 61.9375em) {
+
+@media (min-width: 47.9375em) {
+  #counters:hover ~ .cards_home,
+  .cards_home:hover {
+    display: grid;
+    opacity: 1;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    width: 100%;
+    align-items: center;
+    align-self: auto;
+    position: absolute;
+    bottom: 14.1875rem;
+    background: rgba(255, 255, 255, 0.65);
+    margin: 0;
+  }
+}
+@media (min-width: 47.9375em) and (max-width: 61.9375em) {
   #counters:hover ~ .cards_home,
   .cards_home:hover {
     grid-template-columns: repeat(3, minmax(135px, 1fr));
   }
 }
+#entities_mobile {
+  display: none;
+  color: black;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: opacity 0.3s ease;
+}
 @media (max-width: 47.9375em) {
-  #counters:hover ~ .cards_home,
-  .cards_home:hover {
-    grid-template-columns: 1fr;
-    position: sticky;
-    overflow-y: auto;
+  #entities_mobile {
+    display: inline-block;
   }
+}
+#entities_mobile .bi-arrow-down-circle-fill {
+  font-size: 3rem;
 }
 
 /*# sourceMappingURL=main.css.map */
