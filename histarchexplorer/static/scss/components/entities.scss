@@ -1,6 +1,6 @@
 @use '../globals'as *;
 
-.entity-cards { //also possible make a card-grid or whatever class and define flexbox in layout scss for breakpoints
+.entity-cards {
   display: grid;
   grid-template-columns: 1fr;
   gap: rem(30);
@@ -12,21 +12,19 @@
     @include breakpoint(large) {
       grid-template-columns: repeat(4, 1fr);
     }
-
   }
 }
 
 
 .entity-card {
   position: relative;
-  overflow: hidden;
-  margin: rem(20);
+  margin: 1vw;
   background: var(--card-bg);
   color: var(--text-color2);
   text-align: center;
   padding: rem(20);
   border-radius: rem(5);
-  transition: backbround 150ms ease-in-out;
+  transition: background 150ms ease-in-out;
   cursor: pointer;
 
   @include breakpoint-down('mini') {
@@ -35,7 +33,6 @@
 
 
   &:hover {
-    background: var(--card-hover);
   }
 
 
