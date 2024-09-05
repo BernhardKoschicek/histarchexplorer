@@ -28,8 +28,8 @@ VIEW_CLASSES = {
     'actors': ('person','group'),
     'items': ('artifact', 'human_remains'),
     'events': ('acquisition', 'event', 'activity', 'creation', 'move',
-            'production'),
-    'places': ('place',),
+            'production', 'modification'),
+    'places': ('place', 'stratigraphic unit', 'feature'),
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
     'files': ('file',)
 }
