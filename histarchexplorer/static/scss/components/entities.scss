@@ -18,13 +18,14 @@
 
 .entity-card {
   position: relative;
-  margin: 1vw;
+  overflow: hidden;
+  margin: rem(20);
   background: var(--card-bg);
   color: var(--text-color2);
   text-align: center;
   padding: rem(20);
   border-radius: rem(5);
-  transition: background 150ms ease-in-out;
+  transition: backbround 150ms ease-in-out;
   cursor: pointer;
 
   @include breakpoint-down('mini') {
@@ -33,6 +34,7 @@
 
 
   &:hover {
+    background: var(--card-hover);
   }
 
 
