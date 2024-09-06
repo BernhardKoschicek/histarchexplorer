@@ -6,8 +6,9 @@ from flask_login import current_user, login_required
 from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
+from histarchexplorer.api.helpers import get_entities_count_by_case_study
+from histarchexplorer.database.settings import get_map_data, get_shown_entities
 from histarchexplorer.utils import helpers
-
 
 
 def update_jsonb_column(column_name, value, language, config_id):
@@ -26,6 +27,7 @@ def update_jsonb_column(column_name, value, language, config_id):
         """
     g.cursor.execute(update_query)
 
+
 @app.route('/admin/')
 @app.route('/admin/<tab>')
 @app.route('/admin/<tab>/<entry>')
@@ -41,15 +43,15 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     preferred_lan = app.config['PREFERRED_LANGUAGE']
 
-    
     g.cursor.execute(f"SELECT * FROM tng.config ORDER BY (name->>'{language}')")
     config_data = g.cursor.fetchall()
 
     entities = []
     for item in config_data:
-        entity = {'id':item.id, 'config_class': item.config_class, 'website': item.website, 'email': item.email, 'orcid_id': item.orcid_id, 'image': item.image}
+        entity = {'id': item.id, 'config_class': item.config_class, 'website': item.website, 'email': item.email,
+                  'orcid_id': item.orcid_id, 'image': item.image}
 
-        for column in ['name','description','imprint','address','legal_notice']:
+        for column in ['name', 'description', 'imprint', 'address', 'legal_notice']:
             entity[column] = {}
             if getattr(item, column):
                 for key, value in getattr(item, column).items():
@@ -73,7 +75,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     colnames = [desc[0] for desc in g.cursor.description]
 
     config_list = [dict(zip(colnames, row)) for row in config_properties]
-
 
     for row in config_list:
         row['name'] = helpers.get_translation(row['name'])
@@ -179,13 +180,11 @@ FROM tng.links l
 
     links_list = [dict(zip(colnames, row)) for row in links_data]
 
-
     for row in links_list:
         row['start_name'] = helpers.get_translation(row['start_name'])
         row['end_name'] = helpers.get_translation(row['end_name'])
         row['config_property'] = helpers.get_translation(row['config_property'])
         row['role'] = helpers.get_translation(row['role'])
-
 
     map_id = request.args.get('map_id')
 
@@ -193,8 +192,7 @@ FROM tng.links l
         g.cursor.execute('SELECT * FROM tng.maps WHERE id = %s', (map_id,))
         map_data = g.cursor.fetchone()
 
-    g.cursor.execute('SELECT index_img, index_map, img_map, greyscale FROM tng.settings LIMIT 1')
-    data = g.cursor.fetchone()
+    data = get_map_data()
     settings = {}
     settings['img'] = data.index_img
     settings['map'] = data.index_map
@@ -205,28 +203,27 @@ FROM tng.links l
     else:
         settings['not_sel'] = 'image'
 
+    class_items = get_entities_count_by_case_study()
+    entities_dict = {k: v for k, v in class_items.items() if k not in app.config['CLASSES_TO_SKIP']}
 
-    g.cursor.execute('''
-           SELECT openatlas_class_name, COUNT(openatlas_class_name) as count
-           FROM model.entity
-           GROUP BY openatlas_class_name
-           ORDER BY count DESC
-       ''')
-    class_items = g.cursor.fetchall()
-    entities_dict = {entity[0]: entity[1] for entity in class_items if entity[0] not in app.config['CLASSES_TO_SKIP']}
-
-    g.cursor.execute('''
-        SELECT shown_entities from tng.settings LIMIT 1''')
-    shown_entities = (g.cursor.fetchone()).shown_entities
-    print(entities_dict)
+    shown_entities = get_shown_entities()
 
     view_classes = app.config['VIEW_CLASSES']
-    print(links_list)
 
-    return render_template("/admin.html", config_data=entities, entities=entities, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_list, config_properties=config_list, maps=map_data, map=map,
-                           settings=settings, class_items=entities_dict, shown_entities=shown_entities, view_classes=view_classes)
-
+    return render_template(
+        "/admin.html",
+        config_data=entities,
+        entities=entities,
+        tabs=tabs,
+        activetab=tab,
+        activeentry=entry,
+        links_data=links_list,
+        config_properties=config_list,
+        maps=map_data,
+        settings=settings,
+        class_items=entities_dict,
+        shown_entities=shown_entities,
+        view_classes=view_classes)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -235,9 +232,9 @@ def add_entry():
     if current_user.group not in ['admin', 'manager']:
         abort(403)
     language = session.get(
-            'language',
-            request.accept_languages.best_match(
-                app.config['LANGUAGES'].keys()))
+        'language',
+        request.accept_languages.best_match(
+            app.config['LANGUAGES'].keys()))
     category = request.form.get('category')
     current_tab = 'nav-' + category
     description = request.form.get('description')
@@ -284,8 +281,6 @@ def add_entry():
         update_jsonb_column('description', description, language, config_id)
         update_jsonb_column('imprint', imprint, language, config_id)
         update_jsonb_column('legal_notice', legal_notice, language, config_id)
-
-
 
         flash('Entry added successfully!', 'success')
         return redirect(url_for('admin') + current_tab + '/' + current_tab + str(new_entry_id))
@@ -373,7 +368,8 @@ def edit_entry():
         g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s', {'id': int(config_id)})
         result = g.cursor.fetchone()
         if result:
-            g.cursor.execute(editsql, {'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id, 'image': image})
+            g.cursor.execute(editsql,
+                             {'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id, 'image': image})
             flash(f'"{name}" updated successfully', 'success')
         else:
             flash(f'Error updating {name}', 'danger')
@@ -384,9 +380,6 @@ def edit_entry():
     update_jsonb_column('description', description, language, config_id)
     update_jsonb_column('imprint', imprint, language, config_id)
     update_jsonb_column('legal_notice', legal_notice, language, config_id)
-
-
-
 
     return redirect(url_for('admin') + current_tab + '/' + current_entry)
 
@@ -482,8 +475,6 @@ def delete_map(map_id: int) -> str:
 
 @app.route('/choose_indexBg', methods=['POST'])
 def choose_index_bg():
-
-
     map_id = request.form.get('mapselection')
     default_img = request.form.get('default_img')
     map_img = request.form.get('imgmap')
@@ -504,8 +495,6 @@ def select_entities() -> str:
         selected_entities_str = json.dumps(selected_entities)
 
         g.cursor.execute('UPDATE tng.settings SET shown_entities = %s::JSONB', (selected_entities_str,))
-
-
 
         return redirect(url_for('admin'))
 

@@ -17,7 +17,7 @@ def entities() -> str:
     # list of tuples to dictionary (entities_dict); keys = entities; values = associated IDs.
     entities_dict = {entity[0]: entity[1] for entity in entities}
 
-    view_classes = cerberos.gatekeeper()
+    view_classes = cerberos.get_view_class_count()
     print(view_classes)
 
 
@@ -28,7 +28,7 @@ def entities() -> str:
     for shown_entity in shown_entities:
         print(shown_entity)
 
-    cerberos.gatekeeper()
+    cerberos.get_view_class_count()
 
     return render_template('entities.html', entities=entities_dict, view_classes=view_classes, viewcount=len(view_classes.keys()))
 

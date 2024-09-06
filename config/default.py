@@ -18,7 +18,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 
 API_URL = 'https://thanados.openatlas.eu/api/'  # Todo: move to instance
 API_PROXY = ''
-OPENATLAS_CASE_STUDY_IDS = []
+OPENATLAS_CASE_STUDY_IDS: list[int] = []
 
 CLASSES_TO_SKIP = [
     'object_location', 'type', 'appellation', 'administrative_unit',
@@ -29,7 +29,7 @@ VIEW_CLASSES = {
     'items': ('artifact', 'human_remains'),
     'events': ('acquisition', 'event', 'activity', 'creation', 'move',
             'production', 'modification'),
-    'places': ('place', 'stratigraphic unit', 'feature'),
+    'places': ('place', 'stratigraphic_unit', 'feature'),
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
     'files': ('file',)
 }

@@ -5,9 +5,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    const chosenMap = {{map | safe}}
-    const imgString = '{{ img|safe }}'
-    const imgOrMap = '{{ img_map|safe }}'
+    const chosenMap = {{ map | safe }}
+    const imgString = '{{ map_data.index_img | safe }}'
+    const imgOrMap = '{{ map_data.img_map | safe }}'
 </script>
 
 
@@ -19,7 +19,7 @@
         </a>
     </div>
     <div id="index-image"></div>
-    <div id="map" class="{% if greyscale %}map-gray{% endif %}"></div>
+    <div id="map" class="{% if map_data.greyscale %}map-gray{% endif %}"></div>
 </div>
 
 <div id="counters" class="text-center pt-3">
