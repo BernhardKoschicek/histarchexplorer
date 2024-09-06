@@ -12132,9 +12132,6 @@ textarea.form-control-lg {
     margin-right: 0;
   }
 }
-.entity-card:hover {
-  background: var(--card-hover);
-}
 .entity-card--places {
   border-top: 0.3125rem solid var(--limegreen);
 }
@@ -12217,8 +12214,7 @@ textarea.form-control-lg {
   }
 }
 #entities_mobile {
-  visibility: hidden;
-  opacity: 0;
+  display: none;
   color: rgba(0, 0, 0, 0.7);
   text-decoration: none;
   padding: 10px 15px;
