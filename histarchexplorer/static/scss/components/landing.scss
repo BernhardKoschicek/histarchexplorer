@@ -1,5 +1,5 @@
 #content-columns .column {
-  height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
+  height: calc(100vh - var(--navbar-height) - 95px);
   color: black;
 }
 
@@ -32,7 +32,7 @@
 
 .sidebar {
   background-color: var(--card-bg);
-  height: calc(100vh - var(--logo-height) - var(--navbar-height) );
+  height: calc(100vh - var(--navbar-height) );
   color: black;
   text-align: center;
 }
