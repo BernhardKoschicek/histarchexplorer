@@ -2,6 +2,7 @@
 {% block content %}
 
 <div class="container">
+
     <div class="row mt-5">
         {% for view_class, details in view_classes.items() %}
         <div class="col-lg-4 col-md-6">
@@ -10,7 +11,8 @@
                     <img src="/static/images/entity_icons/{{ view_class | lower }}_550.png" alt="{{ class_name }}">
                 </div>
                 <div class="entity-card__label">{{ view_class }}</div>
-                <div class="entity-card__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat
+                <div class="entity-card__description">
+                    Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat
                     sit
                     integer non.
                     Nisl blandit at scelerisque id arcu nisi nisl lacus.
