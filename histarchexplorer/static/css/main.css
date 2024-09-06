@@ -12239,6 +12239,14 @@ textarea.form-control-lg {
   color: black;
 }
 
+.column-label {
+  font-size: 1.3em;
+  font-weight: bold;
+  position: relative;
+  top: 1rem;
+  left: 1rem;
+}
+
 #col1 {
   background-color: #ff5733;
 }
