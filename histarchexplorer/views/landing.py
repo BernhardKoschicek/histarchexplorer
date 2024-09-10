@@ -13,5 +13,5 @@ def landing(id_: int) -> str:
     print(entity.begin)
     print(entity.end)
     print(entity.relations)
-    print(entity.relation_class)
+    print(entity.depictions)
     return render_template('landing.html', entity=entity, relations=entity.relations)

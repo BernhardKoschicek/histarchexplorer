@@ -12251,6 +12251,17 @@ textarea.form-control-lg {
   position: relative;
 }
 
+.main-image {
+  margin-top: 2rem;
+  width: 90%;
+}
+
+.main-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 #col2 {
   background-color: #F5F5F5;
 }
