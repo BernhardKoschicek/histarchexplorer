@@ -4,80 +4,87 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-2 sidebar" id="sidebar">
-                <div class="sidebar-content">
-                    <div class="entity-card__icon">
-                        <img src="/static/images/entity_icons/places_550.png" alt="Places">
-                    </div>
-                    <div class="entity-card__label">{{ entity.name }}</div>
-                    <div class="entity-country">
-                        {% for type in entity.types %}
-                            {% if type.hierarchy == 'Country' %}
-                                <p>{{ type.label }}</p>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-
-                    <div class="entity-type">
-                        {% if entity.types and entity.types[0] %}
-                            <p>{{ entity.types[0].label | upper }}</p>
+    <div class="row">
+        <div class="col-md-2 sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <div class="entity-card__icon">
+                    <img src="/static/images/entity_icons/places_550.png" alt="Places">
+                </div>
+                <div class="entity-card__label">{{ entity.name }}</div>
+                <div class="entity-country">
+                    {% for type in entity.types %}
+                        {% if type.hierarchy == 'Country' %}
+                            <p>{{ type.label }}</p>
                         {% endif %}
-                    </div>
+                    {% endfor %}
+                </div>
 
-                    <div class="entity-date">
-                        {% if entity.begin_from and entity.end_to %}
-                            AD {{ entity.begin_from.split('.')[-1] }} - {{ entity.end_to.split('.')[-1] }}
-                        {% elif entity.begin_from %}
-                            AD {{ entity.begin_from.split('.')[-1] }}
-                        {% elif entity.end_to %}
-                            AD {{ entity.end_to.split('.')[-1] }}
+                <div class="entity-type">
+                    {% if entity.types and entity.types[0] %}
+                        <p>{{ entity.types[0].label | upper }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="entity-date">
+                    {% if entity.begin_from and entity.end_to %}
+                        AD {{ entity.begin_from.split('.')[-1] }} - {{ entity.end_to.split('.')[-1] }}
+                    {% elif entity.begin_from %}
+                        AD {{ entity.begin_from.split('.')[-1] }}
+                    {% elif entity.end_to %}
+                        AD {{ entity.end_to.split('.')[-1] }}
+                    {% endif %}
+
+                    {% for type in entity.types %}
+                        {% if type.root == 'Chronology' %}
+                            {{ type.label or 'No date available' }}
                         {% endif %}
+                    {% endfor %}
 
-                        {% for type in entity.types %}
-                            {% if type.root == 'Chronology' %}
-                                {{ type.label or 'No date available' }}
-                            {% endif %}
-                        {% endfor %}
+                </div>
 
-                    </div>
-
-                    <div class="btn-group-vertical" id="entity-link-buttons" role="group"
-                         aria-label="Vertical button group">
-                        <button type="button" class="btn btn-outline-secondary">ACTORS</button>
-                        <button type="button" class="btn btn-outline-secondary">ITEMS</button>
-                        <button type="button" class="btn btn-outline-secondary">EVENTS</button>
-                        <button type="button" class="btn btn-outline-secondary">FILES</button>
-                        <button type="button" class="btn btn-outline-secondary">SOURCES</button>
-                    </div>
+                <div class="btn-group-vertical" id="entity-link-buttons" role="group"
+                     aria-label="Vertical button group">
+                    {% for key in entity.relations %}
+                        <button type="button" class="btn btn-outline-secondary">{{ key }}</button>
+                    {% endfor %}
                 </div>
             </div>
+        </div>
 
-            <!-- Main content area - MUURI Tiles -->
-            <div class="col-md-10">
-                <div class="grid">
-                    {% if entity.depictions %}
-                        {% for depiction in entity.depictions %}
-                            <div class="item">
-                                <div class="item-content">
-                                    <div class="muuri-images">
-                                        <div class="image">
-                                            <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
-                                        </div>
+        <!-- Main content area - MUURI Tiles -->
+        <div class="col-md-10">
+            <div class="grid">
+                {% if entity.depictions %}
+                    {% for depiction in entity.depictions %}
+                        <div class="item">
+                            <div class="item-content">
+                                <div class="muuri-images">
+                                    <div class="image">
+                                        <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
                                     </div>
                                 </div>
                             </div>
-                        {% endfor %}
-                    {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
-                    <div class="item">
-                        <div class="item-content">
-                            <div class="muuri-description">
-                                <span class="tile-label">DESCRIPTION</span>
-                                <p>{{ entity.description }}</p>
-                            </div>
+                <div class="item">
+                    <div class="item-content">
+                        <div class="muuri-description">
+                            <span class="tile-label">DESCRIPTION</span>
+                            <p>{{ entity.description }}</p>
                         </div>
                     </div>
+                </div>
+
+                <div class="item">
+                    <div class="item-content">
+                        <div class="location">
+                            <span class="tile-label">LOCATION</span>
+                            <div id="map" style="height: 400px"></div>
+                        </div>
+                    </div>
+                </div>
 
                     <div class="item">
                         <div class="item-content">

@@ -22,15 +22,15 @@
 }
 
 .image img {
-  max-width: 100%; /* Image can't be larger than the container */
-  height: auto; /* Keeps aspect ratio */
+  max-width: 100%;
+  height: auto;
   display: block;
-  margin: 0 auto; /* Center the image */
+  margin: 0 auto;
 }
 
 .item-content {
-  width: auto; /* Allow item content to shrink based on image size */
-  height: auto; /* Let the height adapt to the content */
+  width: auto;
+  height: auto;
 }
 
 .tile-label {
