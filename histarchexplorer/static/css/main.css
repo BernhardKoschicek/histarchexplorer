@@ -12241,22 +12241,32 @@ textarea.form-control-lg {
 .item {
   display: block;
   position: absolute;
-  width: 500px;
-  min-height: 200px;
-  max-height: 700px;
+  max-width: 500px;
+  min-width: 200px;
   margin: 5px;
   z-index: 1;
   background: #ece6e6;
   color: #060606;
-  overflow: hidden;
+  overflow: hidden; /* Prevents content from overflowing the container */
 }
 
 .item-content {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  padding: 1rem;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.image img {
+  max-width: 100%; /* Image can't be larger than the container */
+  height: auto; /* Keeps aspect ratio */
+  display: block;
+  margin: 0 auto; /* Center the image */
+}
+
+.item-content {
+  width: auto; /* Allow item content to shrink based on image size */
+  height: auto; /* Let the height adapt to the content */
 }
 
 .tile-label {
@@ -12266,10 +12276,10 @@ textarea.form-control-lg {
   top: 1rem;
 }
 
-.main-image img {
-  max-width: 100%;
-  max-height: 100%;
-  z-index: 3;
+.muuri-description p {
+  max-height: 700px;
+  overflow: auto;
+  margin-top: 1.5rem;
 }
 
 .subentitites {
