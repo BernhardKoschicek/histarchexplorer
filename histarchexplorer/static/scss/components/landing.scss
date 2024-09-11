@@ -5,14 +5,15 @@
 .item {
   display: block;
   position: absolute;
-  max-width: 500px;
-  min-width: 200px;
+  width: 26vw; /*sidebarwidth */
   margin: 5px;
   z-index: 1;
   background: #ece6e6;
   color: #060606;
   overflow: hidden; /* Prevents content from overflowing the container */
 }
+
+/*mediaqoery ab gewisser breite 2, dann 1 - ab 776*/
 
 .item-content {
   padding: 1rem;
