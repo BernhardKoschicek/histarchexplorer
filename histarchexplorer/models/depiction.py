@@ -6,6 +6,8 @@ class Depiction:
         self.link = data.get('@id')
         self.title = data.get('title')
         self.license = data.get('license')
+        self.license_holder = data.get('licenseHolder')
+        self.creator = data.get('creator')
         self.url = data.get('url')
         self.mimetype = data.get('mimetype')
         self.iiif_manifest = data.get('IIIFManifest')
