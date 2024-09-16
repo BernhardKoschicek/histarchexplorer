@@ -55,7 +55,7 @@
 .muuri-description {
   p {
     max-height: 700px;
-    overflow: auto ;
+    overflow: auto;
     margin-top: 1.5rem;
   }
 }
@@ -63,6 +63,7 @@
 .location {
   width: 26vw;
 }
+
 #muuri-map {
   margin-top: 1.5rem;
   height: 700px;
@@ -102,6 +103,7 @@
   text-align: center;
 }
 
+
 .sidebar-content {
   margin-top: 2rem;
 }
@@ -112,18 +114,27 @@
 
 .entity-type,
 .entity-date {
-  font-size: 1.2rem;
+  font-size: 1.2em;
+}
+
+@media (max-width: 992px) {
+  .entity-type,
+  .entity-date {
+    font-size: 1em;
+  }
 }
 
 .entity-type {
   margin-top: 3rem;
 }
 
-.btn-group-vertical .btn {
-  margin-top: 3rem;
-  margin-bottom: 1rem;
+#entity-link-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.btn-group-vertical .btn:last-child {
-  margin-bottom: 0;
+#entity-link-buttons button {
+  margin-top: 1.5rem;
+  width: auto;
 }

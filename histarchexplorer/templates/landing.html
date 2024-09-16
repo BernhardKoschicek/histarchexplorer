@@ -4,114 +4,126 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-2 sidebar" id="sidebar">
-            <div class="sidebar-content">
-                <div class="entity-card__icon">
-                    <img src="/static/images/entity_icons/places_550.png" alt="Places">
-                </div>
-                <div class="entity-card__label">{{ entity.name }}</div>
-                <div class="entity-country">
-                    {% for type in entity.types %}
-                        {% if type.hierarchy == 'Country' %}
-                            <p>{{ type.label }}</p>
+        <div class="row">
+            <div class="col-md-2 sidebar" id="sidebar">
+                <div class="sidebar-content">
+                    <div class="entity-card__icon">
+                        <img src="/static/images/entity_icons/places_550.png" alt="Places">
+                    </div>
+                    <div class="entity-card__label">{{ entity.name }}</div>
+                    <div class="entity-country">
+                        {% for type in entity.types %}
+                            {% if type.hierarchy == 'Country' %}
+                                <p>{{ type.label }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="entity-type">
+                        {% if entity.types and entity.types[0] %}
+                            <p>{{ entity.types[0].label | upper }}</p>
                         {% endif %}
-                    {% endfor %}
-                </div>
+                    </div>
 
-                <div class="entity-type">
-                    {% if entity.types and entity.types[0] %}
-                        <p>{{ entity.types[0].label | upper }}</p>
-                    {% endif %}
-                </div>
-
-                <div class="entity-date">
-                    {% if entity.begin_from and entity.end_to %}
-                        AD {{ entity.begin_from.split('.')[-1] }} - {{ entity.end_to.split('.')[-1] }}
-                    {% elif entity.begin_from %}
-                        AD {{ entity.begin_from.split('.')[-1] }}
-                    {% elif entity.end_to %}
-                        AD {{ entity.end_to.split('.')[-1] }}
-                    {% endif %}
-
-                    {% for type in entity.types %}
-                        {% if type.root == 'Chronology' %}
-                            {{ type.label or 'No date available' }}
+                    <div class="entity-date">
+                        {% if entity.begin_from and entity.end_to %}
+                            AD {{ entity.begin_from.split('.')[-1] }} - {{ entity.end_to.split('.')[-1] }}
+                        {% elif entity.begin_from %}
+                            AD {{ entity.begin_from.split('.')[-1] }}
+                        {% elif entity.end_to %}
+                            AD {{ entity.end_to.split('.')[-1] }}
                         {% endif %}
-                    {% endfor %}
 
-                </div>
+                        {% for type in entity.types %}
+                            {% if type.root == 'Chronology' %}
+                                {{ type.label or 'No date available' }}
+                            {% endif %}
+                        {% endfor %}
 
-                <div class="btn-group-vertical" id="entity-link-buttons" role="group"
-                     aria-label="Vertical button group">
-                    {% for key in entity.relations %}
-                        <button type="button" class="btn btn-outline-secondary">{{ key }}</button>
-                    {% endfor %}
+                    </div>
+
+                    <div id="entity-link-buttons">
+                        {% for key in entity.relations %}
+                            <button type="button"
+                                    class="btn btn-outline-secondary btn-lg">{{ key|capitalize_first }}</button>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Main content area - MUURI Tiles -->
-        <div class="col-md-10">
-            <div class="grid">
-                <!--{% if entity.depictions %}-->
-                    <!--{% for depiction in entity.depictions %} -->
+            <!-- Main content area - MUURI Tiles -->
+            <div class="col-md-10">
+                <div class="grid">
+                    <!-- First image -->
+                    {% if entity.depictions %}
                         <div class="item">
                             <div class="item-content">
                                 <div class="muuri-images">
                                     <div class="image">
-                                        <img src="{{ depiction.url}}" alt="{{ depiction.title}}"/>
+                                        <img src="{{ entity.depictions[0].url }}"
+                                             alt="{{ entity.depictions[0].title }}"/>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    <!--{% endfor %}-->
-               <!-- {% endif %}-->
+                    {% endif %}
 
-                <div class="item">
-                    <div class="item-content">
-                        <div class="muuri-description">
-                            <span class="tile-label">DESCRIPTION</span>
-                            <p>{{ entity.description }}</p>
+                    <!-- Description -->
+                    {% if entity.description %}
+                        <div class="item">
+                            <div class="item-content">
+                                <div class="muuri-description">
+                                    <span class="tile-label">DESCRIPTION</span>
+                                    <p>{{ entity.description }}</p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    {% endif %}
 
-                <div class="item">
-                    <div class="item-content">
-                        <div class="location">
-                            <span class="tile-label">LOCATION</span>
-                            <div id="muuri-map"></div>
-                        </div>
-                    </div>
-                </div>
-
+                    <!-- Map Location - ADD PIN! -->
                     <div class="item">
                         <div class="item-content">
-                            <div class="my-custom-content">
-                                {% for type in entity.types %}
-                                    {% if type.hierarchy == 'Country' %}
-                                        <p>{{ type.label }}</p>
-                                    {% endif %}
-                                {% endfor %}
+                            <div class="location">
+                                <span class="tile-label">LOCATION</span>
+                                <div id="muuri-map"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="item">
-                        <div class="item-content">
-                            <div class="subentities">
-                                <ul>
-                                    {% set linked_entities = relations.places | selectattr('relation_type', 'equalto', 'crm:P46_is_composed_of') | list %}
-                                    {% for linked_entity in linked_entities %}
-                                        <li>
-                                            <a href="{{ linked_entity.relation_to }}">{{ linked_entity.label }}</a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
+                    <!-- Related entities -->
+                    {% set linked_entities = relations.places | selectattr('relation_type', 'equalto', 'crm:P46_is_composed_of') | list %}
+                    {% if linked_entities %}
+                        <div class="item">
+                            <div class="item-content">
+                                <div class="subentities">
+                                    <span class="tile-label">RELATED ENTITIES</span>
+                                    <ul>
+                                        {% for linked_entity in linked_entities %}
+                                            <li>
+                                                <a href="{{ linked_entity.relation_to }}">{{ linked_entity.label }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
+
+
+                    <!-- All other images -->
+                    {% if entity.depictions|length > 1 %}
+                        {% for depiction in entity.depictions[1:] %}
+                            <div class="item">
+                                <div class="item-content">
+                                    <div class="muuri-images">
+                                        <div class="image">
+                                            <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>
