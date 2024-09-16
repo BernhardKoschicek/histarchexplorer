@@ -38,7 +38,7 @@
   font-size: 1.3em;
   font-weight: bold;
   position: relative;
-  top: 1rem;
+  top: 0.5rem;
 }
 
 .muuri-description {
@@ -47,6 +47,15 @@
     overflow: auto ;
     margin-top: 1.5rem;
   }
+}
+
+.location {
+  width: 26vw;
+}
+#muuri-map {
+  margin-top: 1.5rem;
+  height: 700px;
+  width: 100%;
 }
 
 
