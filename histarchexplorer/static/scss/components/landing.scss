@@ -5,7 +5,7 @@
 .item {
   display: block;
   position: absolute;
-  width: 26vw; /*sidebarwidth */
+  width: calc((100% - 30px) / 3);
   margin: 5px;
   z-index: 1;
   background: #ece6e6;
@@ -13,7 +13,18 @@
   overflow: hidden; /* Prevents content from overflowing the container */
 }
 
-/*mediaqoery ab gewisser breite 2, dann 1 - ab 776*/
+@media (max-width: 992px) { // Below col-md breakpoint
+  .item {
+    width: calc((100% - 20px) / 2); // 2 tiles per row
+  }
+}
+
+@media (max-width: 766px) { // Mobile
+  .item {
+    width: calc(100% - 10px); // 1 tile per row
+  }
+}
+
 
 .item-content {
   padding: 1rem;

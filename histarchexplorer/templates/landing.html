@@ -54,19 +54,19 @@
         <!-- Main content area - MUURI Tiles -->
         <div class="col-md-10">
             <div class="grid">
-                {% if entity.depictions %}
-                    {% for depiction in entity.depictions %}
+                <!--{% if entity.depictions %}-->
+                    <!--{% for depiction in entity.depictions %} -->
                         <div class="item">
                             <div class="item-content">
                                 <div class="muuri-images">
                                     <div class="image">
-                                        <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
+                                        <img src="{{ depiction.url}}" alt="{{ depiction.title}}"/>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
-                {% endif %}
+                    <!--{% endfor %}-->
+               <!-- {% endif %}-->
 
                 <div class="item">
                     <div class="item-content">
