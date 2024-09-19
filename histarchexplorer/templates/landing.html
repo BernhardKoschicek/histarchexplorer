@@ -92,19 +92,15 @@
                     </div>
 
                     <!-- Related entities -->
-                    {% set linked_entities = relations.places | selectattr('relation_type', 'equalto', 'crm:P46_is_composed_of') | list %}
-                    {% if linked_entities %}
+                    {% if subunits %}
                         <div class="item">
                             <div class="item-content">
                                 <div class="subentities">
-                                    <span class="tile-label">RELATED ENTITIES</span>
-                                    <ul>
-                                        {% for linked_entity in linked_entities %}
-                                            <li>
-                                                <a href="{{ linked_entity.relation_to }}">{{ linked_entity.label }}</a>
-                                            </li>
+                                    <p class="tile-label">RELATED ENTITIES</p>
+                                        {% for type_, list_ in subunits.items() %}
+                                            <p>{{ type_ }} ({{ list_ | length }})</p>
+
                                         {% endfor %}
-                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -136,20 +132,6 @@
                                     <p class="reference-link">
                                         <a href="{{ reference.relation_to }}"
                                            target="_blank">{{ reference.relation_to }}</a>
-                                    </p>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bibliography Tile -->
-                    <div class="item">
-                        <div class="item-content">
-                            <div class="muuri-bibliography">
-                                <p class="bibliography-label">Bibliography:</p>
-                                {% for bib in entity.relations['bibliography'] %}
-                                    <p class="bibliography-entry">
-                                        <a href="{{ bib.relation_to }}" target="_blank">{{ bib.label }}</a>
                                     </p>
                                 {% endfor %}
                             </div>

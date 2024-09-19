@@ -18,7 +18,7 @@ class Entity:
         self.system_class = uc_first(data['systemClass'].replace('_', ' '))
         self.types = self.get_types(data['types']) if 'types' in data else None
         self.alias = self.get_alias(data['names']) if 'names' in data else None
-        self.relation_class = self.get_relation_class(data.get('relations'))
+        self.relation_class = self.get_relation_class(data['relations']) if data.get('relations') else None
         self.relations = self.get_relations() if self.relation_class else None
         self.depictions = self.get_depiction(data['depictions']) \
             if 'depictions' in data else None
@@ -93,7 +93,7 @@ class Entity:
                 ApiAccess.get_by_system_class(class_, parser)]
 
     @staticmethod
-    def linked_entities_by_properties_recursive(id_: int, parser: Parser):
+    def get_linked_entities_by_properties_recursive(id_: int, parser: Parser):
         return [Entity(entity) for entity in
                 ApiAccess.linked_entities_by_properties_recursive(id_, parser)]
 
