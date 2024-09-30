@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="entity-date">
-                        <p>{{ entity.formated_date  }}</p>
+                        <p>{{ entity.formated_date }}</p>
 
                         {% if entity.types %}
                             {% for type in entity.types %}
@@ -53,6 +53,30 @@
             <div class="col-md-10">
                 <div class="grid">
 
+                    <!-- Map Location -->
+                    <!-- Todo: Add Pin! -->
+                    <div class="item">
+                        <div class="item-content">
+                            <div class="location">
+                                <span class="tile-label">LOCATION</span>
+                                <div id="muuri-map"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Description -->
+                    {% if entity.description %}
+                        <div class="item {% if entity.description|length > 500 %}item-middle{% endif %}">
+                            <div class="item-content">
+                                <div class="muuri-description">
+                                    <span class="tile-label">DESCRIPTION</span>
+                                    <p>{{ entity.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
                     <!-- First image -->
                     {% if entity.depictions %}
                         <div class="item">
@@ -66,29 +90,6 @@
                             </div>
                         </div>
                     {% endif %}
-
-                    <!-- Description -->
-                    {% if entity.description %}
-                        <div class="item">
-                            <div class="item-content">
-                                <div class="muuri-description">
-                                    <span class="tile-label">DESCRIPTION</span>
-                                    <p>{{ entity.description }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    <!-- Map Location -->
-                    <!-- Todo: Add Pin! -->
-                    <div class="item">
-                        <div class="item-content">
-                            <div class="location">
-                                <span class="tile-label">LOCATION</span>
-                                <div id="muuri-map"></div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Related entities -->
                     {% if subunits %}
@@ -135,7 +136,7 @@
 
                     <!-- External references -->
                     {% if entity.relations['references'] %}
-                        <div class="item wide-item">
+                        <div class="item item-wide">
                             <div class="item-content">
                                 <div class="muuri-references">
                                     <span class="tile-label">EXTERNAL REFERENCES</span>

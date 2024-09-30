@@ -12259,17 +12259,21 @@ textarea.form-control-lg {
     width: calc(100% - 10px);
   }
 }
-.wide-item {
+.item-middle {
+  width: calc((100% - 30px) / 3 * 2);
+}
+
+.item-wide {
   width: calc(100% - 30px);
 }
 
 @media (max-width: 992px) {
-  .wide-item {
+  .item-wide {
     width: calc(100% - 20px);
   }
 }
 @media (max-width: 766px) {
-  .wide-item {
+  .item-wide {
     width: calc(100% - 10px);
   }
 }

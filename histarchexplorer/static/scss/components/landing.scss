@@ -25,18 +25,22 @@
   }
 }
 
-.wide-item {
+.item-middle {
+  width: calc(((100% - 30px) / 3)*2); //2 tiles width
+}
+
+.item-wide {
   width: calc(100% - 30px); // full width of three tiles
 }
 
 @media (max-width: 992px) { // two tiles
-  .wide-item {
+  .item-wide {
     width: calc(100% - 20px);
   }
 }
 
 @media (max-width: 766px) { // one tile
-  .wide-item {
+  .item-wide {
     width: calc(100% - 10px);
   }
 }
