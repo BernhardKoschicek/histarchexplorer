@@ -56,6 +56,13 @@ def landing(id_: int) -> str:
 
     if entity.depictions is None:
         entity.depictions = []
+
+    #Description 2/3 column or 1/3 column
+    if entity.description and len(entity.description) > 500:
+        entity.description_class = "item-middle"
+    else:
+        entity.description_class = "item"
+
     return render_template(
         'landing.html',
         entity=entity,

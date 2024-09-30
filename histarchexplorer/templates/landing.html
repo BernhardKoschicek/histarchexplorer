@@ -67,7 +67,7 @@
 
                     <!-- Description -->
                     {% if entity.description %}
-                        <div class="item {% if entity.description|length > 500 %}item-middle{% endif %}">
+                         <div class="{{ entity.description_class }}">
                             <div class="item-content">
                                 <div class="muuri-description">
                                     <span class="tile-label">DESCRIPTION</span>
