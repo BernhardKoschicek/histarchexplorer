@@ -39,7 +39,7 @@ def format_date(
         string = [s.lstrip("0") for s in date_from.split('.')]
         date = '.'.join(string)
 
-        date = f"{date} {'BC' if bc_date_from else 'AD'}"
+        date = f"{date} {'BC' if bc_date_from else ''}"
     return date
 
 

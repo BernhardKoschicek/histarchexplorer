@@ -12,7 +12,6 @@ def landing(id_: int) -> str:
     parser = Parser()
     entity = Entity.get_entity(id_, parser)
 
-
     subunits_dict = defaultdict(list)
     feature_dict = defaultdict(list)
     strati_dict = defaultdict(list)
