@@ -12244,8 +12244,6 @@ textarea.form-control-lg {
   position: absolute;
   width: calc((100% - 30px) / 3);
   z-index: 1;
-  background: rgba(249, 246, 246, 0.4);
-  color: #060606;
   overflow: hidden;
 }
 
@@ -12260,7 +12258,7 @@ textarea.form-control-lg {
   }
 }
 .item-middle {
-  width: calc((100% - 15px) / 3 * 2);
+  width: 66.6666666667%;
 }
 
 @media (max-width: 992px) {

@@ -49,9 +49,21 @@
                 </div>
             </div>
 
+
             <!-- Main content area - MUURI Tiles -->
             <div class="col-md-10">
                 <div class="grid">
+                    <!-- Description -->
+                    {% if entity.description %}
+                        <div class="{{ entity.description_class }}">
+                            <div class="item-content">
+                                <div class="muuri-description">
+                                    <span class="tile-label">DESCRIPTION</span>
+                                    <p>{{ entity.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
 
                     <!-- Map Location -->
                     <!-- Todo: Add Pin! -->
@@ -64,18 +76,6 @@
                         </div>
                     </div>
 
-
-                    <!-- Description -->
-                    {% if entity.description %}
-                        <div class="{{ entity.description_class }}">
-                            <div class="item item-content">
-                                <div class="muuri-description">
-                                    <span class="tile-label">DESCRIPTION</span>
-                                    <p>{{ entity.description }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
 
                     <!-- First image -->
                     {% if entity.depictions %}

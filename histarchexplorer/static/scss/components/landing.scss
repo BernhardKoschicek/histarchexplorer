@@ -8,8 +8,9 @@
   position: absolute;
   width: calc((100% - 30px) / 3);
   z-index: 1;
-  background: rgba(249, 246, 246, 0.4);
-  color: #060606;
+  //background: rgba(249, 246, 246, 0.4);
+  //color: #060606;
+
   overflow: hidden;
 }
 
@@ -26,7 +27,7 @@
 }
 
 .item-middle {
-  width: calc(((100% - 15px) / 3) * 2); //2 tiles width
+  width: calc(((100% ) / 3) * 2); //2 tiles width
 }
 
 @media (max-width: 992px) { // two tiles
@@ -109,10 +110,10 @@
   }
 }
 
-
 .location {
   width: 100%;
 }
+
 
 #muuri-map {
   margin-top: 1.5rem;
