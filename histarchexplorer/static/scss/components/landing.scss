@@ -3,6 +3,7 @@
 }
 
 .item {
+
   display: block;
   margin: 5px;
   position: absolute;
@@ -26,7 +27,7 @@
 }
 
 .item-middle {
-  width: calc(((100% ) / 3) * 2); //2 tiles width
+  width: calc(((100%) / 3) * 2); //2 tiles width
 }
 
 @media (max-width: 992px) { // two tiles
