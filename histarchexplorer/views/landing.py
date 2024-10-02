@@ -23,6 +23,7 @@ def landing(id_: int) -> str:
     strati_dict = defaultdict(list)
     artifact_dict = defaultdict(list)
     remains_dict = defaultdict(list)
+    places_dict = defaultdict(list)
     if entity.system_class.lower() in [
         "artifact",
         "feature",
@@ -50,6 +51,8 @@ def landing(id_: int) -> str:
                         artifact_dict[type_.label].append(subunit)
                     case 'Human remains':
                         remains_dict[type_.label].append(subunit)
+                    case 'Place':
+                        places_dict[type_.label].append(subunit)
 
         # print(subunits_dict['Feature'])
 
