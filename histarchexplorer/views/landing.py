@@ -64,9 +64,6 @@ def landing(id_: int) -> str:
     # print("Relation Class:", entity.relation_class)
     print(entity.geometry)
 
-    if entity.depictions is None:
-        entity.depictions = []
-
     # Description 2/3 column or 1/3 column
     if entity.description and len(entity.description) > 500:
         entity.description_class = "item-middle"

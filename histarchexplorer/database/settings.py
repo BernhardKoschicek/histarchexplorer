@@ -1,4 +1,7 @@
+from email.policy import default
+
 from flask import g
+from pydantic.fields import defaultdict
 
 
 def get_map_data():
@@ -14,3 +17,14 @@ def get_shown_entities():
         'FROM tng.settings '
         'LIMIT 1')
     return g.cursor.fetchone().shown_entities
+
+def get_main_image_table() -> dict[int, int]:
+    main_image = defaultdict()
+    g.cursor.execute(
+        'SELECT '
+        '   entity_id,'
+        '   image_id '
+        'FROM web.entity_profile_image')
+    for row in g.cursor.fetchall():
+        main_image[row[0]] = row[1]
+    return main_image

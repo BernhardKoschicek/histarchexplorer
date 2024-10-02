@@ -7,6 +7,8 @@ from flask_babel import Babel
 
 from psycopg2.extensions import connection
 
+from histarchexplorer.database.settings import get_main_image_table
+
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
@@ -43,6 +45,7 @@ def before_request() -> None:
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     session['language'] = get_locale()
+    g.main_images = get_main_image_table()
 
 
 @app.context_processor

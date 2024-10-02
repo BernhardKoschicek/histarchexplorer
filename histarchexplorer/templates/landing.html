@@ -86,16 +86,24 @@
 
                     <!-- First image -->
                     {% if entity.depictions %}
-                        <div class="item">
-                            <div class="item-content">
-                                <div class="muuri-images">
-                                    <div class="image">
-                                        <img src="{{ entity.depictions[0].url }}"
-                                             alt="{{ entity.depictions[0].title }}"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                      {% for depiction in entity.depictions %}
+                          <div class="item">
+                              <div class="item-content">
+                                  <div class="muuri-images">
+                                      <div class="image">
+
+                                        {% if depiction.main_image %}
+                                          <img src="{{ depiction.url }}"
+                                               alt="{{ depiction.title }}"/>
+                                        {% else %}
+                                          <img src="{{ entity.depictions[0].url }}"
+                                               alt="{{ entity.depictions[0].title }}"/>
+                                        {% endif %}
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      {% endfor %}
                     {% endif %}
 
                     <!-- Related entities -->
@@ -127,16 +135,18 @@
 
                     <!-- All other images -->
                     {% if entity.depictions|length > 1 %}
-                        {% for depiction in entity.depictions[1:] %}
-                            <div class="item">
-                                <div class="item-content">
-                                    <div class="muuri-images">
-                                        <div class="image">
-                                            <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        {% for depiction in entity.depictions %}
+                          {% if not depiction.main_image %}
+                              <div class="item">
+                                  <div class="item-content">
+                                      <div class="muuri-images">
+                                          <div class="image">
+                                              <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          {% endif %}
                         {% endfor %}
                     {% endif %}
 

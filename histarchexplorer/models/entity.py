@@ -11,19 +11,18 @@ from histarchexplorer.models.util import format_date, split_date_string, \
 
 class Entity:
     def __init__(self, json: dict[str, Any]) -> None:
-        data = json['features'][0]
-        self.id = int(data['@id'].rsplit('/', 1)[-1])
-        self.name = data['properties']['title']
-        self.description = self.get_description(data['descriptions'])
-        self.system_class = uc_first(data['systemClass'].replace('_', ' '))
-        self.view_class = uc_first(data['viewClass'].replace('_', ' ')) if data.get('viewClass') else None
-        self.types = self.get_types(data['types']) if data.get('types') else None
-        self.alias = self.get_alias(data['names']) if data.get('names') else None
-        self.relation_class = self.get_relation_class(data['relations']) if data.get('relations') else None
+        self.data = json['features'][0]
+        self.id = int(self.data['@id'].rsplit('/', 1)[-1])
+        self.name = self.data['properties']['title']
+        self.description = self.get_description(self.data['descriptions'])
+        self.system_class = uc_first(self.data['systemClass'].replace('_', ' '))
+        self.view_class = uc_first(self.data['viewClass'].replace('_', ' ')) if self.data.get('viewClass') else None
+        self.types = self.get_types()
+        self.alias = self.get_alias()
+        self.relation_class = self.get_relation_class()
         self.relations = self.get_relations() if self.relation_class else None
-        self.depictions = self.get_depiction(data['depictions']) \
-            if 'depictions' in data else None
-        self.reference_systems = data['links'] if 'links' in data else None
+        self.depictions = self.get_depiction()
+        self.reference_systems = self.data.get('links')
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -31,16 +30,16 @@ class Entity:
         self.end_to = None
         self.begin = None
         self.end = None
-        self.geometry = self.handling_geometry(data)
-        if 'when' in data:
+        self.geometry = self.handling_geometry(self.data)
+        if 'when' in self.data:
             self.begin_from = split_date_string(
-                data['when']['timespans'][0]['start']['earliest'])
+                self.data['when']['timespans'][0]['start']['earliest'])
             self.begin_to = split_date_string(
-                data['when']['timespans'][0]['start']['latest'])
+                self.data['when']['timespans'][0]['start']['latest'])
             self.end_from = split_date_string(
-                data['when']['timespans'][0]['end']['earliest'])
+                self.data['when']['timespans'][0]['end']['earliest'])
             self.end_to = split_date_string(
-                data['when']['timespans'][0]['end']['latest'])
+                self.data['when']['timespans'][0]['end']['latest'])
             self.begin = format_date(self.begin_from, self.begin_to)
             self.end = format_date(self.end_from, self.end_to)
             self.formated_date = date_template_format(self.begin, self.end)
@@ -87,10 +86,27 @@ class Entity:
                     relation_dict.setdefault('others', []).append(relation)
         return relation_dict
 
-    @staticmethod
-    def get_relation_class(
-            data: list[dict[str, Any]]) -> list[Relation]:
-        return [Relation(relation) for relation in data]
+
+    def get_relation_class(self) -> list[Relation]:
+        if relations := self.data.get('relations'):
+            return [Relation(relation) for relation in relations]
+
+
+    def get_alias(self) -> str:
+        if names := self.data.get('names'):
+            return ', '.join(map(str, [a['alias'] for a in names]))
+        return ''
+
+    def get_types(self) -> Optional[list[Types]]:
+        if self.data.get('types'):
+            return [Types(types) for types in self.data['types']]
+        return None
+
+    def get_depiction(self) -> Optional[list[Depiction]]:
+        if depictions := self.data.get('depictions'):
+            return [Depiction(depiction, self.id) for depiction in depictions]
+        return []
+
 
     @staticmethod
     def get_entity(id_: int, parser: Parser):
@@ -111,18 +127,11 @@ class Entity:
         return [Entity(entity) for entity in
                 ApiAccess.linked_entities_by_properties_recursive(id_, parser)]
 
-    @staticmethod
-    def get_alias(data: list[dict[str, str]]) -> str:
-        return ', '.join(map(str, [alias['alias'] for alias in data])) \
-            if data else ''
 
-    @staticmethod
-    def get_types(data: list[dict[str, Any]]) -> Optional[list[Types]]:
-        return [Types(types) for types in data] if data else None
 
-    @staticmethod
-    def get_depiction(data: list[dict[str, Any]]) -> Optional[list[Depiction]]:
-        return [Depiction(depiction) for depiction in data] if data else None
+
+
+
 
     @staticmethod
     def get_description(data: list[dict[str, Any]]) -> Optional[list[str]]:
