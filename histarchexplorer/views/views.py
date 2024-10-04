@@ -1,6 +1,7 @@
 from typing import Optional
 
-from flask import Response, redirect, render_template, request, session
+from flask import redirect, render_template, request, session
+from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.database.map import get_map_server
@@ -9,7 +10,7 @@ from histarchexplorer.utils.cerberos import get_view_class_count
 
 
 @app.route('/')
-def index():
+def index() -> str:
     map_data = get_map_data()
     map_ = get_map_server(map_data)
 

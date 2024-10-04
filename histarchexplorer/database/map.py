@@ -1,7 +1,9 @@
+from typing import Any
+
 from flask import g
 
 
-def get_map_server(data):
+def get_map_server(data) -> Any:
     g.cursor.execute(
         f'SELECT tilestring '
         f'FROM tng.maps '

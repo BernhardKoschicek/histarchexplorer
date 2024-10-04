@@ -15,8 +15,11 @@ class Entity:
         self.id = int(self.data['@id'].rsplit('/', 1)[-1])
         self.name = self.data['properties']['title']
         self.description = self.get_description(self.data['descriptions'])
-        self.system_class = uc_first(self.data['systemClass'].replace('_', ' '))
-        self.view_class = uc_first(self.data['viewClass'].replace('_', ' ')) if self.data.get('viewClass') else None
+        self.system_class = uc_first(
+            self.data['systemClass'].replace('_', ' '))
+        self.view_class = uc_first(
+            self.data['viewClass'].replace('_', ' ')) \
+            if self.data.get('viewClass') else None
         self.types = self.get_types()
         self.alias = self.get_alias()
         self.relation_class = self.get_relation_class()
@@ -87,10 +90,11 @@ class Entity:
         return relation_dict
 
 
-    def get_relation_class(self) -> list[Relation]:
+    def get_relation_class(self) -> list[Optional[Relation]]:
+        relation =  []
         if relations := self.data.get('relations'):
-            return [Relation(relation) for relation in relations]
-
+            relation = [Relation(relation) for relation in relations]
+        return relation
 
     def get_alias(self) -> str:
         if names := self.data.get('names'):

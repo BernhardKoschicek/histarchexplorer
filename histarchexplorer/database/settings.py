@@ -1,17 +1,17 @@
-from email.policy import default
+from collections import defaultdict
+from typing import Any
 
 from flask import g
-from pydantic.fields import defaultdict
 
 
-def get_map_data():
+def get_map_data() -> Any:
     g.cursor.execute(
         'SELECT index_img, index_map, img_map, greyscale '
         'FROM tng.settings '
         'LIMIT 1')
     return g.cursor.fetchone()
 
-def get_shown_entities():
+def get_shown_entities() -> Any:
     g.cursor.execute(
         'SELECT shown_entities '
         'FROM tng.settings '

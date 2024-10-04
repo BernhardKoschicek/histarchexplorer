@@ -13,10 +13,10 @@ def landing(id_: int) -> str:
     entity = Entity.get_entity(id_, parser)
     linked_entities = Entity.get_entities_linked_to_entity(id_, parser)
     for relation in entity.relations.values():
-        for r in relation:
-            for e_ in linked_entities:
-                if int(e_.id) == int(r.relation_to_id):
-                    r.set_related_entity(e_)
+        for rel in relation:
+            for e in linked_entities:
+                if int(e.id) == int(rel.relation_to_id):
+                    rel.set_related_entity(e)
 
     subunits_dict = defaultdict(list)
     feature_dict = defaultdict(list)

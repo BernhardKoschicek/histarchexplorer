@@ -1,9 +1,12 @@
 import json
 from typing import Optional
 
-from flask import render_template, abort, g, request, redirect, url_for, flash, jsonify, session
+from flask import (render_template, abort, g, request, redirect, url_for,
+                   flash, \
+    jsonify, session)
 from flask_login import current_user, login_required
 from flask_babel import lazy_gettext as _
+from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
@@ -16,7 +19,8 @@ def update_jsonb_column(column_name, value, language, config_id):
         value_to_be_inserted_json = json.dumps(value)
         update_query = f"""
             UPDATE tng.config
-            SET {column_name} = jsonb_set(COALESCE({column_name}, '{{}}'), '{{{language}}}', '{value_to_be_inserted_json}', true)
+            SET {column_name} = jsonb_set(COALESCE({column_name}, '{{}}'), 
+            '{{{language}}}', '{value_to_be_inserted_json}', true)
             WHERE id = {int(config_id)}
         """
     else:
@@ -43,20 +47,24 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     preferred_lan = app.config['PREFERRED_LANGUAGE']
 
-    g.cursor.execute(f"SELECT * FROM tng.config ORDER BY (name->>'{language}')")
+    g.cursor.execute(
+        f"SELECT * FROM tng.config ORDER BY (name->>'{language}')")
     config_data = g.cursor.fetchall()
 
     entities = []
     for item in config_data:
-        entity = {'id': item.id, 'config_class': item.config_class, 'website': item.website, 'email': item.email,
+        entity = {'id': item.id, 'config_class': item.config_class,
+                  'website': item.website, 'email': item.email,
                   'orcid_id': item.orcid_id, 'image': item.image}
 
-        for column in ['name', 'description', 'imprint', 'address', 'legal_notice']:
+        for column in ['name', 'description', 'imprint', 'address',
+                       'legal_notice']:
             entity[column] = {}
             if getattr(item, column):
                 for key, value in getattr(item, column).items():
                     entity[column][key] = value
-                entity[column]['display'] = helpers.get_translation(entity[column])
+                entity[column]['display'] = helpers.get_translation(
+                    entity[column])
 
         entities.append(entity)
 
@@ -67,9 +75,11 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     config_classes = g.cursor.fetchall()
 
     g.cursor.execute('''
-        SELECT id, name, domain, range, 'direct' AS direction  FROM tng.config_properties
+        SELECT id, name, domain, range, 'direct' AS direction  FROM 
+        tng.config_properties
         UNION ALL
-        SELECT id, name_inv, range,domain, 'inverse' AS direction FROM tng.config_properties''')
+        SELECT id, name_inv, range,domain, 'inverse' AS direction FROM 
+        tng.config_properties''')
     config_properties = g.cursor.fetchall()
 
     colnames = [desc[0] for desc in g.cursor.description]
@@ -183,7 +193,8 @@ FROM tng.links l
     for row in links_list:
         row['start_name'] = helpers.get_translation(row['start_name'])
         row['end_name'] = helpers.get_translation(row['end_name'])
-        row['config_property'] = helpers.get_translation(row['config_property'])
+        row['config_property'] = helpers.get_translation(
+            row['config_property'])
         row['role'] = helpers.get_translation(row['role'])
 
     map_id = request.args.get('map_id')
@@ -193,18 +204,19 @@ FROM tng.links l
         map_data = g.cursor.fetchone()
 
     data = get_map_data()
-    settings = {}
-    settings['img'] = data.index_img
-    settings['map'] = data.index_map
-    settings['img_map'] = data.img_map
-    settings['greyscale'] = data.greyscale
+    settings = {
+        'img': data.index_img,
+        'map': data.index_map,
+        'img_map': data.img_map,
+        'greyscale': data.greyscale}
     if data.img_map == 'image':
         settings['not_sel'] = 'map'
     else:
         settings['not_sel'] = 'image'
 
     class_items = get_entities_count_by_case_study()
-    entities_dict = {k: v for k, v in class_items.items() if k not in app.config['CLASSES_TO_SKIP']}
+    entities_dict = {k: v for k, v in class_items.items() if
+                     k not in app.config['CLASSES_TO_SKIP']}
 
     shown_entities = get_shown_entities()
 
@@ -258,11 +270,13 @@ def add_entry():
     try:
         tab_config_class = config_class_map.get(category)
         if tab_config_class == 5:
-            flash(f'Error adding entry {name}: Only one main project allowed', 'danger')
+            flash(f'Error adding entry {name}: Only one main project allowed',
+                  'danger')
             return redirect(url_for('admin') + current_tab)
 
         g.cursor.execute('''
-                   INSERT INTO tng.config (name, email, website, orcid_id, image, config_class)
+                   INSERT INTO tng.config (name, email, website, orcid_id, 
+                   image, config_class)
                    VALUES (
                     '{"de": "Stefan Eichert", "en": "Stefan Eichert"}'::jsonb,
                     NULLIF(%s, ''),
@@ -283,7 +297,9 @@ def add_entry():
         update_jsonb_column('legal_notice', legal_notice, language, config_id)
 
         flash('Entry added successfully!', 'success')
-        return redirect(url_for('admin') + current_tab + '/' + current_tab + str(new_entry_id))
+        return redirect(
+            url_for('admin') + current_tab + '/' + current_tab + str(
+                new_entry_id))
 
     except Exception as e:
         flash(f'Error adding entry {name}: {str(e)}', 'danger')
@@ -304,30 +320,37 @@ def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
         flash('Main Project cannot be deleted', 'danger')
         return redirect(url_for('admin') + tab)
 
-    g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s', {'id': int(id)})
+    g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s',
+                     {'id': int(id)})
     flash('Entry deleted successfully!', 'success')
     return redirect(url_for('admin') + tab)
 
 
 @app.route('/admin/delete_link/<link_id>/<tab>/<entry>')
 @login_required
-def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None, entry: Optional[str] = None) -> str:
+def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None,
+                entry: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
-    g.cursor.execute('DELETE FROM tng.links WHERE id = %(link_id)s', {'link_id': int(link_id)})
+    g.cursor.execute('DELETE FROM tng.links WHERE id = %(link_id)s',
+                     {'link_id': int(link_id)})
     flash('Link deleted successfully!', 'success')
     return redirect(url_for('admin') + tab + '/' + entry)
 
 
-@app.route('/admin/add_link/<domain>/<range>/<prop>/<role>/<tab>/<entry>', methods=['GET', 'POST'])
+@app.route('/admin/add_link/<domain>/<range>/<prop>/<role>/<tab>/<entry>',
+           methods=['GET', 'POST'])
 @login_required
-def add_link(domain: Optional[int] = None, range: Optional[int] = None, prop: Optional[int] = None,
-             role: Optional[int] = None, tab: Optional[str] = None, entry: Optional[str] = None) -> str:
+def add_link(domain: Optional[int] = None, range: Optional[int] = None,
+             prop: Optional[int] = None,
+             role: Optional[int] = None, tab: Optional[str] = None,
+             entry: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
     g.cursor.execute(
-        f'INSERT INTO tng.links (domain_id, range_id, property, attribute) VALUES ({domain}, {range}, {prop}, NULLIF({role}, 0))')
+        f'INSERT INTO tng.links (domain_id, range_id, property, attribute) '
+        f'VALUES ({domain}, {range}, {prop}, NULLIF({role}, 0))')
     flash('Link added successfully', 'success')
     return redirect(url_for('admin') + tab + '/' + entry)
 
@@ -365,11 +388,14 @@ def edit_entry():
         WHERE  id = %(id)s;
     """
     try:
-        g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s', {'id': int(config_id)})
+        g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s',
+                         {'id': int(config_id)})
         result = g.cursor.fetchone()
         if result:
             g.cursor.execute(editsql,
-                             {'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id, 'image': image})
+                             {'email': mail, 'website': website,
+                              'orcid_id': orcid, 'id': config_id,
+                              'image': image})
             flash(f'"{name}" updated successfully', 'success')
         else:
             flash(f'Error updating {name}', 'danger')
@@ -392,7 +418,8 @@ def edit_map():
 
     name = request.form.get('name')
     display_name = request.form.get('displayname')
-    sortorder = request.form.get('inputorder') if request.form.get('inputorder') else ''
+    sortorder = request.form.get('inputorder') if request.form.get(
+        'inputorder') else ''
     tilestring = request.form.get('description')
     current_tab = request.form.get('current_tab')
     map_id = request.form.get('map_id')
@@ -401,13 +428,15 @@ def edit_map():
         UPDATE tng.maps SET
             name = NULLIF(%(name)s, ''),
             display_name = NULLIF(%(display_name)s, ''),
-            sortorder = CASE WHEN %(sortorder)s = '' THEN NULL ELSE CAST(%(sortorder)s AS integer) END,
+            sortorder = CASE WHEN %(sortorder)s = '' THEN NULL ELSE CAST(%(
+            sortorder)s AS integer) END,
             tilestring = NULLIF(%(tilestring)s, '')
         WHERE id = %(map_id)s
     """
 
     try:
-        g.cursor.execute('SELECT id FROM tng.maps WHERE id = %(map_id)s', {'map_id': map_id})
+        g.cursor.execute('SELECT id FROM tng.maps WHERE id = %(map_id)s',
+                         {'map_id': map_id})
         result = g.cursor.fetchone()
         if result:
             g.cursor.execute(editsql, {
@@ -455,9 +484,6 @@ def add_map():
     return redirect(url_for('admin'))
 
 
-from flask import flash, redirect, url_for
-
-
 @app.route('/admin/delete_map/<int:map_id>')
 @login_required
 def delete_map(map_id: int) -> str:
@@ -465,7 +491,8 @@ def delete_map(map_id: int) -> str:
         abort(403)
 
     try:
-        g.cursor.execute('DELETE FROM tng.maps WHERE id = %(map_id)s', {'map_id': map_id})
+        g.cursor.execute('DELETE FROM tng.maps WHERE id = %(map_id)s',
+                         {'map_id': map_id})
         flash('Map deleted successfully!', 'map success')
     except Exception as e:
         flash(f'Error deleting map: {str(e)}', 'map danger')
@@ -481,7 +508,8 @@ def choose_index_bg():
     greyscale = request.form.get('greyscale') == 'on'
 
     g.cursor.execute(
-        'UPDATE tng.settings SET (index_map, index_img, img_map, greyscale) = (%s, %s, %s, %s) WHERE ID = (SELECT ID FROM tng.settings LIMIT 1)',
+        'UPDATE tng.settings SET (index_map, index_img, img_map, greyscale) '
+        '= (%s, %s, %s, %s) WHERE ID = (SELECT ID FROM tng.settings LIMIT 1)',
         (map_id, default_img, map_img, greyscale)
     )
     return redirect(url_for('admin'))
@@ -494,7 +522,8 @@ def select_entities() -> str:
 
         selected_entities_str = json.dumps(selected_entities)
 
-        g.cursor.execute('UPDATE tng.settings SET shown_entities = %s::JSONB', (selected_entities_str,))
+        g.cursor.execute('UPDATE tng.settings SET shown_entities = %s::JSONB',
+                         (selected_entities_str,))
 
         return redirect(url_for('admin'))
 
@@ -519,7 +548,11 @@ def reset():
         );
         
         INSERT INTO tng.maps (name, display_name, tilestring, sortorder) 
-            VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1);
+            VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer(
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, 
+            attribution: ''&copy; <a 
+            href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 
+            contributors''});', 1);
         
         CREATE TABLE IF NOT EXISTS tng.config
         (
@@ -564,15 +597,20 @@ def reset():
         );
         
         ALTER TABLE tng.config
-            ADD CONSTRAINT config_config_classes_fk FOREIGN KEY (config_class) REFERENCES tng.config_classes (id);
+            ADD CONSTRAINT config_config_classes_fk FOREIGN KEY (
+            config_class) REFERENCES tng.config_classes (id);
         ALTER TABLE tng.links
-            ADD CONSTRAINT links_config_properties_fk FOREIGN KEY (property) REFERENCES tng.config_properties (id);
+            ADD CONSTRAINT links_config_properties_fk FOREIGN KEY (property) 
+            REFERENCES tng.config_properties (id);
         ALTER TABLE tng.links
-            ADD CONSTRAINT links_config_fk_domain FOREIGN KEY (domain_id) REFERENCES tng.config (id);
+            ADD CONSTRAINT links_config_fk_domain FOREIGN KEY (domain_id) 
+            REFERENCES tng.config (id);
         ALTER TABLE tng.links
-            ADD CONSTRAINT links_config_fk_range FOREIGN KEY (range_id) REFERENCES tng.config (id);
+            ADD CONSTRAINT links_config_fk_range FOREIGN KEY (range_id) 
+            REFERENCES tng.config (id);
         ALTER TABLE tng.links
-            ADD CONSTRAINT links_config_fk_role FOREIGN KEY (attribute) REFERENCES tng.config (id);
+            ADD CONSTRAINT links_config_fk_role FOREIGN KEY (attribute) 
+            REFERENCES tng.config (id);
         
         CREATE OR REPLACE FUNCTION tng.delete_links_on_config_delete()
             RETURNS trigger
@@ -580,7 +618,8 @@ def reset():
         AS
         $function$
         BEGIN
-            DELETE FROM tng.links WHERE domain_id = OLD.id OR range_id = OLD.id;
+            DELETE FROM tng.links WHERE domain_id = OLD.id OR range_id = 
+            OLD.id;
             RETURN OLD;
         END;
         $function$;
@@ -599,87 +638,163 @@ def reset():
         INSERT INTO tng.config_classes (name) VALUES ('language_code');
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Mitglied", "en": "has member"}'::jsonb, '{"de": "ist Mitglied von", "en": "is member of"}'::jsonb, 
-                (SELECT id FROM tng.config_classes WHERE name = 'project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
+        VALUES ('{"de": "hat Mitglied", "en": "has member"}'::jsonb, '{"de": 
+        "ist Mitglied von", "en": "is member of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 'project'), 
+                (SELECT id FROM tng.config_classes WHERE name = 'person'));
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Zugehörigkeit", "en": "has affiliation"}'::jsonb, '{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}'::jsonb, 
-                (SELECT id FROM tng.config_classes WHERE name = 'person'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
+        VALUES ('{"de": "hat Zugehörigkeit", "en": "has 
+        affiliation"}'::jsonb, '{"de": "ist Zugehörigkeit von", "en": "is 
+        affiliation of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 'person'), 
+                (SELECT id FROM tng.config_classes WHERE name = 
+                'institution'));
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Kernmitglied", "en": "has core member"}'::jsonb, '{"de": "ist Kernmitglied von", "en": "is core member of"}'::jsonb, 
-                (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
+        VALUES ('{"de": "hat Kernmitglied", "en": "has core 
+        member"}'::jsonb, '{"de": "ist Kernmitglied von", "en": "is core 
+        member of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 
+                'main-project'), (SELECT id FROM tng.config_classes WHERE 
+                name = 'person'));
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Kerninstitution", "en": "has core institution"}'::jsonb, '{"de": "ist Kerninstitution von", "en": "is core institution of"}'::jsonb, 
-                (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
+        VALUES ('{"de": "hat Kerninstitution", "en": "has core 
+        institution"}'::jsonb, '{"de": "ist Kerninstitution von", "en": "is 
+        core institution of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 
+                'main-project'), (SELECT id FROM tng.config_classes WHERE 
+                name = 'institution'));
 
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Institution", "en": "has institution"}'::jsonb, '{"de": "ist Institution von", "en": "is institution of"}'::jsonb, 
-                (SELECT id FROM tng.config_classes WHERE name = 'project'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
+        VALUES ('{"de": "hat Institution", "en": "has institution"}'::jsonb, 
+        '{"de": "ist Institution von", "en": "is institution of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 'project'), 
+                (SELECT id FROM tng.config_classes WHERE name = 
+                'institution'));
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Hauptprojekt", "en": "Main Project"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'main-project'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Hauptprojekt", "en": "Main Project"}'::jsonb, 
+        (SELECT id from tng.config_classes WHERE name = 'main-project'), 
+        NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Stefan Eichert", "en": "Stefan Eichert"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Stefan Eichert", "en": "Stefan Eichert"}'::jsonb, 
+        (SELECT id from tng.config_classes WHERE name = 'person'), NULL, 
+        NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Lisa Aldrian", "en": "Lisa Aldrian"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Lisa Aldrian", "en": "Lisa Aldrian"}'::jsonb, 
+        (SELECT id from tng.config_classes WHERE name = 'person'), NULL, 
+        NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "David Ruß", "en": "David Ruß"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "David Ruß", "en": "David Ruß"}'::jsonb, (SELECT id 
+        from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, 
+        NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Projektleitung", "en": "Principal Investigator"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Projektleitung", "en": "Principal 
+        Investigator"}'::jsonb, (SELECT id from tng.config_classes WHERE 
+        name = 'role'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Hauptkoordinator", "en": "Main Coordinator"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Hauptkoordinator", "en": "Main 
+        Coordinator"}'::jsonb, (SELECT id from tng.config_classes WHERE name 
+        = 'role'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Forscher", "en": "Researcher"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Forscher", "en": "Researcher"}'::jsonb, (SELECT id 
+        from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Softwareentwickler", "en": "Software Developer"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Softwareentwickler", "en": "Software 
+        Developer"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 
+        'role'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Design & Programmierung", "en": "Design & Programming"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Design & Programmierung", "en": "Design & 
+        Programming"}'::jsonb, (SELECT id from tng.config_classes WHERE name 
+        = 'role'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Archäologe", "en": "Archaeologist"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Archäologe", "en": "Archaeologist"}'::jsonb, 
+        (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 
+        NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Anthropologe", "en": "Anthropologist"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Anthropologe", "en": "Anthropologist"}'::jsonb, 
+        (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 
+        NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Datenaufnahme", "en": "Data Acquisition"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Datenaufnahme", "en": "Data Acquisition"}'::jsonb, 
+        (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 
+        NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Historiker", "en": "Historian"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Historiker", "en": "Historian"}'::jsonb, (SELECT id 
+        from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Sponsor", "en": "Sponsor"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'https://example.example', NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Sponsor", "en": "Sponsor"}'::jsonb, (SELECT id from 
+        tng.config_classes WHERE name = 'role'), NULL, NULL, 
+        'https://example.example', NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Partner", "en": "Partner"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'https://example.example', NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Partner", "en": "Partner"}'::jsonb, (SELECT id from 
+        tng.config_classes WHERE name = 'role'), NULL, NULL, 
+        'https://example.example', NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "THANADOS", "en": "THANADOS"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "THANADOS", "en": "THANADOS"}'::jsonb, (SELECT id 
+        from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, 
+        NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "RELIC", "en": "RELIC"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "RELIC", "en": "RELIC"}'::jsonb, (SELECT id from 
+        tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "REPLICO", "en": "REPLICO"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "REPLICO", "en": "REPLICO"}'::jsonb, (SELECT id from 
+        tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "NHM", "en": "NHM"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "NHM", "en": "NHM"}'::jsonb, (SELECT id from 
+        tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, 
+        NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"de": "Universität Wien", "en": "University of Vienna"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"de": "Universität Wien", "en": "University of 
+        Vienna"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 
+        'institution'), NULL, NULL, NULL, NULL);
         
-        INSERT INTO tng.config (name, config_class, description, address, email, website)
-        VALUES ('{"en": "Austrian Centre for Digital Humanities & Cultural Heritage"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
+        INSERT INTO tng.config (name, config_class, description, address, 
+        email, website)
+        VALUES ('{"en": "Austrian Centre for Digital Humanities & Cultural 
+        Heritage"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 
+        'institution'), NULL, NULL, NULL, NULL);
 
         
         CREATE TABLE IF NOT EXISTS tng.settings
@@ -692,8 +807,10 @@ def reset():
             shown_entities  JSONB
         );
 
-        INSERT INTO tng.settings (index_img, index_map, img_map, greyscale, shown_entities)
-        VALUES ('/static/images/index_map_bg/Blank_map_of_Europe_central_network.png',
+        INSERT INTO tng.settings (index_img, index_map, img_map, greyscale, 
+        shown_entities)
+        VALUES ('/static/images/index_map_bg
+        /Blank_map_of_Europe_central_network.png',
                 1,
                 'image', TRUE, '[]'::JSONB)
         
@@ -703,7 +820,7 @@ def reset():
 
 
 @app.route('/sortlinks', methods=['POST'])
-def sortlinks() -> str:
+def sort_links() -> Response:
     @login_required
     def reset():
         if current_user.group not in ['admin', 'manager']:
@@ -714,6 +831,7 @@ def sortlinks() -> str:
     table = data['table']
 
     for row in criteria:
-        g.cursor.execute(f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(id)s',
-                         {'id': row['id'], 'order': row['order'], 'table': table})
+        g.cursor.execute(
+            f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(id)s',
+            {'id': row['id'], 'order': row['order'], 'table': table})
     return jsonify({'status': 'ok'})
