@@ -1,8 +1,9 @@
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
-from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.util import format_date, split_date_string
 
+if TYPE_CHECKING:  # pragma: no cover
+    from histarchexplorer.models.entity import Entity
 
 class Relation:
     def __init__(self, data: dict[str, Any]):
@@ -36,5 +37,5 @@ class Relation:
     def __repr__(self) -> str:
         return str(self.__dict__)
 
-    def set_related_entity(self, entity: Entity) -> None:
+    def set_related_entity(self, entity) -> None:
         self.related_entity = entity
