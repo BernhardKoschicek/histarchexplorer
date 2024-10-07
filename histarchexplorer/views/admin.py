@@ -227,7 +227,7 @@ FROM tng.links l
     view_classes = app.config['VIEW_CLASSES']
 
     return render_template(
-        "/admin.html",
+        "admin.html",
         config_data=entities,
         entities=entities,
         tabs=tabs,

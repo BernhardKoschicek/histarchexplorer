@@ -3,13 +3,8 @@ from histarchexplorer import app
 from histarchexplorer.utils import helpers
 
 
-def capitalize_first(value: str) -> str:
-    if not value:
-        return ''
-    return value[0].upper() + value[1:]
 
 
-app.jinja_env.filters['capitalize_first'] = capitalize_first
 
 
 @app.route('/about')

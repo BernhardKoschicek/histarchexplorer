@@ -48,8 +48,7 @@ def login() -> str | Response:
                     login_user(user)
                     return redirect(
                         request.args.get('next') or url_for('index'))
-                else:  # pragma: no cover
-                    flash('error inactive', 'error')
+                flash('error inactive', 'error')
             else:  # pragma: no cover
                 flash('error wrong password', 'error')
         else:

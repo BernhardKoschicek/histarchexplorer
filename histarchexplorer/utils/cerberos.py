@@ -12,7 +12,7 @@ def get_view_class_count() -> dict[str, Any]:
         if key not in get_shown_entities():
             del entities_count[key]
 
-    return_classes = {}
+    return_classes: dict[str, dict[str, Any]] = {}
     view_classes = app.config['VIEW_CLASSES']
     for view_class in view_classes:
         for key, value in entities_count.items():
