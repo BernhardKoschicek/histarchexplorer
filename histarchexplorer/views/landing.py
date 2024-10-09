@@ -37,7 +37,7 @@ def landing(id_: int) -> str:
                 if int(relation_entity.id) == int(rel.relation_to_id):
                     rel.related_entity = relation_entity
 
-
+    super_entity = None
     if main_entity.system_class.lower() in [
         "artifact",
         "feature",
@@ -47,7 +47,7 @@ def landing(id_: int) -> str:
 
         for subunit in entities:
             if not subunit.types:
-                continue
+                continue #macht mit nächster entity weiter; check also break
             for type_ in subunit.types:
                 subunits_dict[type_.type_hierarchy[0]['label']].append(subunit)
 
@@ -62,6 +62,7 @@ def landing(id_: int) -> str:
                         remains_dict[type_.label].append(subunit)
                     case 'Place':
                         places_dict[type_.label].append(subunit)
+                        super_entity = subunit
 
         # print(subunits_dict['Feature'])
 
@@ -71,7 +72,7 @@ def landing(id_: int) -> str:
     # print("End:", entity.end)
     # print("Relations:", entity.relations)
     # print("Relation Class:", entity.relation_class)
-    print(main_entity.geometry)
+    #print(main_entity.geometry)
 
     main_image= None
     images=[]
@@ -85,6 +86,8 @@ def landing(id_: int) -> str:
         main_image = images[0]
         del images[0]
 
+    if not main_entity.geometry:
+        main_entity.geometry = super_entity.geometry
 
     # Description 2/3 column or 1/3 column
     if main_entity.description and len(main_entity.description) > 500:
@@ -103,5 +106,6 @@ def landing(id_: int) -> str:
         remains=remains_dict or {},
         places=places_dict or {},
         main_image=main_image,
-        images=images
+        images=images,
+        super_entity=super_entity
     )

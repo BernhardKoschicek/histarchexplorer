@@ -3,7 +3,7 @@ from typing import Optional
 
 from flask import (
     render_template, abort, g, request, redirect, url_for,
-    flash, jsonify, session)
+    flash, session)
 from flask_login import current_user, login_required
 from flask_babel import lazy_gettext as _
 from werkzeug import Response
