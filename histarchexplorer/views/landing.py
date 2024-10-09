@@ -62,7 +62,10 @@ def landing(id_: int) -> str:
                         remains_dict[type_.label].append(subunit)
                     case 'Place':
                         places_dict[type_.label].append(subunit)
-                        super_entity = subunit
+
+                        #check if entity = super_entity
+                        if subunit.id != main_entity.id:
+                            super_entity = subunit
 
         # print(subunits_dict['Feature'])
 
@@ -73,6 +76,7 @@ def landing(id_: int) -> str:
     # print("Relations:", entity.relations)
     # print("Relation Class:", entity.relation_class)
     #print(main_entity.geometry)
+    print(type(super_entity))
 
     main_image= None
     images=[]
