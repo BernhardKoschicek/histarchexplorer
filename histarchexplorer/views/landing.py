@@ -90,7 +90,7 @@ def landing(id_: int) -> str:
         main_image = images[0]
         del images[0]
 
-    if not main_entity.geometry:
+    if not main_entity.geometry and super_entity and super_entity.geometry:
         main_entity.geometry = super_entity.geometry
 
     # Description 2/3 column or 1/3 column
@@ -102,6 +102,7 @@ def landing(id_: int) -> str:
         'landing.html',
         entity=main_entity,
         view_class=main_entity.view_class,
+        system_class=main_entity.system_class,
         relations=main_entity.relations,
         subunits=subunits_dict or {},
         features=feature_dict or {},
