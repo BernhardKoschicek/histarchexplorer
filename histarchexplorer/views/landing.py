@@ -18,12 +18,7 @@ def landing(id_: int) -> str:
         id_,
         parser)
 #remove types, adminitrative units, appelations etc.
-    subunits_dict = defaultdict(list)
-    feature_dict = defaultdict(list)
-    strati_dict = defaultdict(list)
-    artifact_dict = defaultdict(list)
-    remains_dict = defaultdict(list)
-    places_dict = defaultdict(list)
+
 
     main_entity = None
     for entity in entities:
@@ -36,6 +31,15 @@ def landing(id_: int) -> str:
             for relation_entity in entities:
                 if int(relation_entity.id) == int(rel.relation_to_id):
                     rel.related_entity = relation_entity
+
+    subunits_dict = defaultdict(list)
+    related_entities = {
+        'Place' : defaultdict(list),
+        'Feature': defaultdict(list),
+        'Stratigraphic unit': defaultdict(list),
+        'Human remains': defaultdict(list),
+        'Artifact': defaultdict(list)
+    }
 
     super_entity = None
     if main_entity.system_class.lower() in [
@@ -51,17 +55,17 @@ def landing(id_: int) -> str:
             for type_ in subunit.types:
                 subunits_dict[type_.type_hierarchy[0]['label']].append(subunit)
 
-                match type_.type_hierarchy[0]['label']:
+                match label := type_.type_hierarchy[0]['label']:
                     case 'Feature':
-                        feature_dict[type_.label].append(subunit)
+                        related_entities[label][type_.label].append(subunit)
                     case 'Stratigraphic unit':
-                        strati_dict[type_.label].append(subunit)
+                        related_entities[label][type_.label].append(subunit)
                     case 'Artifact':
-                        artifact_dict[type_.label].append(subunit)
+                        related_entities[label][type_.label].append(subunit)
                     case 'Human remains':
-                        remains_dict[type_.label].append(subunit)
+                        related_entities[label][type_.label].append(subunit)
                     case 'Place':
-                        places_dict[type_.label].append(subunit)
+                        related_entities[label][type_.label].append(subunit)
 
                         #check if entity = super_entity
                         if subunit.id != main_entity.id:
@@ -101,10 +105,14 @@ def landing(id_: int) -> str:
     else:
         main_entity.description_class = "item"
 
-    case_study = None
+    case_study = []
     for type_ in main_entity.types:
         if type_.root == "Case Study":
-            case_study = type_
+            case_study.append(type_)
+    if not case_study:
+        for type_ in super_entity.types:
+            if type_.root == "Case Study":
+                case_study.append(type_)
 
     return render_template(
         'landing.html',
@@ -113,12 +121,9 @@ def landing(id_: int) -> str:
         system_class=main_entity.system_class,
         relations=main_entity.relations,
         subunits=subunits_dict or {},
-        features=feature_dict or {},
-        strati=strati_dict or {},
-        artifact=artifact_dict or {},
-        remains=remains_dict or {},
-        places=places_dict or {},
+        related_entities=related_entities,
         main_image=main_image,
         images=images,
-        super_entity=super_entity
+        super_entity=super_entity,
+        case_study=case_study
     )

@@ -96,10 +96,10 @@ class Entity:
             return ', '.join(map(str, [a['alias'] for a in names]))
         return ''
 
-    def get_types(self) -> Optional[list[Types]]:
+    def get_types(self) -> list[Types]:
         if self.data.get('types'):
             return [Types(types) for types in self.data['types']]
-        return None
+        return []
 
     def get_depiction(self) -> Optional[list[Depiction]]:
         if depictions := self.data.get('depictions'):
