@@ -88,13 +88,18 @@ def landing(id_: int) -> str:
     images = []
 
     for image in main_entity.depictions:
+        print(image.main_image)
         if image.main_image:
             main_image = image
             continue
         images.append(image)
+    print("Main Image:", main_entity.depictions)
+    print("Main Image:", main_image)
     if not main_image and images:
         main_image = images[0]
         del images[0]
+
+
 
     if not main_entity.geometry and super_entity and super_entity.geometry:
         main_entity.geometry = super_entity.geometry

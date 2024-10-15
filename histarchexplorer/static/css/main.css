@@ -12291,6 +12291,17 @@ textarea.form-control-lg {
     width: calc(100% - 10px);
   }
 }
+.item-fit {
+  display: block;
+  margin: 5px;
+  position: absolute;
+  width: calc((100% - 30px) / 3);
+  z-index: 1;
+  background: var(--muuri-tile);
+  overflow: hidden;
+  max-height: fit-content;
+}
+
 .item-content {
   padding: 1rem;
   display: flex;
@@ -12374,7 +12385,7 @@ textarea.form-control-lg {
 }
 
 .subentities {
-  height: 700px;
+  max-height: 700px;
 }
 
 .no-bullets {
