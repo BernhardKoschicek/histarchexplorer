@@ -127,7 +127,7 @@
 }
 
 .location:hover #expand-button {
-    opacity: 1;
+  opacity: 1;
 }
 
 #expand-button {
@@ -145,18 +145,17 @@
   transition: ease-in 0.3s;
 
   /* Expanded-map - col-md-10 */
-.expanded-map {
-  width: 100% !important;
-  height: calc(100vh - 96px);
-  position: relative;
-  z-index: 1001;
-}
+  .expanded-map #muuri-map {
+    width: 1000px;
+    height: calc(100vh - 96px);
+    // position: relative;
+    // z-index: 1001;
+  }
 
-/* Hide fullscreen button when expanded */
-//.expanded-map .location:hover #fullscreen-button {
-//  opacity: 0;
-//}
-
+  /* Hide fullscreen button when expanded */
+  //.expanded-map .location:hover #fullscreen-button {
+  //  opacity: 0;
+  //}
 
 
   // Icon styling
@@ -228,7 +227,7 @@
   margin-top: 3rem;
 }
 
-.entity-class{
+.entity-class {
   color: grey;
 }
 

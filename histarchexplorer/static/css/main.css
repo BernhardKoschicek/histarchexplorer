@@ -12365,11 +12365,9 @@ textarea.form-control-lg {
   /* Expanded-map - col-md-10 */
   /* Hide fullscreen button when expanded */
 }
-#expand-button .expanded-map {
-  width: 100% !important;
+#expand-button .expanded-map #muuri-map {
+  width: 1000px;
   height: calc(100vh - 96px);
-  position: relative;
-  z-index: 1001;
 }
 #expand-button i {
   font-size: 1.2rem;

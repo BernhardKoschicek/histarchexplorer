@@ -29,17 +29,17 @@ if (gisData) {
 }
 
 // Expand button
-document.getElementById('expand-button').addEventListener('click', function () {
-    const mapContainer = document.querySelector('.map-wrapper');
+const expandButton = document.getElementById('expand-button');
+const mapContainer = document.querySelector('.map-wrapper');
+const muuriMap = document.getElementById('muuri-map');
 
-    console.log("Button clicked");
+ expandButton.addEventListener('click', event => {
+    setTimeout(() => {
+        muuriMap.classList.toggle('expanded-map');
+        mapContainer.classList.toggle('expanded-map');
 
-    // Toggle fullscreen class
-    mapContainer.classList.toggle('expanded-map');
-    console.log("Class toggled:", mapContainer.classList.contains('expanded-map'));
-
-    // Invalidate map size so that it properly adjusts
-    setTimeout(function () {
+        // Invalidate the map size to adjust for the new dimensions
         map.invalidateSize();
-    }, 300); //delay to ensure SCSS is applied before resizing the map
+        grid.refreshItems().layout();
+    }, 300);
 });
