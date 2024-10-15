@@ -12381,6 +12381,11 @@ textarea.form-control-lg {
   list-style: none;
 }
 
+.entity-list {
+  font-size: 1em;
+  font-weight: lighter;
+}
+
 .item.muuri-item-dragging {
   z-index: 3;
 }
@@ -12410,6 +12415,15 @@ textarea.form-control-lg {
   margin-top: 2rem;
 }
 
+.super-entity {
+  font-weight: lighter;
+}
+
+.nude-link {
+  color: inherit;
+  font-weight: inherit;
+}
+
 .entity-country {
   margin-top: 1rem;
 }
@@ -12430,7 +12444,8 @@ textarea.form-control-lg {
 }
 
 .entity-class {
-  color: grey;
+  color: dimgrey;
+  font-weight: lighter;
 }
 
 #entity-link-buttons {

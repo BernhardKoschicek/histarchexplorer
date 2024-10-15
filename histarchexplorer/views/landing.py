@@ -17,14 +17,12 @@ def landing(id_: int) -> str:
     entities = Entity.get_linked_entities_by_properties_recursive(
         id_,
         parser)
-#remove types, adminitrative units, appelations etc.
-
+    # remove types, adminitrative units, appelations etc.
 
     main_entity = None
     for entity in entities:
         if entity.id == id_:
             main_entity = entity
-
 
     for relation in main_entity.relations.values():
         for rel in relation:
@@ -34,7 +32,7 @@ def landing(id_: int) -> str:
 
     subunits_dict = defaultdict(list)
     related_entities = {
-        'Place' : defaultdict(list),
+        'Place': defaultdict(list),
         'Feature': defaultdict(list),
         'Stratigraphic unit': defaultdict(list),
         'Human remains': defaultdict(list),
@@ -51,7 +49,9 @@ def landing(id_: int) -> str:
 
         for subunit in entities:
             if not subunit.types:
-                continue #macht mit nächster entity weiter; check also break
+                continue  # macht mit nächster entity weiter; check also break
+
+
             for type_ in subunit.types:
                 subunits_dict[type_.type_hierarchy[0]['label']].append(subunit)
 
@@ -67,7 +67,7 @@ def landing(id_: int) -> str:
                     case 'Place':
                         related_entities[label][type_.label].append(subunit)
 
-                        #check if entity = super_entity
+                        # check if entity = super_entity
                         if subunit.id != main_entity.id:
                             super_entity = subunit
 
@@ -79,17 +79,17 @@ def landing(id_: int) -> str:
     # print("End:", entity.end)
     # print("Relations:", entity.relations)
     # print("Relation Class:", entity.relation_class)
-    #print(main_entity.geometry)
+    # print(main_entity.geometry)
     print(type(super_entity))
     print(main_entity.system_class)
-    #print(subunit)
+    # print(subunit)
 
-    main_image= None
-    images=[]
+    main_image = None
+    images = []
 
     for image in main_entity.depictions:
         if image.main_image:
-            main_image =image
+            main_image = image
             continue
         images.append(image)
     if not main_image and images:
