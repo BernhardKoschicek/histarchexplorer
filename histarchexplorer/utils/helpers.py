@@ -3,7 +3,6 @@ from histarchexplorer import app
 
 
 def get_translation(item: dict[str, str]) -> dict[str, str]:
-    print(item)
     language = session.get(
         'language',
         request.accept_languages.best_match(

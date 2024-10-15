@@ -80,8 +80,8 @@ def landing(id_: int) -> str:
     # print("Relations:", entity.relations)
     # print("Relation Class:", entity.relation_class)
     # print(main_entity.geometry)
-    print(type(super_entity))
-    print(main_entity.system_class)
+    # print(type(super_entity))
+    # print(main_entity.system_class)
     # print(subunit)
 
     main_image = None

@@ -10,7 +10,7 @@
                     {% if super_entity %}
                         <p>
                             <a href="{{ url_for('landing', id_=super_entity.id) }}" class="nude-link">
-                                {{ super_entity.data.properties.title }}
+                               <i class="bi bi-box-arrow-left"></i> {{ super_entity.data.properties.title }}
                             </a>
                         </p>
                     {% endif %}
@@ -59,7 +59,7 @@
                         {% for key in relations %}
                             {% if not key == 'others' %}
                                 <button type="button"
-                                        class="btn btn-outline-secondary btn-lg">{{ key|capitalize_first }}</button>
+                                        class="btn btn-outline-secondary btn-lg">{{ key|replace('_', ' ')|capitalize_first }}</button>
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -76,7 +76,7 @@
                                 {% if loop.index > 1 %}| {% endif %}{{ case.label }}
                             {% endfor %}
                         </p>
-                        <p>Type: {{ system_class }}</p>
+                        <p>Hierarchy: {{ system_class }}</p>
                     </div>
 
                 </div>
