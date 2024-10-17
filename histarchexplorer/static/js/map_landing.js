@@ -39,12 +39,13 @@ expandButton.addEventListener('click', event => {
     setTimeout(() => {
         muuriMap.classList.toggle('expanded-map');
         mapContainer.classList.toggle('expanded-map');
-        //superMapContainer.classList.toggle('expanded-map');
-        itemContainer.classList.remove('item');
 
-        // hide other tiles
+        const locationTile = document.querySelector('.map-wrapper').closest('.item');
+        if (locationTile) {
+            locationTile.classList.remove('item');
+        }
         document.querySelectorAll('.item, .item-content').forEach(item => {
-            if (!item.contains(muuriMap)){
+            if (!item.contains(muuriMap)) {
                 item.classList.toggle('hidden');
             }
         });
