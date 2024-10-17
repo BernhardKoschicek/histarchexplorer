@@ -12266,6 +12266,7 @@ textarea.form-control-lg {
   width: calc((100% - 30px) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
+  border-radius: 7.5px;
 }
 
 @media (max-width: 992px) {

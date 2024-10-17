@@ -5,7 +5,9 @@ var map = L.map('muuri-map', {
     scrollWheelZoom: false,
     doubleClickZoom: false,
     touchZoom: false,
-    boxZoom: false
+    boxZoom: false,
+    dragging: false,
+
 });
 
 L.control.scale().addTo(map);
