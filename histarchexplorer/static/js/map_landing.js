@@ -49,11 +49,24 @@ expandButton.addEventListener('click', event => {
                 item.classList.toggle('hidden');
             }
         });
-    //Expand-Shrink Button
+        //Expand-Shrink Button
         if (muuriMap.classList.contains('expanded-map')) {
             expandButton.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+        //Enable map zoom etc
+            map.scrollWheelZoom.enable();
+            map.doubleClickZoom.enable();
+            map.touchZoom.enable();
+            map.boxZoom.enable();
+            map.dragging.enable();
+
         } else {
             expandButton.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+
+            map.scrollWheelZoom.disable();
+            map.doubleClickZoom.disable();
+            map.touchZoom.disable();
+            map.boxZoom.disable();
+            map.dragging.disable();
         }
 
         // adjust for new size
