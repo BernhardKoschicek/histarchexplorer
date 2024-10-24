@@ -7,8 +7,9 @@ var map = L.map('muuri-map', {
     touchZoom: false,
     boxZoom: false,
     dragging: false,
-
 });
+
+document.getElementById('muuri-map').removeAttribute('tabindex');
 
 L.control.scale().addTo(map);
 
