@@ -170,6 +170,27 @@
                     {% endif %}
 
 
+                    {% if categorized_types %}
+                        {% for category, types in categorized_types.items() %}
+                            {% if types %}
+                                <div class="item item-fit">
+                                    <div class="item-content">
+                                        <div class="categorized-types">
+                                            <p class="tile-label text-uppercase">{{ category }}</p>
+                                            <ul>
+                                                {% for type in types %}
+                                                    <li>
+                                                        <strong>{{ type.label }}:</strong> {{ type.value }} {{ type.unit }}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
 
                     <!-- All other images -->
                     {% if images %}

@@ -172,4 +172,5 @@ def landing(id_: int) -> str:
         super_entity=super_entity,
         case_study=case_study,
         standard_types=app.config['STANDARD_TYPES'],
+        categorized_types=categorized_types
     )
