@@ -164,19 +164,16 @@ def landing(id_: int) -> str:
 
    #find ancestor entities
     ancestor_entities = []
-    current_entity = main_entity
-    while current_entity:
-
-
+    while main_entity:
         # if there is a parent, get the actual entity it points to
-        if current_entity.parent:
+        if main_entity.parent:
             parent_entity = next(
-                (entity for entity in entities if entity.id == current_entity.parent.relation_to_id),
+                (entity for entity in entities if entity.id == main_entity.parent.relation_to_id),
                 None
             )
             if parent_entity:
                 ancestor_entities.append(parent_entity)
-                current_entity = parent_entity  # move up to the next level in hierarchy
+                main_entity = parent_entity  # move up to the next level in hierarchy
             else:
                 break  # exit if no parent entity
         else:
