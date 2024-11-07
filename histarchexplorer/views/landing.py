@@ -29,6 +29,7 @@ def landing(id_: int) -> str:
     print("type:", main_entity.types)
     print("main_entity:", main_entity)
 
+    #establish connection between main_entity and related entities
     for relation in main_entity.relations.values():
         for rel in relation:
             for relation_entity in entities:
@@ -75,7 +76,8 @@ def landing(id_: int) -> str:
                         if subunit.id != main_entity.id:
                             super_entity = subunit
 
-        # print(subunits_dict['Feature'])
+
+    # print(subunits_dict['Feature'])
 
     # print(entity.view_class)
     # print("Types:", entity.types)
@@ -121,7 +123,7 @@ def landing(id_: int) -> str:
             if type_.root == "Case Study":
                 case_study.append(type_)
 
-    # beginof what the fuck are you doing?#
+    # Types Division - Categories + Rest
     type_divisions = app.config['TYPE_DIVISIONS']
     categorized_types = {key: [] for key in type_divisions.keys()} #empty dict with each key from type_div
     categorized_types['properties'] = [] #+ properties for all other
@@ -160,21 +162,28 @@ def landing(id_: int) -> str:
 
     print("Categorized Types:", categorized_types)
 
-    # endof what the fuck are you doing?#
+   #find ancestor entities
+    ancestor_entities = []
+    current_entity = main_entity
+    while current_entity:
 
-    # Find the parent entity
-    parent_entity = None
-    for relation in main_entity.relations.values():
-        for rel in relation:
-            if super_entity and rel.relation_to_id == super_entity.id:
-                break
-            if rel.relation_type == 'crm:P46i_forms_part_of':
-                parent_entity = rel
-                break
-        if parent_entity:
+
+        # if there is a parent, get the actual entity it points to
+        if current_entity.parent:
+            parent_entity = next(
+                (entity for entity in entities if entity.id == current_entity.parent.relation_to_id),
+                None
+            )
+            if parent_entity:
+                ancestor_entities.append(parent_entity)
+                current_entity = parent_entity  # move up to the next level in hierarchy
+            else:
+                break  # exit if no parent entity
+        else:
             break
 
-
+    ancestor_entities.reverse()
+    print([entity.name for entity in ancestor_entities])
 
     return render_template(
         'landing.html',
@@ -186,8 +195,9 @@ def landing(id_: int) -> str:
         related_entities=related_entities,
         main_image=main_image,
         images=images,
-        super_entity=super_entity,
-        parent_entity=parent_entity,
+        ancestor_entities=ancestor_entities,
+        #super_entity=super_entity,
+        #parent_entity=parent_entity,
         case_study=case_study,
         standard_types=app.config['STANDARD_TYPES'],
         categorized_types=categorized_types

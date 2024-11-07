@@ -35,6 +35,7 @@ class Entity:
         self.end_to = None
         self.begin = None
         self.end = None
+        self.parent = self.get_parent()
         self.geometry = self.handling_geometry(self.data)
         if 'when' in self.data:
             self.begin_from = split_date_string(
@@ -105,6 +106,17 @@ class Entity:
         if depictions := self.data.get('depictions'):
             return [Depiction(depiction, self.id) for depiction in depictions]
         return []
+
+    def get_parent(self) -> Optional[Relation]:
+        parent_relation = None
+        for relation in self.relations.values():
+            for rel in relation:
+                if rel.relation_type == 'crm:P46i_forms_part_of':
+                    parent_relation = rel
+                    break
+            if parent_relation:
+                break
+        return parent_relation
 
     @staticmethod
     def get_entity(id_: int, parser: Parser) -> Entity:
