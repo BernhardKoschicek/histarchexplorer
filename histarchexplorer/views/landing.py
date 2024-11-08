@@ -180,7 +180,7 @@ def landing(id_: int) -> str:
             break
 
     ancestor_entities.reverse()
-    print([entity.name for entity in ancestor_entities])
+    print([entity.types for entity in ancestor_entities])
 
     return render_template(
         'landing.html',

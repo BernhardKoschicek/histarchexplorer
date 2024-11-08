@@ -3,47 +3,61 @@
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <!-- Hierarchy Navigation-->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/sankey.js"></script>
+    <script src="https://code.highcharts.com/modules/organization.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 sidebar" id="sidebar">
-                <div class="sidebar-content">
+                <div class="sidebar-content d-flex flex-column">
                     {% if ancestor_entities %}
                         {% for entity in ancestor_entities %}
-                           <p>
-                            <a href="{{ url_for('landing', id_=entity.id) }}" class="nude-link">
-                                <i class="bi bi-box-arrow-left"></i> {{ entity.name}}
-                            </a>
-                        </p>
+                            <button type="button" class="btn btn-outline-secondary rounded-5 mb-2">
+                                <a href="{{ url_for('landing', id_=entity.id) }}"
+                                   class="nude-link text-decoration-none fs-6">
+                                    {% if loop.first %}
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-box-arrow-left"></i>
+                                    {% endif %}
+                                    {{ entity.name }}
+                                </a>
+                            </button>
                         {% endfor %}
-
                     {% endif %}
 
-                    <div class="entity-card__icon">
-                        {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
-                            <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
-                        {% else %}
-                            {% if system_class.lower() in ['feature', 'stratigraphic unit'] %}
-                                <img src="/static/images/entity_icons/places_550.png" alt="{{ system_class }}">
-                            {% elif system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
-                                <img src="/static/images/entity_icons/events_550.png" alt="{{ system_class }}">
+                    <button type="button" class="btn btn-light rounded-5">
+                        <div class="entity-card__icon">
+                            {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
+                                <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
                             {% else %}
-                                <img src="/static/images/entity_icons/{{ system_class | lower }}s_550.png"
-                                     alt="{{ system_class }}">
-                            {% endif %}
-                        {% endif %}
-                    </div>
-
-
-                    <div class="entity-card__label">{{ entity.name }}</div>
-                    <div class="entity-country">
-                        {% if entity.types %}
-                            {% for type in entity.types %}
-                                {% if type.hierarchy == 'Country' %}
-                                    <p>{{ type.label }}</p>
+                                {% if system_class.lower() in ['feature', 'stratigraphic unit'] %}
+                                    <img src="/static/images/entity_icons/places_550.png" alt="{{ system_class }}">
+                                {% elif system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
+                                    <img src="/static/images/entity_icons/events_550.png" alt="{{ system_class }}">
+                                {% else %}
+                                    <img src="/static/images/entity_icons/{{ system_class | lower }}s_550.png"
+                                         alt="{{ system_class }}">
                                 {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
+                            {% endif %}
+                        </div>
+
+
+                        <div class="entity-card__label">{{ entity.name }}</div>
+                        <div class="entity-country">
+                            {% if entity.types %}
+                                {% for type in entity.types %}
+                                    {% if type.hierarchy == 'Country' %}
+                                        <p>{{ type.label }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </button>
 
                     <div class="entity-type">
                         {% if entity.types and entity.types[0] %}
@@ -142,6 +156,17 @@
                             </div>
                         </div>
                     {% endif %}
+
+                    <div class="item">
+                        <div class="item-content">
+                            <figure class="highcharts-figure">
+                                <div id="container"></div>
+                                <p class="highcharts-description">
+                                    HERE SHOULD BE THE HIERARCHY_NAV THINGY
+                                </p>
+                            </figure>
+                        </div>
+                    </div>
 
                     <!-- Types -->
 
@@ -277,4 +302,9 @@
     <script
             src="{{ url_for('static', filename='js/entity_landing.js') }}"></script>
     <script src="{{ url_for('static', filename='js/map_landing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/hierarchy_nav.js') }}"></script>
+
+
+
+
 {% endblock %}

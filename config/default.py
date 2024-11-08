@@ -47,3 +47,8 @@ TYPE_DIVISIONS = {
     'grave characteristics': (218839,)
 
 }
+
+bla ={
+    'bi bi-arrow': [47471, 5858],
+}
+
