@@ -1,4 +1,5 @@
 # Don't edit this file. To override settings please use instance/production.py
+
 VERSION = '0.1.0'
 LANGUAGES = {'de': 'Deutsch', 'en': 'English'}
 PREFERRED_LANGUAGE = 'en'
@@ -45,22 +46,12 @@ TYPE_DIVISIONS = {
     'age': (22277, 117198,),
     'burial characteristics': (213223,),
     'grave characteristics': (218839,)
-
 }
-
-
-def create_icon(css_class: str) -> str:
-    return f'<i class="{css_class}"></i>'
-
-def create_svg_icon(path: str) -> str:
-    return f'<img src="{path}" alt="My Happy SVG"/>'
-
 
 TYPE_ICONS = {
-    26204: create_svg_icon('/static/images/entity_icons/grave.svg'),
-    22378: create_icon('bi bi-geo-alt-fill'),
-    26197: create_icon('bi bi-house-door'),
-    73: create_icon('bi bi-geo-alt-fill'),
-    13362: create_icon('bi bi-geo-yelp'),
-}
-
+    'svg': {
+        'grave.svg': [26204]},
+    'icon': {
+        'bi bi-geo-alt-fill': [22378, 73],
+        'bi bi-house-door': [26197],
+        'bi bi-geo-yelp': [13362]}}

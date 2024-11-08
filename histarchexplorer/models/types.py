@@ -1,7 +1,6 @@
 from typing import Any
 
-from histarchexplorer import app
-
+from flask import g
 
 class Types:
     def __init__(self, data: dict[str, Any]):
@@ -14,7 +13,7 @@ class Types:
         self.url = data.get('identifier')
         self.root = self.hierarchy.split('>')[0].rstrip()
         self.type_hierarchy = data.get('typeHierarchy')
-        self.icon = app.config['TYPE_ICONS'].get(self.id)
+        self.icon = g.type_icons.get(int(self.id))
 
     def __repr__(self) -> str:
         return str(self.__dict__)

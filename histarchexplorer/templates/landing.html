@@ -12,7 +12,7 @@
                             <button type="button" class="btn btn-outline-secondary rounded-5 mb-2">
                                 <a href="{{ url_for('landing', id_=entity.id) }}"
                                    class="nude-link text-decoration-none fs-6">
-                                    {{ entity.standard_type.icon }}
+                                    {{ entity.standard_type.icon | safe }}
                                     {{ entity.name }}
                                 </a>
                             </button>

@@ -2,7 +2,7 @@ from typing import Any
 
 import psycopg2.extras
 
-from flask import Flask, g, Response, session, request
+from flask import Flask, g, Response, session, request, url_for
 from flask_babel import Babel
 from psycopg2 import DatabaseError
 
@@ -19,6 +19,7 @@ babel = Babel(app)
 from histarchexplorer.views import (
     admin, login, test_entity, views, about, entities, landing)
 from histarchexplorer.utils import view_util
+
 
 def connect() -> connection:
     try:
@@ -41,6 +42,30 @@ def get_locale() -> str:
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
 
 
+def create_icon(css_class: str) -> str:
+    return f'<i class="{css_class}"></i>'
+
+
+def create_svg_icon(file_name: str) -> str:
+    filepath = url_for("static", filename="images/entity_icons/")
+    return (f'<img src="{filepath + file_name}" '
+            f'width="16" height="16" alt="{file_name}"/>')
+
+
+def get_type_icons() -> dict[int, str]:
+    type_icons = app.config['TYPE_ICONS']
+    icons = {}
+    for svg, ids in type_icons['svg'].items():
+        svg_tag = create_svg_icon(svg)
+        for id_ in ids:
+            icons[id_] = svg_tag
+    for icon, ids in type_icons['icon'].items():
+        icon_tag = create_icon(icon)
+        for id_ in ids:
+            icons[id_] = icon_tag
+    return icons
+
+
 @app.before_request
 def before_request() -> None:
     g.db = connect()
@@ -48,12 +73,14 @@ def before_request() -> None:
     session['language'] = get_locale()
     g.main_images = get_main_image_table()
     app.jinja_env.filters['capitalize_first'] = capitalize_first
+    g.type_icons = get_type_icons()
 
 
 def capitalize_first(value: str) -> str:
     if not value:
         return ''
     return value[0].upper() + value[1:]
+
 
 @app.context_processor
 def inject_conf_var() -> dict[str, Any]:
