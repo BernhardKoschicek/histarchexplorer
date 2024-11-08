@@ -48,7 +48,19 @@ TYPE_DIVISIONS = {
 
 }
 
-bla ={
-    'bi bi-arrow': [47471, 5858],
+
+def create_icon(css_class: str) -> str:
+    return f'<i class="{css_class}"></i>'
+
+def create_svg_icon(path: str) -> str:
+    return f'<img src="{path}" alt="My Happy SVG"/>'
+
+
+TYPE_ICONS = {
+    26204: create_svg_icon('/static/images/entity_icons/grave.svg'),
+    22378: create_icon('bi bi-geo-alt-fill'),
+    26197: create_icon('bi bi-house-door'),
+    73: create_icon('bi bi-geo-alt-fill'),
+    13362: create_icon('bi bi-geo-yelp'),
 }
 

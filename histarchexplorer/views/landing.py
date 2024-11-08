@@ -1,4 +1,5 @@
 from collections import defaultdict
+from pprint import pprint
 
 from flask import render_template
 
@@ -180,7 +181,7 @@ def landing(id_: int) -> str:
             break
 
     ancestor_entities.reverse()
-    print([entity.types for entity in ancestor_entities])
+    print("ANCESTOR ENTITIES:",[entity.types for entity in ancestor_entities])
 
     return render_template(
         'landing.html',
@@ -197,5 +198,5 @@ def landing(id_: int) -> str:
         #parent_entity=parent_entity,
         case_study=case_study,
         standard_types=app.config['STANDARD_TYPES'],
-        categorized_types=categorized_types
+        categorized_types=categorized_types,
     )

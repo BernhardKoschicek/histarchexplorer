@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.depiction import Depiction
@@ -23,6 +24,7 @@ class Entity:
             self.data['viewClass'].replace('_', ' ')) \
             if self.data.get('viewClass') else None
         self.types = self.get_types()
+        self.standard_type = self.get_standard_type()
         self.alias = self.get_alias()
         self.relation_class = self.get_relation_class()
         self.relations = self.get_relations() if self.relation_class else None
@@ -152,4 +154,10 @@ class Entity:
             if geometry['type'] == 'GeometryCollection':
                 return geometry['geometries']
             return geometry
+        return None
+
+    def get_standard_type(self) -> Optional[Types]:
+        for type_ in self.types:
+            if type_.root in app.config['STANDARD_TYPES']:
+                return type_
         return None

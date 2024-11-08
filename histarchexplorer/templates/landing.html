@@ -3,13 +3,6 @@
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-      <!-- Hierarchy Navigation-->
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/sankey.js"></script>
-    <script src="https://code.highcharts.com/modules/organization.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 sidebar" id="sidebar">
@@ -19,11 +12,7 @@
                             <button type="button" class="btn btn-outline-secondary rounded-5 mb-2">
                                 <a href="{{ url_for('landing', id_=entity.id) }}"
                                    class="nude-link text-decoration-none fs-6">
-                                    {% if loop.first %}
-                                        <i class="bi bi-geo-alt-fill"></i>
-                                    {% else %}
-                                        <i class="bi bi-box-arrow-left"></i>
-                                    {% endif %}
+                                    {{ entity.standard_type.icon }}
                                     {{ entity.name }}
                                 </a>
                             </button>
@@ -60,12 +49,8 @@
                     </button>
 
                     <div class="entity-type">
-                        {% if entity.types and entity.types[0] %}
-                            {% for type_ in entity.types %}
-                                {% if type_.root in standard_types %}
-                                    <p>{{ type_.label | upper }}</p>
-                                {% endif %}
-                            {% endfor %}
+                        {% if entity.standard_type %}
+                            <p>{{ entity.standard_type.label | upper }}</p>
                         {% endif %}
                     </div>
 
@@ -159,9 +144,7 @@
 
                     <div class="item">
                         <div class="item-content">
-                            <figure class="highcharts-figure">
-                                <div id="container"></div>
-                                <p class="highcharts-description">
+                            <div id="svg-tree"></div>
                                     HERE SHOULD BE THE HIERARCHY_NAV THINGY
                                 </p>
                             </figure>
@@ -302,6 +285,7 @@
     <script
             src="{{ url_for('static', filename='js/entity_landing.js') }}"></script>
     <script src="{{ url_for('static', filename='js/map_landing.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apextree"></script>
     <script src="{{ url_for('static', filename='js/hierarchy_nav.js') }}"></script>
 
 
