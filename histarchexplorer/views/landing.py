@@ -1,5 +1,4 @@
 from collections import defaultdict
-from pprint import pprint
 
 from flask import render_template
 
@@ -30,7 +29,7 @@ def landing(id_: int) -> str:
     print("type:", main_entity.types)
     print("main_entity:", main_entity)
 
-    #establish connection between main_entity and related entities
+    # establish connection between main_entity and related entities
     for relation in main_entity.relations.values():
         for rel in relation:
             for relation_entity in entities:
@@ -76,7 +75,6 @@ def landing(id_: int) -> str:
                         # check if entity = super_entity
                         if subunit.id != main_entity.id:
                             super_entity = subunit
-
 
     # print(subunits_dict['Feature'])
 
@@ -126,18 +124,22 @@ def landing(id_: int) -> str:
 
     # Types Division - Categories + Rest
     type_divisions = app.config['TYPE_DIVISIONS']
-    categorized_types = {key: [] for key in type_divisions.keys()} #empty dict with each key from type_div
-    categorized_types['properties'] = [] #+ properties for all other
+    categorized_types = {key: [] for key in
+                         type_divisions.keys()}  # empty dict with each key
+    # from type_div
+    categorized_types['properties'] = []  # + properties for all other
 
     def extract_id(identifier):
         return identifier.split('/')[-1]
 
-    def is_type_in_division(type_item, division_ids): #check if type belongs to category
-        for type_hierarchy_item in type_item.type_hierarchy:
+    def is_type_in_division(
+            type_item_,
+            division_ids_):  # check if type belongs to category
+        for type_hierarchy_item in type_item_.type_hierarchy:
             hierarchy_id = extract_id(type_hierarchy_item['identifier'])
-            print(f"Checking if {hierarchy_id} is in {division_ids}")
-            if int(hierarchy_id) in division_ids:
-                print(f"Yes: {hierarchy_id} is in {division_ids}")
+            print(f"Checking if {hierarchy_id} is in {division_ids_}")
+            if int(hierarchy_id) in division_ids_:
+                print(f"Yes: {hierarchy_id} is in {division_ids_}")
                 return True
         return False
 
@@ -149,39 +151,44 @@ def landing(id_: int) -> str:
                 print(f"Categorizing {type_item.label} under {key}")
 
                 # conditionally include value and unit
-                type_info = {'label': type_item.label}
-                type_info['value'] = getattr(type_item, 'value', None)
-                type_info['unit'] = getattr(type_item, 'unit', None)
+                type_info = {
+                    'label': type_item.label,
+                    'value': getattr(type_item, 'value', None),
+                    'unit': getattr(type_item, 'unit', None)}
 
                 categorized_types[key].append(type_info)
                 found = True
                 break
         if not found:
-            print(f"{type_item.label} does not match any division, --> properties")
+            print(
+                f"{type_item.label} does not match any division, "
+                f"--> properties")
 
             categorized_types['properties'].append(type_item)
 
     print("Categorized Types:", categorized_types)
 
-   #find ancestor entities
+    # find ancestor entities
     ancestor_entities = []
     while main_entity:
         # if there is a parent, get the actual entity it points to
         if main_entity.parent:
             parent_entity = next(
-                (entity for entity in entities if entity.id == main_entity.parent.relation_to_id),
+                (entity for entity in entities if
+                 entity.id == main_entity.parent.relation_to_id),
                 None
             )
             if parent_entity:
                 ancestor_entities.append(parent_entity)
-                main_entity = parent_entity  # move up to the next level in hierarchy
+                main_entity = parent_entity  # move up to the next level in
+                # hierarchy
             else:
                 break  # exit if no parent entity
         else:
             break
 
     ancestor_entities.reverse()
-    print("ANCESTOR ENTITIES:",[entity.types for entity in ancestor_entities])
+    print("ANCESTOR ENTITIES:", [entity.types for entity in ancestor_entities])
 
     return render_template(
         'landing.html',
@@ -194,8 +201,8 @@ def landing(id_: int) -> str:
         main_image=main_image,
         images=images,
         ancestor_entities=ancestor_entities,
-        #super_entity=super_entity,
-        #parent_entity=parent_entity,
+        # super_entity=super_entity,
+        # parent_entity=parent_entity,
         case_study=case_study,
         standard_types=app.config['STANDARD_TYPES'],
         categorized_types=categorized_types,
