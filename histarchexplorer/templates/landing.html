@@ -8,17 +8,16 @@
             <div class="col-md-2 sidebar" id="sidebar">
                 <div class="sidebar-content d-flex flex-column">
                     {% if ancestor_entities %}
-                        {% for entity in ancestor_entities %}
+                        {% for entity_ in ancestor_entities %}
                             <button type="button" class="btn btn-outline-secondary rounded-5 mb-2">
-                                <a href="{{ url_for('landing', id_=entity.id) }}"
+                                <a href="{{ url_for('landing', id_=entity_.id) }}"
                                    class="nude-link text-decoration-none fs-6">
-                                    {{ entity.standard_type.icon | safe }}
-                                    {{ entity.name }}
+                                    {{ entity_.standard_type.icon | safe }}
+                                    {{ entity_.name }}
                                 </a>
                             </button>
                         {% endfor %}
                     {% endif %}
-
                     <button type="button" class="btn btn-light rounded-5">
                         <div class="entity-card__icon">
                             {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
@@ -53,6 +52,7 @@
                             <p>{{ entity.standard_type.label | upper }}</p>
                         {% endif %}
                     </div>
+
 
                     <div class="entity-date">
                         <p>{{ entity.formated_date }}</p>
@@ -145,8 +145,8 @@
                     <div class="item">
                         <div class="item-content">
                             <div id="svg-tree"></div>
-                                    HERE SHOULD BE THE HIERARCHY_NAV THINGY
-                                </p>
+                            HERE SHOULD BE THE HIERARCHY_NAV THINGY
+                            </p>
                             </figure>
                         </div>
                     </div>

@@ -168,28 +168,31 @@ def landing(id_: int) -> str:
 
     print("Categorized Types:", categorized_types)
 
-    # find ancestor entities
+    # Find ancestor entities
     ancestor_entities = []
-    while main_entity:
-        # if there is a parent, get the actual entity it points to
-        if main_entity.parent:
+    current_entity = main_entity
+
+    while current_entity:
+        # If there is a parent, get the actual entity it points to
+        if current_entity.parent:
             parent_entity = next(
-                (entity for entity in entities if
-                 entity.id == main_entity.parent.relation_to_id),
+                (entity for entity in entities if entity.id == current_entity.parent.relation_to_id),
                 None
             )
             if parent_entity:
                 ancestor_entities.append(parent_entity)
-                main_entity = parent_entity  # move up to the next level in
-                # hierarchy
+                current_entity = parent_entity  # Move up to the next level in hierarchy
             else:
-                break  # exit if no parent entity
+                break  # Exit if no parent entity
         else:
             break
 
     ancestor_entities.reverse()
+
     print("ANCESTOR ENTITIES:", [entity.types for entity in ancestor_entities])
 
+    from histarchexplorer import get_type_icons
+    type_icons = get_type_icons()
     return render_template(
         'landing.html',
         entity=main_entity,
@@ -206,4 +209,5 @@ def landing(id_: int) -> str:
         case_study=case_study,
         standard_types=app.config['STANDARD_TYPES'],
         categorized_types=categorized_types,
+        type_icons=type_icons,
     )
