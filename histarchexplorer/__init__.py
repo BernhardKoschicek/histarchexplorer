@@ -63,6 +63,7 @@ def get_type_icons() -> dict[int, str]:
         icon_tag = create_icon(icon)
         for id_ in ids:
             icons[id_] = icon_tag
+    icons['other']= '<i class="bi bi-box-arrow-left"></i>'
     return icons
 
 

@@ -13,7 +13,7 @@ class Types:
         self.url = data.get('identifier')
         self.root = self.hierarchy.split('>')[0].rstrip()
         self.type_hierarchy = data.get('typeHierarchy')
-        self.icon = g.type_icons.get(int(self.id))
+        self.icon = g.type_icons.get(int(self.id)) or g.type_icons.get('other')
 
     def __repr__(self) -> str:
         return str(self.__dict__)

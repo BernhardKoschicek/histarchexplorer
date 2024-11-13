@@ -191,8 +191,6 @@ def landing(id_: int) -> str:
 
     print("ANCESTOR ENTITIES:", [entity.types for entity in ancestor_entities])
 
-    from histarchexplorer import get_type_icons
-    type_icons = get_type_icons()
     return render_template(
         'landing.html',
         entity=main_entity,
@@ -209,5 +207,5 @@ def landing(id_: int) -> str:
         case_study=case_study,
         standard_types=app.config['STANDARD_TYPES'],
         categorized_types=categorized_types,
-        type_icons=type_icons,
+
     )
