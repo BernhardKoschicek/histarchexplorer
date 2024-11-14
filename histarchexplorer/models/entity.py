@@ -37,7 +37,7 @@ class Entity:
         self.end_to = None
         self.begin = None
         self.end = None
-        self.parent = self.get_parent()
+        self.parent = self.get_parent() if self.relations else None
         self.geometry = self.handling_geometry(self.data)
         if 'when' in self.data:
             self.begin_from = split_date_string(
@@ -113,7 +113,10 @@ class Entity:
         parent_relation = None
         for relation in self.relations.values():
             for rel in relation:
-                if rel.relation_type == 'crm:P46i_forms_part_of':
+                if rel.relation_type in [
+                    'crm:P46i_forms_part_of',
+                    'crm:P9i_forms_part_of',
+                    'crm:P107i_is_current_or_former_member_of']:
                     parent_relation = rel
                     break
             if parent_relation:

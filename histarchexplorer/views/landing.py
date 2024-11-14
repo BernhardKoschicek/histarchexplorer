@@ -7,74 +7,112 @@ from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
 
 
-@app.route('/entity/<int:id_>')
-def landing(id_: int) -> str:
-    parser = Parser(
-        properties=['P46', 'P67'],
+def get_parser_for_landing(id_: int) -> Parser:
+    simple_entity = Entity.get_entity(id_, Parser(show=['None']))
+    match simple_entity.system_class:
+        case 'Place' | 'Feature' | 'Stratigraphic unit':
+            properties = ['P46', 'P67']
+        case 'Human remains' | 'Artifact':
+            properties = ['P46', 'P67', 'P52']
+        case 'Source' | 'Source translation':
+            properties = ['P67', 'P73', 'P128']
+        case 'Event' | 'Acquisition' | 'Activity' | 'Creation' | 'Move' | \
+             'Production' | 'Modification':
+            properties = ['P67', 'P11', 'P14', 'P22', 'P23', 'P25', 'P7',
+                          'P26', 'P27', 'P24', 'P31', 'P25', '108', 'P9',
+                          'P134']
+        case 'Bibliography' | 'Edition' | 'External reference':
+            properties = ['P67']
+        case 'Group' | 'Person':
+            properties = ['OA7', 'OA8', 'OA9', 'P107', 'P74', 'P52', 'P11',
+                          'P14', 'P22', 'P23', 'P25']
+        case _:
+            properties = []
+    return Parser(
+        properties=properties,
         limit=0,
         format='lpx')
 
-    entities = Entity.get_linked_entities_by_properties_recursive(
-        id_,
-        parser)
-    # remove types, adminitrative units, appelations etc.
 
-    main_entity = None
-    for entity in entities:
-        if entity.id == id_:
-            main_entity = entity
-
-    print("System class:", main_entity.system_class)
-   # print("View class:", main_entity.view_class)
-  #  print("type:", main_entity.types)
-  #  print("main_entity:", main_entity)
-
-    # establish connection between main_entity and related entities
+def add_entity_object_to_relation(
+        main_entity: Entity,
+        entities: list[Entity]) -> None:
     for relation in main_entity.relations.values():
         for rel in relation:
             for relation_entity in entities:
                 if int(relation_entity.id) == int(rel.relation_to_id):
                     rel.related_entity = relation_entity
 
-    subunits_dict = defaultdict(list)
-    related_entities = {
-        'Place': defaultdict(list),
-        'Feature': defaultdict(list),
-        'Stratigraphic unit': defaultdict(list),
-        'Human remains': defaultdict(list),
-        'Artifact': defaultdict(list)
-    }
 
-    super_entity = None
-    if main_entity.system_class.lower() in [
-        "artifact",
-        "feature",
-        "human remains",
-        "place",
-        "stratigraphic unit"]:
+def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
+    main_entity = None
+    for entity in entities:
+        if entity.id == id_:
+            main_entity = entity
+            break
+    return main_entity
 
-        for subunit in entities:
-            if not subunit.types:
-                continue  # macht mit nächster entity weiter; check also break
 
-            for type_ in subunit.types:
-                subunits_dict[type_.type_hierarchy[0]['label']].append(subunit)
+def get_related_entities(main_entity: Entity, entities: list[Entity]):
+    related_entities = defaultdict(lambda: defaultdict(list))
+    for subunit in entities:
+        if subunit.id == main_entity.id:
+            continue
+        match subunit.system_class:
+            case 'Group' | 'Person':
+                related_entities[subunit.system_class][subunit.name].append(
+                    subunit)
+            case _:
+                if not subunit.types:
+                    continue
+                for type_ in subunit.types:
+                    label = type_.type_hierarchy[0]['label']
+                    if label in app.config['STANDARD_TYPES']:
+                        related_entities[label][type_.label].append(subunit)
+    return related_entities
 
-                match label := type_.type_hierarchy[0]['label']:
-                    case 'Feature':
-                        related_entities[label][type_.label].append(subunit)
-                    case 'Stratigraphic unit':
-                        related_entities[label][type_.label].append(subunit)
-                    case 'Artifact':
-                        related_entities[label][type_.label].append(subunit)
-                    case 'Human remains':
-                        related_entities[label][type_.label].append(subunit)
-                    case 'Place':
-                        related_entities[label][type_.label].append(subunit)
+@app.route('/entity/<int:id_>')
+def landing(id_: int) -> str:
+    entities = Entity.get_linked_entities_by_properties_recursive(
+        id_,
+        get_parser_for_landing(id_))
 
-                        # check if entity = super_entity
-                        if subunit.id != main_entity.id:
-                            super_entity = subunit
+    main_entity = get_main_entity(id_, entities)
+    add_entity_object_to_relation(main_entity, entities)
+    related_entities = get_related_entities(main_entity, entities)
+
+    print("System class:", main_entity.system_class)
+    # print("View class:", main_entity.view_class)
+    # print("type:", main_entity.types)
+    # print("main_entity:", main_entity)
+
+
+    # Find ancestor entities
+    ancestor_entities = []
+    current_entity = main_entity
+
+    while current_entity:
+        # If there is a parent, get the actual entity it points to
+        if current_entity.parent:
+            parent_entity = next(
+                (entity for entity in entities if
+                 entity.id == current_entity.parent.relation_to_id),
+                None
+            )
+            if parent_entity:
+                ancestor_entities.append(parent_entity)
+                current_entity = parent_entity  # Move up to the next level
+                # in hierarchy
+            else:
+                break  # Exit if no parent entity
+        else:
+            break
+
+    ancestor_entities.reverse()
+
+    print("ANCESTOR ENTITIES:", [entity.name for entity in ancestor_entities])
+    super_entity = ancestor_entities[0] if ancestor_entities else None
+
 
     # print(subunits_dict['Feature'])
 
@@ -117,7 +155,7 @@ def landing(id_: int) -> str:
     for type_ in main_entity.types:
         if type_.root == "Case Study":
             case_study.append(type_)
-    if not case_study:
+    if not case_study and super_entity:
         for type_ in super_entity.types:
             if type_.root == "Case Study":
                 case_study.append(type_)
@@ -137,18 +175,18 @@ def landing(id_: int) -> str:
             division_ids_):  # check if type belongs to category
         for type_hierarchy_item in type_item_.type_hierarchy:
             hierarchy_id = extract_id(type_hierarchy_item['identifier'])
-          #  print(f"Checking if {hierarchy_id} is in {division_ids_}")
+            #  print(f"Checking if {hierarchy_id} is in {division_ids_}")
             if int(hierarchy_id) in division_ids_:
-            #    print(f"Yes: {hierarchy_id} is in {division_ids_}")
+                #    print(f"Yes: {hierarchy_id} is in {division_ids_}")
                 return True
         return False
 
     for type_item in main_entity.types:
-       # print(f"Processing type: {type_item.label} with ID: {type_item.id}")
+        # print(f"Processing type: {type_item.label} with ID: {type_item.id}")
         found = False
         for key, division_ids in type_divisions.items():
             if is_type_in_division(type_item, division_ids):
-              #  print(f"Categorizing {type_item.label} under {key}")
+                #  print(f"Categorizing {type_item.label} under {key}")
 
                 # conditionally include value and unit
                 type_info = {
@@ -160,36 +198,13 @@ def landing(id_: int) -> str:
                 found = True
                 break
         if not found:
-           # print(
-               # f"{type_item.label} does not match any division, "
-              #  f"--> properties")
+            # print(
+            # f"{type_item.label} does not match any division, "
+            #  f"--> properties")
 
             categorized_types['properties'].append(type_item)
 
-   # print("Categorized Types:", categorized_types)
-
-    # Find ancestor entities
-    ancestor_entities = []
-    current_entity = main_entity
-
-    while current_entity:
-        # If there is a parent, get the actual entity it points to
-        if current_entity.parent:
-            parent_entity = next(
-                (entity for entity in entities if entity.id == current_entity.parent.relation_to_id),
-                None
-            )
-            if parent_entity:
-                ancestor_entities.append(parent_entity)
-                current_entity = parent_entity  # Move up to the next level in hierarchy
-            else:
-                break  # Exit if no parent entity
-        else:
-            break
-
-    ancestor_entities.reverse()
-
-    print("ANCESTOR ENTITIES:", [entity.types for entity in ancestor_entities])
+    # print("Categorized Types:", categorized_types)
 
     return render_template(
         'landing.html',
@@ -197,7 +212,6 @@ def landing(id_: int) -> str:
         view_class=main_entity.view_class,
         system_class=main_entity.system_class,
         relations=main_entity.relations,
-        subunits=subunits_dict or {},
         related_entities=related_entities,
         main_image=main_image,
         images=images,
