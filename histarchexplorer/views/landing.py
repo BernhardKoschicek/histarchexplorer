@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Any
 
 from flask import render_template
 
@@ -106,11 +107,14 @@ def get_parser_for_landing(id_: int) -> Parser:
 def add_entity_object_to_relation(
         main_entity: Entity,
         entities: list[Entity]) -> None:
+    if not main_entity.relations:
+        return None
     for relation in main_entity.relations.values():
         for rel in relation:
             for relation_entity in entities:
                 if int(relation_entity.id) == int(rel.relation_to_id):
                     rel.related_entity = relation_entity
+    return None
 
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
@@ -122,8 +126,10 @@ def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
     return main_entity
 
 
-def get_related_entities(main_entity: Entity, entities: list[Entity]):
-    related_entities = defaultdict(lambda: defaultdict(list))
+def get_related_entities(
+        main_entity: Entity,
+        entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
+    related_entities: dict[str, Any]  = defaultdict(lambda: defaultdict(list))
     for subunit in entities:
         if subunit.id == main_entity.id:
             continue
@@ -167,7 +173,7 @@ def get_ancestor_entities(
     return ancestor_entities
 
 
-def get_categorized_types(main_entity: Entity):
+def get_categorized_types(main_entity: Entity) -> dict[str, Any]:
     # Types Division - Categories + Rest
     type_divisions = app.config['TYPE_DIVISIONS']
     categorized_types = {key: [] for key in

@@ -35,9 +35,11 @@ VIEW_CLASSES = {
     'files': ('file',)
 }
 
-STANDARD_TYPES = (
-'Source', 'Event', 'Actor function', 'Involvement', 'Bibliography', 'Edition', 'License', 'External reference',
-'Source translation', 'Actor relation', 'Human remains', 'Artifact', 'Place', 'Feature', 'Stratigraphic unit')
+STANDARD_TYPES = [
+    'Source', 'Event', 'Actor function', 'Involvement', 'Bibliography',
+    'Edition', 'License', 'External reference',
+    'Source translation', 'Actor relation', 'Human remains', 'Artifact',
+    'Place', 'Feature', 'Stratigraphic unit']
 
 TYPE_DIVISIONS = {
     'dimensions': [15678],

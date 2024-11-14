@@ -38,7 +38,7 @@ class Entity:
         self.end_to = None
         self.begin = None
         self.end = None
-        self.parent = self.get_parent() if self.relations else None
+        self.parent = self.get_parent()
         self.geometry = self.handling_geometry(self.data)
         if 'when' in self.data:
             self.begin_from = split_date_string(
@@ -105,12 +105,14 @@ class Entity:
             return [Types(types) for types in self.data['types']]
         return []
 
-    def get_depiction(self) -> Optional[list[Depiction]]:
+    def get_depiction(self) -> list[Depiction]:
         if depictions := self.data.get('depictions'):
             return [Depiction(depiction, self.id) for depiction in depictions]
         return []
 
     def get_parent(self) -> Optional[Relation]:
+        if not self.relations:
+            return None
         parent_relation = None
         for relation in self.relations.values():
             for rel in relation:
@@ -166,7 +168,8 @@ class Entity:
                 return type_
         return None
 
-    def get_description_class(self) -> None:
-        self.description_class = "item"
+    def get_description_class(self) -> str:
+        description_class = "item"
         if self.description and len(self.description) > 500:
-            self.description_class = "item-middle"
+            description_class = "item-middle"
+        return description_class
