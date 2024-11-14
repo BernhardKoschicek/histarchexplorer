@@ -75,6 +75,7 @@ def landing(id_: int) -> str:
                         # check if entity = super_entity
                         if subunit.id != main_entity.id:
                             super_entity = subunit
+    #print(subunits_dict.keys())
 
     # print(subunits_dict['Feature'])
 

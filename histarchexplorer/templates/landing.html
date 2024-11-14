@@ -18,7 +18,7 @@
                                             {{ entity.name }}
                                         </a>
                                     </button>
-                                 <div class="line"></div>
+                                    <div class="line"></div>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -71,10 +71,11 @@
                         {% endif %}
                     </div>
 
-                   <!--  <div id="entity-link-buttons">
+                    <!--  <div id="entity-link-buttons">
                         {% for key, type_ in related_entities.items() %}
                             <button type="button"
-                                    class="btn btn-outline-secondary btn-lg">{{ key|replace('_', ' ')|capitalize_first }}</button>
+                                    class="btn btn-outline-secondary btn-lg">
+                        {{ key|replace('_', ' ')|capitalize_first }}</button>
                         {% endfor %}
                     </div> -->
 
@@ -148,6 +149,19 @@
                     {% endif %}
 
                     <!-- Types -->
+
+                    <!--{% if subunits %}
+                        <div class="item">
+                            <div class="item-content">
+                                <div class="subentities">
+                                    <p class="tile-label">SUBUNITS?</p>
+                                    {% for type_, list_ in subunits.items() %}
+                                        <p>{{ type_ }} ({{ list_ | length }})</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}-->
 
                     <!-- Related entities -->
                     {% if subunits %}
