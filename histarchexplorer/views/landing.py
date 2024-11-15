@@ -111,11 +111,10 @@ def add_entity_object_to_relation(
         entities: list[Entity]) -> None:
     if not main_entity.relations:
         return None
-    for relation in main_entity.relations.values():
-        for rel in relation:
-            for relation_entity in entities:
-                if int(relation_entity.id) == int(rel.relation_to_id):
-                    rel.related_entity = relation_entity
+    for relation in main_entity.relations:
+        for relation_entity in entities:
+            if int(relation_entity.id) == int(relation.relation_to_id):
+                relation.related_entity = relation_entity
     return None
 
 
@@ -126,11 +125,10 @@ def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
     raise ValueError(f"Entity with id {id_} not found.")
 
 
-
 def get_related_entities(
         main_entity: Entity,
         entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
-    related_entities: dict[str, Any]  = defaultdict(lambda: defaultdict(list))
+    related_entities: dict[str, Any] = defaultdict(lambda: defaultdict(list))
     for subunit in entities:
         if subunit.id == main_entity.id:
             continue
@@ -188,7 +186,8 @@ def get_categorized_types(main_entity: Entity) -> dict[str, Any]:
 
     def is_type_in_division(
             type_item_: Types,
-            division_ids_: list[int]) -> bool:  # check if type belongs to category
+            division_ids_: list[
+                int]) -> bool:  # check if type belongs to category
         for type_hierarchy_item in type_item_.type_hierarchy:
             hierarchy_id = extract_id(type_hierarchy_item['identifier'])
             #  print(f"Checking if {hierarchy_id} is in {division_ids_}")

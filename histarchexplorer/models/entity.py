@@ -27,8 +27,7 @@ class Entity:
         self.types = self.get_types()
         self.standard_type = self.get_standard_type()
         self.alias = self.get_alias()
-        self.relation_class = self.get_relation_class()
-        self.relations = self.get_relations() if self.relation_class else None
+        self.relations =  self.get_relation_class()
         self.depictions = self.get_depiction()
         self.reference_systems = self.data.get('links')
         self.begin_from = None
@@ -57,39 +56,6 @@ class Entity:
     def __repr__(self) -> str:
         return str(self.__dict__)
 
-    def get_relations(self) -> dict[str, list[Relation]]:
-        relation_dict: dict[str, Any] = {}
-        for relation in self.relation_class:
-            match relation.relation_system_class:
-                case 'source':
-                    relation_dict.setdefault('sources', []).append(relation)
-                case 'source_translation':
-                    (relation_dict.setdefault('source_translations', [])
-                     .append(relation))
-
-                case 'place' | 'feature' | 'stratigraphic_unit':
-                    relation_dict.setdefault('places', []).append(relation)
-                case 'artifact' | 'human_remains':
-                    relation_dict.setdefault('artifacts', []).append(relation)
-
-                case 'bibliography':
-                    relation_dict.setdefault('bibliography', []).append(
-                        relation)
-                case 'external_reference':
-                    relation_dict.setdefault('external_references', []).append(
-                        relation)
-                case 'edition':
-                    relation_dict.setdefault('editions', []).append(relation)
-
-                case 'acquisition' | 'activity' | \
-                     'event' | 'move' | 'production':
-                    relation_dict.setdefault('events', []).append(relation)
-                case 'group' | 'person':
-                    relation_dict.setdefault('actors', []).append(relation)
-                case _:
-                    relation_dict.setdefault('others', []).append(relation)
-        return relation_dict
-
     def get_relation_class(self) -> list[Relation]:
         relation = []
         if relations := self.data.get('relations'):
@@ -115,14 +81,13 @@ class Entity:
         if not self.relations:
             return None
         parent_relation = None
-        for relation in self.relations.values():
-            for rel in relation:
-                if rel.relation_type in [
-                    'crm:P46i_forms_part_of',
-                    'crm:P9i_forms_part_of',
-                    'crm:P107i_is_current_or_former_member_of']:
-                    parent_relation = rel
-                    break
+        for relation in self.relations:
+            if relation.relation_type in [
+                'crm:P46i_forms_part_of',
+                'crm:P9i_forms_part_of',
+                'crm:P107i_is_current_or_former_member_of']:
+                parent_relation = relation
+                break
             if parent_relation:
                 break
         return parent_relation
@@ -143,13 +108,12 @@ class Entity:
         if not self.relations:
             return []
         subunit = []
-        for relation in self.relations.values():
-            for rel in relation:
-                if rel.relation_type in [
-                    'crm:P46_is_composed_of',
-                    'crm:P9_consists_of',
-                    'crm:P107_has_current_or_former_member']:
-                    subunit.append(rel)
+        for relation in self.relations:
+            if relation.relation_type in [
+                'crm:P46_is_composed_of',
+                'crm:P9_consists_of',
+                'crm:P107_has_current_or_former_member']:
+                subunit.append(relation)
         return subunit
 
 
