@@ -5,15 +5,12 @@
     border-color: grey;
 }
 
-.hierarchy-button{
+.hierarchy-button {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
 
-
-.hierarchy-button {
     button {
         transition: transform 0.2s ease-in-out;
 
@@ -22,6 +19,7 @@
         }
     }
 }
+
 
 .btn-hierarchy {
   --bs-btn-color: #6c757d;

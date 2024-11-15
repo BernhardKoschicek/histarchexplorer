@@ -23,7 +23,7 @@
                             {% endfor %}
                         </ul>
                     {% endif %}
-                    <button type="button" class="btn btn-light rounded-5">
+                    <button type="button" class="btn btn-light rounded-5 hierarchy-button">
                         <div class="entity-card__icon">
                             {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
                                 <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
@@ -38,18 +38,29 @@
                                 {% endif %}
                             {% endif %}
                         </div>
-
-
                         <div class="entity-card__label">{{ entity.name }}</div>
-                        <div class="entity-country">
-                            {% if entity.types %}
-                                {% for type in entity.types %}
-                                    {% if type.hierarchy == 'Country' %}
-                                        <p>{{ type.label }}</p>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+                    </button>
+
+                    <!--  Subunits button -->
+                    {% if entity.subunits %}
+                        <div class="line"></div>
+                        <button type="button" class="btn btn-outline-secondary rounded-5">
+                            <i class="bi bi-diagram-3"></i>
+                            <span class="nude-link">{{ entity.subunits | length }} Subentities</span>
+
+                        </button>
+                    {% endif %}
+
+
+                    <div class="entity-country">
+                        {% if entity.types %}
+                            {% for type in entity.types %}
+                                {% if type.hierarchy == 'Country' %}
+                                    <p>{{ type.label }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                     </button>
 
                     <div class="entity-type">
