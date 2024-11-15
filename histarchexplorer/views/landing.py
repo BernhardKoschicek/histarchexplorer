@@ -65,6 +65,7 @@ def landing(id_: int) -> str:
     # print(subunit)
     # print("Categorized Types:", categorized_types)
 
+    print([rel.related_entity.name for rel in main_entity.subunits])
     return render_template(
         'landing.html',
         entity=main_entity,

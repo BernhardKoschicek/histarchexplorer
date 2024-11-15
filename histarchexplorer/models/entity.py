@@ -39,6 +39,7 @@ class Entity:
         self.begin = None
         self.end = None
         self.parent = self.get_parent()
+        self.subunits = self.get_subunits()
         self.geometry = self.handling_geometry(self.data)
         if 'when' in self.data:
             self.begin_from = split_date_string(
@@ -126,6 +127,32 @@ class Entity:
                 break
         return parent_relation
 
+    def get_standard_type(self) -> Optional[Types]:
+        for type_ in self.types:
+            if type_.root in app.config['STANDARD_TYPES']:
+                return type_
+        return None
+
+    def get_description_class(self) -> str:
+        description_class = "item"
+        if self.description and len(self.description) > 500:
+            description_class = "item-middle"
+        return description_class
+
+    def get_subunits(self) -> list[Relation]:
+        if not self.relations:
+            return []
+        subunit = []
+        for relation in self.relations.values():
+            for rel in relation:
+                if rel.relation_type in [
+                    'crm:P46_is_composed_of',
+                    'crm:P9_consists_of',
+                    'crm:P107_has_current_or_former_member']:
+                    subunit.append(rel)
+        return subunit
+
+
     @staticmethod
     def get_entity(id_: int, parser: Parser) -> Entity:
         return Entity(ApiAccess.get_entity(id_, parser))
@@ -161,15 +188,3 @@ class Entity:
                 return geometry['geometries']
             return geometry
         return None
-
-    def get_standard_type(self) -> Optional[Types]:
-        for type_ in self.types:
-            if type_.root in app.config['STANDARD_TYPES']:
-                return type_
-        return None
-
-    def get_description_class(self) -> str:
-        description_class = "item"
-        if self.description and len(self.description) > 500:
-            description_class = "item-middle"
-        return description_class
