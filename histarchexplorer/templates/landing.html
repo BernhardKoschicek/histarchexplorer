@@ -49,7 +49,10 @@
                             <div class="line"></div>
                             <button type="button" class="btn btn-outline-secondary rounded-5" disabled>
                                 <i class="bi bi-diagram-3"></i>
-                                <span class="nude-link">{{ entity.subunits | length }} Subentities</span>
+                                <span class="nude-link">
+                                    {{ entity.subunits | length }}
+                                    {{ "Subentity" if entity.subunits | length == 1 else "Subentities" }}
+                                </span>
                         </div>
                         </button>
                     {% endif %}
