@@ -12458,7 +12458,7 @@ textarea.form-control-lg {
 
 .sidebar {
   background-color: var(--card-bg);
-  height: calc(100vh - var(--navbar-height));
+  margin-top: -var(--navbar-height);
   color: black;
   text-align: center;
 }
