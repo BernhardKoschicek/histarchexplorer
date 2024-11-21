@@ -12302,7 +12302,8 @@ textarea.form-control-lg {
   display: block;
   margin: 5px;
   position: absolute;
-  width: calc((100% - 30px) / 3 / 2);
+  width: calc(((100% - 30px) / 3 - 10px) / 2);
+  max-height: fit-content;
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
@@ -12310,12 +12311,12 @@ textarea.form-control-lg {
 
 @media (max-width: 992px) {
   .item-half {
-    width: calc((100% - 20px) / 2 / 2);
+    width: calc(((100% - 20px) / 2 - 10px) / 2);
   }
 }
 @media (max-width: 766px) {
   .item-half {
-    width: calc((100% - 10px) / 2);
+    width: calc(100% - 10px);
   }
 }
 .item-wide {
@@ -12387,7 +12388,7 @@ textarea.form-control-lg {
 }
 
 .badge.bg-secondary.text-wrap {
-  font-size: 1.1 rem;
+  font-size: 1.1rem;
   line-height: 1.5;
 }
 

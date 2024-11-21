@@ -16,6 +16,7 @@ class Depiction:
         self.url = data.get('url')
         self.mimetype = data.get('mimetype')
         self.iiif_manifest = data.get('IIIFManifest')
+        self.iiif_base_path = data.get('IIIFBasePath')
         self.entity_id = entity_id
         self.main_image = self.check_if_main_image()
 

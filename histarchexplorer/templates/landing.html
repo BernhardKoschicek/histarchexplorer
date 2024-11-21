@@ -163,47 +163,30 @@
                     {% endif %}
 
 
-
-
-                    <!-- Types -->
-
-                    <!--{% if subunits %}
-                        <div class="item">
-                            <div class="item-content">
-                                <div class="subentities">
-                                    <p class="tile-label">SUBUNITS?</p>
-                                    {% for type_, list_ in subunits.items() %}
-                                        <p>{{ type_ }} ({{ list_ | length }})</p>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}-->
-
                     <!-- Related entities -->
                     {% if related_entities %}
                         {% for key, type_ in related_entities.items() %}
-                            {% if type_ %}
-                                <div class="item item-fit">
-                                    <div class="item-content">
-                                        <div class="subentities">
-                                            <p class="tile-label text-uppercase">{{ key }}</p>
-                                            <ul class="no-bullets">
-                                                {% for type_label, list_ in type_.items() %}
-                                                    <li>
-                                                        <a tabindex="0" class="" role="button"
-                                                           data-bs-toggle="popover" data-bs-trigger="focus"
-                                                           data-bs-title="{{ type_label }} ({{ list_ | length }})"
-                                                           data-bs-content="<ul>{% for entity in list_ %}<li><a href={{ url_for('landing', id_=entity.id) }}>{{ entity.name }} </a></li>{% endfor %}</ul>">
-                                                            {{ type_label }} ({{ list_ | length }})
-                                                        </a>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
+                                {% if type_ %}
+                                    <div class="item">
+                                        <div class="item-content">
+                                            <div class="subentities">
+                                                <p class="tile-label text-uppercase">{{ key }}</p>
+                                                <ul class="no-bullets">
+                                                    {% for type_label, list_ in type_.items() %}
+                                                        <li>
+                                                            <a tabindex="0" class="" role="button"
+                                                               data-bs-toggle="popover" data-bs-trigger="focus"
+                                                               data-bs-title="{{ type_label }} ({{ list_ | length }})"
+                                                               data-bs-content="<ul>{% for entity in list_ %}<li><a href={{ url_for('landing', id_=entity.id) }}>{{ entity.name }} </a></li>{% endfor %}</ul>">
+                                                                {{ type_label }} ({{ list_ | length }})
+                                                            </a>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            {% endif %}
+                                {% endif %}
                         {% endfor %}
                     {% endif %}
 
@@ -211,7 +194,7 @@
                     {% if categorized_types %}
                         {% for category, types in categorized_types.items() %}
                             {% if types %}
-                                <div class="item item-fit">
+                                <div class="item">
                                     <div class="item-content">
                                         <div class="categorized-types">
                                             <p class="tile-label text-uppercase">{{ category }}</p>
@@ -244,15 +227,13 @@
                             {% if not depiction.main_image %}
                                 <div class="{% if total_images >1 %}item-half {% else %}item{% endif %}">
                                     <div class="item-content item-content-full">
-                                        <div class="muuri-images">
-                                            <div class="image">
-                                                {% if depiction.iiif_image_url %}
-                                                    <img src="{{ depiction.iiif_image_url }}"
-                                                         alt="{{ depiction.title }}"/>
-                                                {% else %}
-                                                    <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
-                                                {% endif %}
-                                            </div>
+                                        <div class="image">
+                                            {% if depiction.iiif_base_path %}
+                                                <img src="{{ depiction.iiif_base_path }}/full/max/0/default.jpg"
+                                                     alt="{{ depiction.title }}"/>
+                                            {% else %}
+                                                <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

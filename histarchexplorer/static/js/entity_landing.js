@@ -9,4 +9,6 @@ window.onload = function () {
     }, 300);
 };
 
-
+window.addEventListener('resize', () => {
+    grid.refreshItems().layout();
+});
