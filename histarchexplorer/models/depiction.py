@@ -1,6 +1,6 @@
-from typing import Any
+from typing import Any, Optional
 
-from flask import g
+from flask import g, url_for
 
 import requests
 
@@ -15,7 +15,7 @@ class Depiction:
         self.creator = data.get('creator')
         self.url = data.get('url')
         self.mimetype = data.get('mimetype')
-        self.iiif_manifest = data.get('IIIFManifest')
+        self.iiif_manifest = self.format_manifest_url(data.get('IIIFManifest'))
         self.iiif_base_path = data.get('IIIFBasePath')
         self.entity_id = entity_id
         self.main_image = self.check_if_main_image()
@@ -29,3 +29,10 @@ class Depiction:
             if g.main_images.get(self.entity_id) == self.id_:
                 return True
         return False
+
+    @staticmethod
+    def format_manifest_url(manifest_url: Optional[str]) -> str:
+        url = ''
+        if manifest_url:
+            url = f'{manifest_url}?url={url_for("index", _external=True)}'
+        return url
