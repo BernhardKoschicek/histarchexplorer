@@ -12167,16 +12167,16 @@ textarea.form-control-lg {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.25rem;
+  font-size: 1.5vw;
   font-weight: 600;
   margin-bottom: 0.9375rem;
   text-transform: uppercase;
   color: var(--text-color2);
   letter-spacing: 0.0625rem;
 }
-@media (max-width: 992px) and (min-width: 768px) {
+@media (max-width: 769px) {
   .entity-card__label {
-    font-size: 1.125rem;
+    font-size: 2.5rem;
   }
 }
 .entity-card__description {
@@ -12457,8 +12457,11 @@ textarea.form-control-lg {
 }
 
 .sidebar {
+  position: fixed;
   background-color: var(--card-bg);
   margin-top: -var(--navbar-height);
+  height: calc(100vh - var(--navbar-height));
+  overflow-y: auto;
   color: black;
   text-align: center;
 }
@@ -12515,6 +12518,11 @@ textarea.form-control-lg {
   font-size: 1rem;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.main-content {
+  margin-left: 16.6667%;
+  overflow-y: auto;
 }
 
 .main-entity-ellipse {

@@ -250,9 +250,11 @@
 
 //Sidebar
 .sidebar {
+  position: fixed;
   background-color: var(--card-bg);
   margin-top: - var(--navbar-height);
-  //height: calc(100vh - var(--navbar-height));
+  height: calc(100vh - var(--navbar-height));
+  overflow-y: auto;
   color: black;
   text-align: center;
 }
@@ -311,4 +313,9 @@
   font-size: 1rem;
   overflow: hidden; // Hide content that overflows the button boundary
   text-overflow: ellipsis;
+}
+
+.main-content {
+  margin-left: 16.6667%;
+  overflow-y: auto;
 }

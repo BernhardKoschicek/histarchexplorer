@@ -121,7 +121,7 @@
 
 
       <!-- Main content area - MUURI Tiles -->
-      <div class="col-md-10">
+      <div class="col-md-10 main-content">
         <div class="grid">
           <!-- Description -->
           {% if entity.description %}
@@ -230,6 +230,8 @@
 
           <!-- All other images -->
           {% if images %}
+              <p>License: {{ depiction.license }}</p>
+            <p>Creator: {{ depiction.creator }}</p>
             {% for depiction in images %}
               {% set total_images = images|length %}
               {% if not depiction.main_image %}

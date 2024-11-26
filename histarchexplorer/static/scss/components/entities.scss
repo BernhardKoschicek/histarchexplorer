@@ -109,17 +109,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: rem(20);
+    font-size: 1.5vw;
     font-weight: 600;
     margin-bottom: rem(15);
     text-transform: uppercase;
     color: var(--text-color2);
     letter-spacing: rem(1);
-
-    @media (max-width: 992px) and (min-width: 768px) {
-      font-size: rem(18);
-    }
   }
+
+  @media (max-width: 769px) {
+    &__label {
+      font-size: 2.5rem;
+    }
+    }
 
 
   &--places {
