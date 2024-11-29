@@ -52,7 +52,7 @@ TYPE_DIVISIONS = {
 
 TYPE_ICONS = {
     'images': {
-        'grave.svg': [26204],
+        'grave.svg': [26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713 ],
     },
     'css_icon_class': {
         'bi bi-geo-alt-fill': [22378, 73],
