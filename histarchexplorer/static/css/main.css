@@ -12169,10 +12169,11 @@ textarea.form-control-lg {
   align-items: center;
   font-size: 1.5vw;
   font-weight: 600;
-  margin-bottom: 0.9375rem;
+  margin-bottom: 0.625rem;
   text-transform: uppercase;
   color: var(--text-color2);
   letter-spacing: 0.0625rem;
+  padding: 0.5rem;
 }
 @media (max-width: 769px) {
   .entity-card__label {
@@ -12377,7 +12378,7 @@ textarea.form-control-lg {
 .tile-sub-label {
   font-size: 1em;
   margin-bottom: 5px;
-  padding-left: 0.65em;
+  padding-left: 0.3em;
 }
 
 .muuri-description p {
@@ -12414,7 +12415,7 @@ textarea.form-control-lg {
 
 .location {
   width: 100%;
-  height: calc(100vh - 152px);
+  height: calc(100vh - 106px);
 }
 
 #muuri-map {
@@ -12525,7 +12526,7 @@ textarea.form-control-lg {
 }
 
 .entity-class {
-  color: #3f3f3f;
+  color: #000000;
   font-weight: lighter;
 }
 
@@ -12552,12 +12553,14 @@ textarea.form-control-lg {
 @media (max-width: 766px) {
   .main-content {
     margin-left: 0;
+    margin-right: 0;
+    padding: 0;
     overflow-y: visible;
   }
 }
 
 .main-entity-ellipse {
-  border-radius: 50px;
+  border-radius: 30px;
   background-color: rgba(255, 255, 255, 0.5);
   padding-bottom: 0.3125rem;
   border-top: 0.3125rem solid transparent;

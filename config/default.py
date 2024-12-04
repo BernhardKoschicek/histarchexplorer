@@ -43,7 +43,7 @@ STANDARD_TYPES = [
 
 TYPE_DIVISIONS = {
     'dimensions': [15678],
-    'anthropology': [218963, 213216],
+    'anthropology': [218963, 213216, 119444, 119334],
     'material': [21160],
     'age': [22277, 117198],
     'burial characteristics': [213223],

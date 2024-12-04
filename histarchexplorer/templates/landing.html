@@ -136,7 +136,7 @@
 
 
             <!-- Main content area - MUURI Tiles -->
-            <div class="col-md-10 main-content">
+            <div class="col-md-10 g-0 main-content">
                 <div class="grid">
 
 
@@ -233,7 +233,7 @@
                                                 <p class="tile-sub-label text-uppercase mt-3">{{ category }}</p>
                                                 {% for type in types %}
                                                     <div class="badge bg-dark-subtle text-wrap m-1">
-                                                        <h6>{{ type.label }}
+                                                       <h6 class="m-0 text-center">{{ type.label }}
                                                             {% if type.value and type.unit %}: {{ type.value }}
                                                                 {{ type.unit }}</h6>
                                                             {% endif %}

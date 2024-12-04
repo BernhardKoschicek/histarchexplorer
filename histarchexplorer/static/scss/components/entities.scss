@@ -111,10 +111,11 @@
     align-items: center;
     font-size: 1.5vw;
     font-weight: 600;
-    margin-bottom: rem(15);
+    margin-bottom: rem(10);
     text-transform: uppercase;
     color: var(--text-color2);
     letter-spacing: rem(1);
+    padding: 0.5rem;
   }
 
   @media (max-width: 769px) {
