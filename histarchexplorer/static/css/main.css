@@ -12282,6 +12282,8 @@ textarea.form-control-lg {
 @media (max-width: 766px) {
   .item {
     width: calc(100% - 10px);
+    margin: 0px;
+    padding: 0px;
   }
 }
 .item-middle {
@@ -12345,7 +12347,6 @@ textarea.form-control-lg {
 
 .item-content {
   padding: 1rem;
-  display: flex;
   align-items: center;
   width: auto;
   height: auto;
@@ -12371,6 +12372,12 @@ textarea.form-control-lg {
   font-size: 1.3em;
   font-weight: bold;
   position: relative;
+}
+
+.tile-sub-label {
+  font-size: 1em;
+  margin-bottom: 5px;
+  padding-left: 0.65em;
 }
 
 .muuri-description p {
