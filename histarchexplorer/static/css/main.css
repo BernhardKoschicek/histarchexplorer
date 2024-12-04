@@ -12470,6 +12470,8 @@ textarea.form-control-lg {
 @media (max-width: 766px) {
   .sidebar {
     position: static;
+    height: max-content;
+    overflow-y: visible;
   }
 }
 
@@ -12477,6 +12479,13 @@ textarea.form-control-lg {
   height: calc(100vh - var(--navbar-height));
   padding: 1rem;
   align-items: center;
+}
+@media (max-width: 766px) {
+  .sidebar-content {
+    position: static;
+    height: max-content;
+    overflow-y: visible;
+  }
 }
 
 .super-entity {
