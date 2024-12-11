@@ -50,7 +50,7 @@ TYPE_DIVISIONS = {
         'icon': ('img', 'bone.svg')},
     'material':  {
         'ids': [21160],
-        'icon': None},
+        'icon': ('img', 'material.svg')},
     'age': {
         'ids': [22277, 117198],
         'icon': ('css', 'bi bi-calendar-range')},
@@ -59,7 +59,7 @@ TYPE_DIVISIONS = {
         'icon': None},
     'grave characteristics': {
         'ids': [218839],
-        'icon': None}
+        'icon': ('img', 'grave.svg')}
 }
 
 SIDEBAR_ICONS = {

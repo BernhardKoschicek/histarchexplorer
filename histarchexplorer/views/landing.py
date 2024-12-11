@@ -68,13 +68,14 @@ def landing(id_: int) -> str:
     # print("Types:", entity.types)
     # print("Begin:", entity.begin)
     # print("End:", entity.end)
-    # print("Relations:", main_entity.relations)
-    # print("Relation Class:", entity.relation_class)
+    #print("Relations:", main_entity.relations)
     # print(main_entity.geometry)
     # print(type(super_entity))
     # print("System Class:",main_entity.system_class)
     # print(subunit)
-    # print("Categorized Types:", categorized_types)
+   # result = categorized_types(main_entity)
+   # print("Categorized Types:", result)
+
 
     return render_template(
         'landing.html',
@@ -156,6 +157,7 @@ def get_related_entities(
                     if label in app.config['STANDARD_TYPES']:
                         related_entities[label][type_.label].append(subunit)
     return related_entities
+    print(related_entities.keys())
 
 
 def get_ancestor_entities(
