@@ -60,6 +60,10 @@ def landing(id_: int) -> str:
         del images[0]
         print("Depictions:", main_entity.depictions)
 
+    total_images = len(images)
+    initial_images = images[:3]  # Show only the first 3 images
+    more_images = total_images > 3
+
     total_images = len([img for img in images if not img.main_image])
 
     # print("System class:", main_entity.system_class)
@@ -88,7 +92,8 @@ def landing(id_: int) -> str:
         related_entities=related_entities,
         main_image=main_image,
         total_images=total_images,
-        images=images,
+        images=initial_images,
+        more_images=more_images,
         ancestor_entities=ancestor_entities,
         case_study=case_study,
         categorized_types=categorized_types(main_entity)
