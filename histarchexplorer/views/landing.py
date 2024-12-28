@@ -14,7 +14,12 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
     for type_ in main_entity.types:
         divisions[type_.division['label']].append({
             'type': type_, 'icon': type_.division['icon']})
-    return divisions
+    sorted_divisions = dict(sorted(
+        divisions.items(),
+        key=lambda x: (x[0] == 'other', x[0])
+    ))
+
+    return sorted_divisions
 
 
 @app.route('/entity/<int:id_>')
@@ -53,7 +58,7 @@ def landing(id_: int) -> str:
     if not main_image and images:
         main_image = images[0]
         del images[0]
-        print("Depictions:",main_entity.depictions)
+        print("Depictions:", main_entity.depictions)
 
     total_images = len([img for img in images if not img.main_image])
 
@@ -69,14 +74,13 @@ def landing(id_: int) -> str:
     # print("Types:", entity.types)
     # print("Begin:", entity.begin)
     # print("End:", entity.end)
-    #print("Relations:", main_entity.relations)
+    # print("Relations:", main_entity.relations)
     # print(main_entity.geometry)
     # print(type(super_entity))
     # print("System Class:",main_entity.system_class)
     # print(subunit)
-   # result = categorized_types(main_entity)
-   # print("Categorized Types:", result)
-
+    # result = categorized_types(main_entity)
+    # print("Categorized Types:", result)
 
     return render_template(
         'landing.html',

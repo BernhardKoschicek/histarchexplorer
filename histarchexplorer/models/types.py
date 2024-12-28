@@ -39,5 +39,5 @@ class Types:
                     division = g.type_divisions.get(type_id)
                     break
 
-        return division or {'label': 'other', 'icon': ''}
+        return division or {'label': 'other', 'icon': '<i class="bi bi-boxes"></i>'}
 
