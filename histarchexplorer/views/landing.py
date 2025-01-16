@@ -90,7 +90,7 @@ def landing(id_: int) -> str:
     return render_template(
         'landing.html',
         entity=main_entity,
-        related_entities=related_entities,
+        related_entities = related_entities or {},
         main_image=main_image,
         total_images=total_images,
         images=initial_images,
@@ -169,6 +169,7 @@ def get_related_entities(
                         related_entities[label][type_.label].append(subunit)
     return related_entities
     print(related_entities.keys())
+
 
 
 def get_ancestor_entities(
