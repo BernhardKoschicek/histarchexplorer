@@ -268,12 +268,14 @@
                   <div class="item-content item-content-full">
                     <div class="image">
                       {% if depiction.iiif_base_path %}
+                        <a href="{{ url_for('view_file', depiction_id=depiction.id_) }}">
                         <img
                             src="{{ depiction.iiif_base_path }}/full/max/0/default.jpg"
                             alt="{{ depiction.title }}"
                         />
 
                       {% else %}
+                        <a href="{{ url_for('view_file', entity_id=depiction.id_) }}">
                         <img src="{{ depiction.url }}"
                              alt="{{ depiction.title }}"/>
                       {% endif %}

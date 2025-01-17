@@ -197,7 +197,18 @@ def get_ancestor_entities(
     ancestor_entities.reverse()
     return ancestor_entities
 
-@app.route('/file/<int:entity_id>')
-def view_file(entity_id: int):
-    entity = Entity.get_entity(entity_id)
-    return render_template("iiif.html", entity=entity)
+@app.route('/file/<int:depiction_id>')
+def view_file(depiction_id: int):
+    parser = Parser(show=['None'])
+
+    main_entity = Entity.get_entity(depiction_id, parser)
+
+    depiction = next((d for d in main_entity.depictions if d.id_ == depiction_id), None)
+
+    if not depiction or not depiction.iiif_manifest:
+        return "No IIIF manifest available for this depiction.", 404
+
+    return render_template(
+        "iiif.html",
+        depiction=depiction,
+    )
