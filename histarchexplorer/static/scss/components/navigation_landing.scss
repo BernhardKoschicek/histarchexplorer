@@ -1,48 +1,3 @@
-@media (min-width: 768px) {
-  #offcanvasSidebar {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-  }
-}
-
-@media (max-width: 576px) {
-  .offcanvas-body span {
-    display: none;
-  }
-}
-
-.navigation {
-  height: 100vh;
-  width: 80px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: #f8f9fa;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 1rem;
-}
-
-.navigation i {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  cursor: pointer;
-}
-
-.offcanvas-body a {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.offcanvas-body a i {
-  font-size: 1.5rem;
-  margin-right: 1rem;
-}
-
-
 #toggleSidebar {
   color: black;
   background: none;
@@ -53,4 +8,41 @@
 #toggleSidebar i {
   font-size: 1.5rem;
 }
+
+
+/* Sidebar styling */
+#nav-sidebar {
+  width: 70px;
+  transition: width 0.3s;
+}
+
+#nav-sidebar.expanded {
+  width: 150px;
+  height: 100vh;
+}
+
+#nav-sidebar .nav-link span {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#nav-sidebar.expanded .nav-link span {
+  display: inline;
+  opacity: 1;
+}
+
+
+#nav-sidebar .btn {
+  width: 100%;
+}
+
+#nav-sidebar .nav-link {
+  justify-content: center;
+}
+
+#nav-sidebar.expanded .nav-link {
+  justify-content: flex-start;
+}
+
 

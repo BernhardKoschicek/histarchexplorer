@@ -361,40 +361,5 @@
       });
   </script>
 
-  <style>
-      /* Sidebar styling */
-      #nav-sidebar {
-          width: 70px;
-          transition: width 0.3s;
-      }
 
-      #nav-sidebar.expanded {
-          width: 150px;
-          height: 100vh;
-      }
-
-      #nav-sidebar .nav-link span {
-          display: none;
-          opacity: 0;
-          transition: opacity 0.3s;
-      }
-
-      #nav-sidebar.expanded .nav-link span {
-          display: inline;
-          opacity: 1;
-      }
-
-
-      #nav-sidebar .btn {
-          width: 100%;
-      }
-
-      #nav-sidebar .nav-link {
-          justify-content: center;
-      }
-
-      #nav-sidebar.expanded .nav-link {
-          justify-content: flex-start;
-      }
-  </style>
 {% endblock %}
