@@ -7,7 +7,7 @@
   <div class="container-fluid">
     <div class="row d-flex">
       <!-- Navigation-Sidebar -->
-      <div id="nav-sidebar" class="col-md-1 d-flex flex-column bg-light align-items-center">
+      <div id="nav-sidebar" class="col-md-1 d-none d-md-flex flex-column bg-light align-items-center">
         <ul class="nav nav-pills flex-column text-center w-100">
           <li class="nav-item">
             <a href="#" class="nav-link d-flex align-items-center">
@@ -41,6 +41,8 @@
           </li>
         </ul>
       </div>
+
+
 
       <!-- Main content area - MUURI Tiles -->
       <div class="col-md-10 flex-column grid">
@@ -357,7 +359,9 @@
   <script>
       // JavaScript to toggle sidebar expansion
       document.getElementById('toggleSidebar').addEventListener('click', function () {
-          document.getElementById('nav-sidebar').classList.toggle('expanded');
+          const sidebar = document.getElementById('nav-sidebar');
+          sidebar.classList.toggle('expanded');
+          sidebar.classList.toggle('d-none');
       });
   </script>
 

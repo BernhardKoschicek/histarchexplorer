@@ -12736,6 +12736,7 @@ button.btn-whitish[disabled] {
   background-color: #f8f9fa;
 }
 
+/* Sidebar toggle in Navbar */
 #toggleSidebar {
   color: black;
   background: none;
@@ -12747,10 +12748,11 @@ button.btn-whitish[disabled] {
   font-size: 1.5rem;
 }
 
-/* Sidebar styling */
+/* Sidebar*/
 #nav-sidebar {
   width: 70px;
   transition: width 0.3s;
+  background-color: var(--bs-navbar-color);
 }
 
 #nav-sidebar.expanded {
@@ -12779,6 +12781,24 @@ button.btn-whitish[disabled] {
 
 #nav-sidebar.expanded .nav-link {
   justify-content: flex-start;
+}
+
+@media (max-width: 765px) {
+  #nav-sidebar {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    width: 0;
+    height: 100vh;
+    z-index: 300000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  /* Sidebar shown when expanded */
+  #nav-sidebar.expanded {
+    width: 150px;
+    transform: translateX(0);
+  }
 }
 
 /*# sourceMappingURL=main.css.map */
