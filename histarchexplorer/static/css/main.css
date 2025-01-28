@@ -12302,7 +12302,7 @@ textarea.form-control-lg {
   display: block;
   margin: 5px;
   position: absolute;
-  width: calc((100% - 30px) / 3);
+  width: calc((100vw - 50px - var(--sidebar-width)) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
@@ -12310,7 +12310,7 @@ textarea.form-control-lg {
 
 @media (max-width: 992px) {
   .item {
-    width: calc((100% - 20px) / 2);
+    width: calc((100vw - 40px - var(--sidebar-width)) / 2);
   }
 }
 @media (max-width: 766px) {
@@ -12749,8 +12749,12 @@ button.btn-whitish[disabled] {
 }
 
 /* Sidebar */
+:root {
+  --sidebar-width: 70px; /* Initial width */
+}
+
 #nav-sidebar {
-  width: 70px;
+  width: var(--sidebar-width);
   background-color: grey;
   transition: width 0.3s ease;
   /* Sticky for larger screens */

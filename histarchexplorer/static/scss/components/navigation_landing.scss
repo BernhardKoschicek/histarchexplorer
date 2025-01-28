@@ -13,8 +13,12 @@
 }
 
 /* Sidebar */
+:root {
+    --sidebar-width: 70px;  /* Initial width */
+}
+
 #nav-sidebar {
-  width: 70px;
+  width: var(--sidebar-width);
   background-color: grey;
   transition: width 0.3s ease;
 
