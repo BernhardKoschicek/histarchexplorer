@@ -154,3 +154,4 @@ class Entity:
                 return geometry['geometries']
             return geometry
         return None
+

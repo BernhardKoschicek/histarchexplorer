@@ -20,6 +20,7 @@
 #nav-sidebar {
   width: var(--sidebar-width);
   transition: width 0.3s ease;
+  color: var(--nav-sidebar);
 
 
   /* Sticky for larger screens */
@@ -78,18 +79,23 @@
     overflow-x: hidden;
     transform: translateX(0);
   }
- }
+}
 
-  /* Sidebar icon, link style grey */
-.nav-link i {
-  color: grey ;
+/* Sidebar icon, link style grey */
+.nav-link {
+  color: grey !important;
   transition: color 0.3s ease;
 
   &:hover {
-    color: #007bff;
-  }
-}
+    color: black !important;
 
-.nav-link {
-  color: inherit;
+    i {
+      color: black !important;
+    }
+  }
+
+  i {
+    color: grey;
+    transition: color 0.3s ease;
+  }
 }

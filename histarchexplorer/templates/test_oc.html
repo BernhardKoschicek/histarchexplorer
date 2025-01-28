@@ -7,7 +7,7 @@
   <div class="container-fluid">
     <div class="row d-flex">
       <!-- Navigation-Sidebar -->
-      <div id="nav-sidebar" class="col col-auto d-none d-md-flex flex-column bg-light align-items-center">
+      <div id="nav-sidebar" class="col col-auto d-none d-md-flex flex-column bg-body-tertiary align-items-center">
         <ul class="nav nav-pills flex-column text-center w-100">
           <li class="nav-item">
             <a href="#" class="nav-link d-flex align-items-center">
@@ -275,7 +275,7 @@
                               data-bs-toggle="popover"
                               data-bs-trigger="focus"
                               data-bs-title="{{ type_label }} ({{ list_ | length }})"
-                              data-bs-content="<ul>{% for entity in list_ %}<li><a href={{ url_for('landing', id_=entity.id) }}>{{ entity.name }}</a></li>{% endfor %}</ul>">
+                              data-bs-content="<ul>{% for entity_ in list_ %}<li><a href={{ url_for('landing', id_=entity_.id) }}>{{ entity_.name }}</a></li>{% endfor %}</ul>">
                                             {{ list_ | length }}
                                         </span>
                         </li>
@@ -298,22 +298,33 @@
                 <ul class="no-bullets">
                   {% for key, type_ in related_entities.items() %}
                     {% if key == "Bibliography" or key == "External reference" %}
-                      {% for entity in type_.values() %}
-                        {% for item in entity %}
+                      {% for entity_ in type_.values() %}
+                        {% for item in entity_ %}
                           <li>
                             <div class="reference-content">
                               <div class="reference-header">
                                 {% if key == "Bibliography" %}
                                   <i class="bi bi-book"></i>
+                                  <a href="{{ url_for('landing', id_=item.id) }}" class="reference-name">
+                                    {{ item.name }}
+                                  </a>
                                 {% elif key == "External reference" %}
                                   <i class="bi bi-box-arrow-up-right"></i>
+                                  {% set parts = item.name.split('/') %}
+                                  {% set result = parts[:3] %}
+                                  <a href="{{ item.name }}" class="reference-name">
+                                    {{ result | join('/') }}
+                                  </a>
                                 {% endif %}
-                                <a href="{{ url_for('landing', id_=item.id) }}" class="reference-name">
-                                  {{ item.name }}
-                                </a>
+
                               </div>
                               <p class="reference-description">
                                 {{ item.description }}
+                                {% for relation in item.relations %}
+                                  {% if entity.id == relation.relation_to_id %}
+                                   {{ _("Page:")}} {{ relation.relation_description }}
+                                  {% endif %}
+                                {% endfor %}
                               </p>
                             </div>
                           </li>

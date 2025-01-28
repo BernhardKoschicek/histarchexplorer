@@ -2,6 +2,7 @@ from collections import defaultdict
 from typing import Any
 
 from flask import render_template
+from urllib.parse import urlparse
 
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
@@ -233,12 +234,25 @@ def test_offcanvas(id_: int):
     ancestor_entities = get_ancestor_entities(main_entity, entities)
     super_entity = ancestor_entities[0] if ancestor_entities else None
 
+
+
+
+
     if not main_entity.geometry and super_entity and super_entity.geometry:
         main_entity.geometry = super_entity.geometry
+
+
     return render_template(
         'test_oc.html',
         page_name="landing",
-       entity=main_entity,
+        entity=main_entity,
         related_entities=related_entities or {},
         ancestor_entities=ancestor_entities,
         categorized_types=categorized_types(main_entity))
+
+
+
+
+
+
+
