@@ -12302,7 +12302,7 @@ textarea.form-control-lg {
   display: block;
   margin: 5px;
   position: absolute;
-  width: calc((100vw - 50px - var(--sidebar-width)) / 3);
+  width: calc((100vw - 45px - var(--sidebar-width)) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
@@ -12315,7 +12315,7 @@ textarea.form-control-lg {
 }
 @media (max-width: 766px) {
   .item {
-    width: calc(100% - 10px);
+    width: 100%;
     margin: 0px;
     padding: 0px;
   }
@@ -12795,11 +12795,10 @@ button.btn-whitish[disabled] {
   justify-content: flex-start;
 }
 
-/* Responsive behavior for smaller screens */
 @media (max-width: 765px) {
   #nav-sidebar {
     position: fixed;
-    top: var(--navbar-height); /* Adjust based on your navbar height */
+    top: var(--navbar-height);
     left: 0;
     width: 0;
     height: 100vh;
@@ -12811,6 +12810,7 @@ button.btn-whitish[disabled] {
   #nav-sidebar.expanded {
     width: 150px;
     height: 100vh;
+    overflow-x: hidden;
     transform: translateX(0);
   }
 }

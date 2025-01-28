@@ -14,13 +14,14 @@
 
 /* Sidebar */
 :root {
-    --sidebar-width: 70px;  /* Initial width */
+  --sidebar-width: 70px; /* Initial width */
 }
 
 #nav-sidebar {
   width: var(--sidebar-width);
   background-color: grey;
   transition: width 0.3s ease;
+
 
   /* Sticky for larger screens */
   @media (min-width: 765px) {
@@ -58,11 +59,11 @@
   justify-content: flex-start;
 }
 
-/* Responsive behavior for smaller screens */
+
 @media (max-width: 765px) {
   #nav-sidebar {
     position: fixed;
-    top: var(--navbar-height); /* Adjust based on your navbar height */
+    top: var(--navbar-height);
     left: 0;
     width: 0;
     height: 100vh;
@@ -75,6 +76,7 @@
   #nav-sidebar.expanded {
     width: 150px;
     height: 100vh;
+    overflow-x: hidden;
     transform: translateX(0);
   }
 }

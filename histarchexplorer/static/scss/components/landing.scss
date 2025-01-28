@@ -26,7 +26,7 @@
   display: block;
   margin: 5px;
   position: absolute;
-  width: calc((100vw - 50px - var(--sidebar-width)) / 3);
+  width: calc((100vw - 45px - var(--sidebar-width)) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
@@ -40,7 +40,7 @@
 
 @media (max-width: 766px) { // Mobile
   .item {
-    width: calc(100% - 10px); // 1 tile
+    width: calc(100%); // 1 tile
     margin: 0px;
     padding: 0px;
   }
