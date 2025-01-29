@@ -152,8 +152,9 @@
 
 
 .muuri-description {
+  max-height: calc(100vh - var(--navbar-height));
+
   p {
-    max-height: 700px;
     margin-top: 1.5rem;
 
     // These are technically the same, but use both
@@ -270,10 +271,10 @@
   color: black;
   text-align: center;
 
-    @media (max-width: 766px) {
+  @media (max-width: 766px) {
     position: static;
     height: max-content;
-    overflow-y:visible;
+    overflow-y: visible;
   }
 
 }
@@ -286,9 +287,9 @@
   @media (max-width: 766px) {
     position: static;
     height: max-content;
-    overflow-y:visible;
+    overflow-y: visible;
   }
-  }
+}
 
 .super-entity {
   font-weight: lighter;

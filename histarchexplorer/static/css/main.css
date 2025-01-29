@@ -12414,8 +12414,10 @@ textarea.form-control-lg {
   padding-left: 0.3em;
 }
 
+.muuri-description {
+  max-height: calc(100vh - var(--navbar-height));
+}
 .muuri-description p {
-  max-height: 700px;
   margin-top: 1.5rem;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -12624,6 +12626,9 @@ textarea.form-control-lg {
   border-radius: 30px;
   background-color: rgba(255, 255, 255, 0.5);
   padding-bottom: 0.3125rem;
+  max-width: 80%;
+  margin: auto;
+  display: grid;
   border-top: 0.3125rem solid transparent;
   border-bottom: 0.3125rem solid transparent;
 }
@@ -12702,6 +12707,7 @@ button.btn-whitish[disabled] {
 .hierarchy-item {
   background-color: lightgrey;
   padding: 2rem;
+  display: grid;
 }
 
 #offcanvasSidebar .nav-pills .nav-item {
@@ -12753,6 +12759,7 @@ button.btn-whitish[disabled] {
 
 #nav-sidebar.expanded {
   width: 150px;
+  overflow-x: hidden;
 }
 
 #nav-sidebar .nav-link span {

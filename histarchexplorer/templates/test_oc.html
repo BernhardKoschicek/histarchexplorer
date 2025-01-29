@@ -322,7 +322,7 @@
                                 {{ item.description }}
                                 {% for relation in item.relations %}
                                   {% if entity.id == relation.relation_to_id %}
-                                   <strong>{{ _("Page:")}} {{ relation.relation_description }}</strong>
+                                     {{ relation.relation_description }}
                                   {% endif %}
                                 {% endfor %}
                               </p>
@@ -379,6 +379,9 @@
           } else {
               root.style.setProperty('--sidebar-width', '70px');
           }
+          setTimeout(() => {
+              grid.refreshItems().layout();
+          }, 500);
       });
   </script>
 
