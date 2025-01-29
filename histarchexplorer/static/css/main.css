@@ -12195,7 +12195,7 @@ textarea.form-control-lg {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.5vw;
+  font-size: 1.7vw;
   font-weight: 600;
   margin-bottom: 0.625rem;
   text-transform: uppercase;
@@ -12494,10 +12494,15 @@ textarea.form-control-lg {
   font-size: 1.2rem;
 }
 
+.entity-card__icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .entity-card__icon img {
-  max-width: 100%;
+  max-width: 60%;
   height: auto;
-  margin-bottom: 1rem;
 }
 
 .sidebar {
@@ -12547,7 +12552,10 @@ textarea.form-control-lg {
 
 .entity-type,
 .entity-date {
-  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
   color: black;
 }
 
@@ -12559,6 +12567,10 @@ textarea.form-control-lg {
 }
 .entity-type {
   margin-top: 2rem;
+}
+
+.entity-type p {
+  margin-bottom: 0;
 }
 
 .entity-class {
