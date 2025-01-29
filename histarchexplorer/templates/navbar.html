@@ -2,9 +2,7 @@
   <div class="container-fluid">
     {% block page_name %}{% endblock %}
     {% if page_name == "landing" %}
-      <button id="toggleSidebar" class="btn btn-secondary" type="button"
-              data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar"
-              aria-controls="offcanvasSidebar">
+      <button id="toggleSidebar" class="btn btn-secondary" type="button">
         <i class="bi bi-list"></i>
       </button>
     {% endif %}
@@ -16,7 +14,7 @@
             data-bs-target=".navbar-collapse"
             aria-controls=".navbar-collapse" aria-expanded="false"
             aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+      <i class="bi bi-three-dots-vertical"></i>
     </button>
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">

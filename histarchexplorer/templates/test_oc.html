@@ -322,7 +322,7 @@
                                 {{ item.description }}
                                 {% for relation in item.relations %}
                                   {% if entity.id == relation.relation_to_id %}
-                                   {{ _("Page:")}} {{ relation.relation_description }}
+                                   <strong>{{ _("Page:")}} {{ relation.relation_description }}</strong>
                                   {% endif %}
                                 {% endfor %}
                               </p>
