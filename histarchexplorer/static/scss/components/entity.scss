@@ -1,0 +1,50 @@
+.entity-container {
+  position: absolute;
+  top: var(--navbar-height);
+}
+
+
+.entity-content {
+  background-color: #a3baae;
+  max-height: calc(100vh - var(--navbar-height));
+  overflow-y: auto;
+  width: calc(100vw - var(--sidebar-width));
+  @media (max-width: 764px) {
+    width: 100vw;
+    position: fixed;
+    left: 0;
+  }
+  transition: width 0.3s ease;
+
+  .fade:not(.show) {
+    display: none;
+  }
+}
+
+#nav-sidebar {
+  .nav {
+    .nav-item {
+      .nav-link {
+        transition: all 0.3s ease-in-out;
+        border-radius: 0;
+
+        &:hover {
+          background-color: #e1e1e1;
+          color: white;
+        }
+
+        &.active {
+          background-color: #c9cdcf;
+          color: white;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}
+
+#mymap {
+  height: calc(100vh - var(--navbar-height));
+  width: calc(100vw - var(--sidebar-width));
+}
+

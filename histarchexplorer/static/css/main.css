@@ -85,6 +85,10 @@ body {
   z-index: 1000;
 }
 
+.nopointer {
+  cursor: default !important;
+}
+
 .navbar-brand {
   height: 80px;
   align-content: center;
@@ -118,6 +122,15 @@ body {
   transform: translateX(-50%);
   height: 2px;
   background-color: #151515;
+}
+
+main {
+  overflow: auto;
+  max-height: calc(100vh - var(--navbar-height));
+}
+
+body {
+  overflow: hidden;
 }
 
 .team-card {
@@ -12758,14 +12771,13 @@ button.btn-whitish[disabled] {
   width: var(--sidebar-width);
   transition: width 0.3s ease;
   color: var(--nav-sidebar);
+  height: calc(100vh - var(--navbar-height));
   /* Sticky for larger screens */
 }
 @media (min-width: 765px) {
   #nav-sidebar {
-    position: sticky;
-    top: var(--navbar-height);
-    height: calc(100vh - var(--navbar-height));
     overflow-y: auto;
+    top: var(--navbar-height);
   }
 }
 
@@ -12799,7 +12811,7 @@ button.btn-whitish[disabled] {
 
 @media (max-width: 765px) {
   #nav-sidebar {
-    position: fixed;
+    --sidebar-width: 0;
     top: var(--navbar-height);
     left: 0;
     width: 0;
@@ -12830,6 +12842,48 @@ button.btn-whitish[disabled] {
 .nav-link i {
   color: grey;
   transition: color 0.3s ease;
+}
+
+.entity-container {
+  position: absolute;
+  top: var(--navbar-height);
+}
+
+.entity-content {
+  background-color: #a3baae;
+  max-height: calc(100vh - var(--navbar-height));
+  overflow-y: auto;
+  width: calc(100vw - var(--sidebar-width));
+  transition: width 0.3s ease;
+}
+@media (max-width: 764px) {
+  .entity-content {
+    width: 100vw;
+    position: fixed;
+    left: 0;
+  }
+}
+.entity-content .fade:not(.show) {
+  display: none;
+}
+
+#nav-sidebar .nav .nav-item .nav-link {
+  transition: all 0.3s ease-in-out;
+  border-radius: 0;
+}
+#nav-sidebar .nav .nav-item .nav-link:hover {
+  background-color: #e1e1e1;
+  color: white;
+}
+#nav-sidebar .nav .nav-item .nav-link.active {
+  background-color: #c9cdcf;
+  color: white;
+  font-weight: bold;
+}
+
+#mymap {
+  height: calc(100vh - var(--navbar-height));
+  width: calc(100vw - var(--sidebar-width));
 }
 
 /*# sourceMappingURL=main.css.map */

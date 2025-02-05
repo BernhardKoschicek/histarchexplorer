@@ -21,14 +21,12 @@
   width: var(--sidebar-width);
   transition: width 0.3s ease;
   color: var(--nav-sidebar);
-
+  height: calc(100vh - var(--navbar-height));
 
   /* Sticky for larger screens */
   @media (min-width: 765px) {
-    position: sticky;
-    top: var(--navbar-height);
-    height: calc(100vh - var(--navbar-height));
     overflow-y: auto;
+    top: var(--navbar-height);
   }
 }
 
@@ -63,7 +61,7 @@
 
 @media (max-width: 765px) {
   #nav-sidebar {
-    position: fixed;
+    --sidebar-width: 0;
     top: var(--navbar-height);
     left: 0;
     width: 0;
