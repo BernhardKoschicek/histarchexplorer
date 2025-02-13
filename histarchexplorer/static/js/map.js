@@ -72,7 +72,7 @@ map.on('load', () => {
 
     map.addSource('geojson-data', {
         type: 'geojson',
-        data: MyMapData
+        data: mapData
     });
 
     // Add polygon layer
