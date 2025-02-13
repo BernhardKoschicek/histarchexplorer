@@ -2,6 +2,11 @@
 
 {% block content %}
 
+    <script>
+        const tabsToLoad = {{ sidebarelements | sort(attribute='order') | map(attribute='route') | list | tojson }};
+        const entity = JSON.parse({{ entity_data.entity|tojson }})
+    </script>
+
     <div class="entity-container">
         <div class="row g-0 d-flex">
             <!-- Navigation-Sidebar -->

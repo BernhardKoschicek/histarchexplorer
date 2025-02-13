@@ -1,3 +1,5 @@
+let loadedTabs = []
+
 document.getElementById('toggleSidebar').addEventListener('click', function () {
     const nav_sidebar = document.getElementById('nav-sidebar');
     const root = document.documentElement;
@@ -51,8 +53,9 @@ async function loadHTML(id, tab) {
     for (const script of scripts) {
         await loadScript(script);
     }
-
-    console.log("HTML, CSS, and scripts loaded in correct order!");
+    loadedTabs.push(tab)
+    console.log(`HTML, CSS, and scripts for "${tab}" loaded in correct order!`);
+    console.log(loadedTabs)
 }
 
 // Load a script dynamically and wait for it to finish loading
@@ -72,7 +75,11 @@ function loadScript(script) {
     });
 }
 
-loadHTML(50505, 'map');
 
+tabsToLoad.forEach(tab => {
+    if (!loadedTabs.includes(tab)) {
+        loadHTML(entity.id, tab);
+    }
+});
 
 

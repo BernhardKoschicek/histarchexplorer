@@ -12881,7 +12881,7 @@ button.btn-whitish[disabled] {
   font-weight: bold;
 }
 
-#mymap {
+#mymap, #mymaptiler {
   height: calc(100vh - var(--navbar-height));
   width: calc(100vw - var(--sidebar-width));
 }

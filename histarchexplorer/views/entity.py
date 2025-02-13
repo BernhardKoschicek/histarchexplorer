@@ -17,15 +17,17 @@ def entity(id_: int, tab_name="overview") -> str:
     if tab_name not in valid_routes:
         abort(404)
 
-    return render_template('entity.html', sidebarelements=sidebarelements, page_name="landing", active_tab=tab_name)
+    entity = Entity.get_entity(id_, Parser())
+
+    entity_data = {'entity': json.dumps(entity.to_serializable(), ensure_ascii=False, indent=4)}
+
+    return render_template('entity.html', sidebarelements=sidebarelements, page_name="landing", active_tab=tab_name, entity_data=entity_data)
 
 
 @app.route('/getentity/<int:id_>/<tab_name>')
 def getentity(id_: int, tab_name=None, json_serializable=None) -> str:
 
-    entity = Entity.get_entity(id_, Parser())
-
-    data = {'entity': json.dumps(entity.to_serializable(), ensure_ascii=False, indent=4)}
+    geoms = None
 
     def get_general_data():
         #here we get data that needs to be loaded anyway
@@ -33,19 +35,24 @@ def getentity(id_: int, tab_name=None, json_serializable=None) -> str:
         return general_data
 
     def get_map_data():
-        map_data = {}
-        return map_data
+        entties = Entity.get_linked_entities_by_properties_recursive(
+        id_, Parser(show='geometry', properties='P46'))
+        geoms = []
+        for ent in entties:
+            if ent.system_class == 'Feature':
+                geoms.append({'geom': ent.geometry, 'id': ent.id, 'label': ent.name})
+        return json.dumps(geoms)
 
     def get_file_data():
         file_data = {}
         return file_data
 
 
-
-
+    if tab_name == 'map':
+        geoms = get_map_data()
 
     if tab_name not in valid_routes:
         print('notvalid')
         abort(404)
 
-    return render_template(f'tabs/{tab_name}.html', data=data)
+    return render_template(f'tabs/{tab_name}.html', geoms=geoms)

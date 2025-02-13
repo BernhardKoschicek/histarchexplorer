@@ -1,5 +1,7 @@
-<script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.umd.min.js"></script>
-<link href="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.css" rel="stylesheet"/>
+<link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="../../static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
 <div id="mymap"></div>
+
+<script> const mapData = JSON.parse({{ geoms|tojson }})</script>
+<script> console.log(mapData)</script>
 <script src="../../static/js/map.js"></script>
-<script> const data = {{ data|tojson }}</script>

@@ -78,7 +78,6 @@ SIDEBAR_ICONS = {
 }}
 
 SIDEBAR_OPTIONS = [
-    {'icon':'bi-globe-europe-africa', 'route':'overview', 'order': 1},
+    {'icon':'bi bi-info-circle', 'route':'overview', 'order': 1},
     {'icon':'bi-map', 'route':'map', 'order': 2},
-    {'icon':'bi-file-earmark-image', 'route':'file', 'order': 3},
 ]
