@@ -14,7 +14,7 @@
                 <ul class="nav nav-pills flex-column text-center w-100">
                     {% for item in sidebarelements %}
                         <li class="nav-item d-none to-remove-{{ item.route }}" role="presentation">
-                            <a href="#"
+                            <button
                                class="nav-link d-flex align-items-center {{ 'active' if active_tab == item.route else '' }}"
                                id="tab-{{ item.route }}" data-bs-toggle="tab"
                                data-bs-target="#tab-pane-{{ item.route }}" role="tab"
@@ -22,15 +22,15 @@
                                aria-selected="{{ 'true' if loop.first else 'false' }}">
                                 <i class="bi {{ item.icon }} fs-5"></i>
                                 <span class="ms-2">{{ item.route }}</span>
-                            </a>
+                            </button>
                         </li>
                     {% endfor %}
                     <li class="nav-item to-remove-spinner" role="presentation">
-                        <a href="#" title="loading"
+                        <button title="loading"
                            class="nav-link d-flex align-items-center"
                            id="tab-spinner">
                             <i class="spinner-border"></i>
-                        </a>
+                        </button>
                     </li>
                 </ul>
             </div>

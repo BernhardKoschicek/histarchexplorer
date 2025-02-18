@@ -13,7 +13,9 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
     }
 });
 
-async function loadHTML(id, tab, index, lastIndex) {
+let loadedCount = 0; // Track completed tab loads
+
+async function loadHTML(id, tab, index, totalTabs) {
     const response = await fetch(`/getentity/${id}/${tab}`);
 
     if (response.status === 404) {
@@ -24,13 +26,8 @@ async function loadHTML(id, tab, index, lastIndex) {
             console.log(`Removed element with class "to-remove-${tab}".`);
         });
 
-        if (index === lastIndex) {
-            document.querySelectorAll(".to-remove-spinner").forEach(element => {
-                element.remove();
-                console.log("Spinner removed.");
-            });
-        }
-
+        loadedCount++; // Increase count even for missing tabs
+        checkAndRemoveSpinner(totalTabs);
         return;
     }
 
@@ -52,11 +49,9 @@ async function loadHTML(id, tab, index, lastIndex) {
         return;
     }
 
-    // Create a temporary element to parse the HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlText;
 
-    // Load stylesheets in order of appearance
     const cssPromises = Array.from(tempDiv.querySelectorAll('link[rel="stylesheet"]')).map(link => {
         return new Promise(resolve => {
             if (!document.querySelector(`link[href="${link.href}"]`)) {
@@ -71,29 +66,33 @@ async function loadHTML(id, tab, index, lastIndex) {
         });
     });
 
-    await Promise.all(cssPromises); // Ensure all CSS is loaded before scripts
+    await Promise.all(cssPromises);
 
-    // Insert HTML content (excluding scripts)
     targetElement.innerHTML = tempDiv.innerHTML;
 
-    // Load scripts sequentially in order of appearance
     const scripts = Array.from(tempDiv.querySelectorAll('script'));
-
     for (const script of scripts) {
         await loadScript(script);
     }
-    loadedTabs.push(tab)
+
+    loadedTabs.push(tab);
     console.log(`HTML, CSS, and scripts for "${tab}" loaded in correct order!`);
-    console.log(loadedTabs)
+    console.log(loadedTabs);
 
-    if (index === lastIndex) {
-            document.querySelectorAll(".to-remove-spinner").forEach(element => {
-                element.remove();
-                console.log("Spinner removed.");
-            });
-        }
-
+    loadedCount++; // Increase count when a tab is fully loaded
+    checkAndRemoveSpinner(totalTabs);
 }
+
+// Function to check if all tabs are loaded and remove the spinner
+function checkAndRemoveSpinner(totalTabs) {
+    if (loadedCount >= totalTabs) {
+        document.querySelectorAll(".to-remove-spinner").forEach(element => {
+            element.remove();
+            console.log("Spinner removed.");
+        });
+    }
+}
+
 
 // Load a script dynamically and wait for it to finish loading
 function loadScript(script) {
@@ -115,9 +114,59 @@ function loadScript(script) {
 
 tabsToLoad.forEach((tab, index) => {
     if (!loadedTabs.includes(tab)) {
-        loadHTML(entityId, tab, index, tabsToLoad.length - 1);
+        loadHTML(entityId, tab, index, tabsToLoad.length);
     }
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+  // Activate a tab by name, optionally skipping pushState (for popstate navigation)
+  function activateTab(tabName, skipPushState = false) {
+    const tabElement = document.querySelector(`#tab-${tabName}`);
+    if (tabElement) {
+      // Activate using Bootstrap's Tab API
+      new bootstrap.Tab(tabElement).show();
+      // Only update history if needed
+      if (!skipPushState) {
+        const newUrl = `/entity/${entityId}/${tabName}`;
+        if (window.location.pathname !== newUrl) {
+          history.pushState({ tab: tabName }, '', newUrl);
+        }
+      }
+    }
+  }
 
+  // Extract the tab name from the current URL path.
+  function getTabNameFromUrl() {
+    const parts = window.location.pathname.split('/');
+    return parts.length >= 4 ? parts[3] : 'overview';
+  }
 
+  // On page load: set initial state and activate the initial tab.
+  const initialTab = getTabNameFromUrl();
+  history.replaceState({ tab: initialTab }, '', window.location.pathname);
+  activateTab(initialTab, true);
+
+  // Listen for tab changes on any element with data-bs-toggle="tab"
+  const tabElements = document.querySelectorAll('[data-bs-toggle="tab"]');
+  tabElements.forEach(function (el) {
+    el.addEventListener('shown.bs.tab', function (event) {
+      const tabName = event.target.id.replace('tab-', '');
+      // Only push state if we're really switching tabs.
+      if (!history.state || history.state.tab !== tabName) {
+        const newUrl = `/entity/${entityId}/${tabName}`;
+        history.pushState({ tab: tabName }, '', newUrl);
+      }
+    });
+  });
+
+  // Listen for popstate (back/forward navigation)
+  window.addEventListener('popstate', function (event) {
+    if (event.state && event.state.tab) {
+      activateTab(event.state.tab, true);
+    } else {
+      // Fallback: if no state, parse the URL.
+      const tabName = getTabNameFromUrl();
+      activateTab(tabName, true);
+    }
+  });
+});

@@ -12518,38 +12518,6 @@ textarea.form-control-lg {
   height: auto;
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  background-color: var(--card-bg);
-  height: calc(100vh - var(--navbar-height));
-  color: black;
-  text-align: center;
-}
-@media (max-width: 766px) {
-  .sidebar {
-    position: static;
-    height: max-content;
-    overflow-y: visible;
-  }
-}
-
-.sidebar-content {
-  height: calc(100vh - var(--navbar-height));
-  padding: 1rem;
-  align-items: center;
-}
-@media (max-width: 766px) {
-  .sidebar-content {
-    position: static;
-    height: max-content;
-    overflow-y: visible;
-  }
-}
-
 .super-entity {
   font-weight: lighter;
 }
@@ -12870,6 +12838,7 @@ button.btn-whitish[disabled] {
 #nav-sidebar .nav .nav-item .nav-link {
   transition: all 0.3s ease-in-out;
   border-radius: 0;
+  width: 100%;
 }
 #nav-sidebar .nav .nav-item .nav-link:hover {
   background-color: #e1e1e1;
@@ -12879,6 +12848,42 @@ button.btn-whitish[disabled] {
   background-color: #c9cdcf;
   color: white;
   font-weight: bold;
+}
+#nav-sidebar .nav .nav-item .spinner-border {
+  max-width: 1.25rem;
+  max-height: 1.25rem;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  background-color: var(--card-bg);
+  height: calc(100vh - var(--navbar-height));
+  color: black;
+  text-align: center;
+}
+@media (max-width: 766px) {
+  .sidebar {
+    position: static;
+    height: max-content;
+    overflow-y: visible;
+  }
+}
+
+.sidebar-content {
+  height: calc(100vh - var(--navbar-height));
+  padding: 1rem;
+  align-items: center;
+}
+@media (max-width: 766px) {
+  .sidebar-content {
+    position: static;
+    height: max-content;
+    overflow-y: visible;
+  }
 }
 
 #mymap, #mymaptiler {
