@@ -175,11 +175,12 @@ def getentity(id_: int, tab_name=None) -> str:
             return {'type': 'FeatureCollection', 'features': []}
 
     features = []
-    if tab_name == 'feature': #@Bernhard- hier baue ich mir das zusammen. Irgendwie kommt mir vor da sind alle siblings und andere Gräber auch drin.
+    if tab_name == 'feature':
         entities = Entity.get_linked_entities_by_properties_recursive(
-            id_, Parser(properties=['P46']))
-        for ent in entities:
-            features.append(ent)
+            id_, Parser(show=['when', 'types', 'names', 'depictions'], properties=['P46']))
+        print(id_)
+        print(entities)
+        features = entities
 
     def get_file_data():
         file_data = {}
