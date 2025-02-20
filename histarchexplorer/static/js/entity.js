@@ -1,4 +1,6 @@
 let loadedTabs = []
+let notYetClickedTabs = tabsToLoad
+
 
 document.getElementById('toggleSidebar').addEventListener('click', function () {
     const nav_sidebar = document.getElementById('nav-sidebar');
@@ -71,6 +73,7 @@ async function loadHTML(id, tab, index, totalTabs) {
     targetElement.innerHTML = tempDiv.innerHTML;
 
     const scripts = Array.from(tempDiv.querySelectorAll('script'));
+    if (tab === tabsToLoad[0]) notYetClickedTabs = notYetClickedTabs.filter(item => item !== tab);
     for (const script of scripts) {
         await loadScript(script);
     }
@@ -78,6 +81,7 @@ async function loadHTML(id, tab, index, totalTabs) {
     loadedTabs.push(tab);
     console.log(`HTML, CSS, and scripts for "${tab}" loaded in correct order!`);
     console.log(loadedTabs);
+
 
     loadedCount++; // Increase count when a tab is fully loaded
     checkAndRemoveSpinner(totalTabs);
@@ -119,54 +123,122 @@ tabsToLoad.forEach((tab, index) => {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-  // Activate a tab by name, optionally skipping pushState (for popstate navigation)
-  function activateTab(tabName, skipPushState = false) {
-    const tabElement = document.querySelector(`#tab-${tabName}`);
-    if (tabElement) {
-      // Activate using Bootstrap's Tab API
-      new bootstrap.Tab(tabElement).show();
-      // Only update history if needed
-      if (!skipPushState) {
-        const newUrl = `/entity/${entityId}/${tabName}`;
-        if (window.location.pathname !== newUrl) {
-          history.pushState({ tab: tabName }, '', newUrl);
+    // Activate a tab by name, optionally skipping pushState (for popstate navigation)
+    function activateTab(tabName, skipPushState = false) {
+        const tabElement = document.querySelector(`#tab-${tabName}`);
+        if (tabElement) {
+            // Activate using Bootstrap's Tab API
+            new bootstrap.Tab(tabElement).show();
+            // Only update history if needed
+            if (!skipPushState) {
+                const newUrl = `/entity/${entityId}/${tabName}`;
+                if (window.location.pathname !== newUrl) {
+                    history.pushState({tab: tabName}, '', newUrl);
+                }
+            }
         }
-      }
     }
-  }
 
-  // Extract the tab name from the current URL path.
-  function getTabNameFromUrl() {
-    const parts = window.location.pathname.split('/');
-    return parts.length >= 4 ? parts[3] : 'overview';
-  }
+    // Extract the tab name from the current URL path.
+    function getTabNameFromUrl() {
+        const parts = window.location.pathname.split('/');
+        return parts.length >= 4 ? parts[3] : 'overview';
+    }
 
-  // On page load: set initial state and activate the initial tab.
-  const initialTab = getTabNameFromUrl();
-  history.replaceState({ tab: initialTab }, '', window.location.pathname);
-  activateTab(initialTab, true);
+    // On page load: set initial state and activate the initial tab.
+    const initialTab = getTabNameFromUrl();
+    history.replaceState({tab: initialTab}, '', window.location.pathname);
+    activateTab(initialTab, true);
 
-  // Listen for tab changes on any element with data-bs-toggle="tab"
-  const tabElements = document.querySelectorAll('[data-bs-toggle="tab"]');
-  tabElements.forEach(function (el) {
-    el.addEventListener('shown.bs.tab', function (event) {
-      const tabName = event.target.id.replace('tab-', '');
-      // Only push state if we're really switching tabs.
-      if (!history.state || history.state.tab !== tabName) {
-        const newUrl = `/entity/${entityId}/${tabName}`;
-        history.pushState({ tab: tabName }, '', newUrl);
-      }
+    // Listen for tab changes on any element with data-bs-toggle="tab"
+    const tabElements = document.querySelectorAll('[data-bs-toggle="tab"]');
+    tabElements.forEach(function (el) {
+        el.addEventListener('shown.bs.tab', function (event) {
+            const tabName = event.target.id.replace('tab-', '');
+            // Only push state if we're really switching tabs.
+            if (!history.state || history.state.tab !== tabName) {
+                const newUrl = `/entity/${entityId}/${tabName}`;
+                history.pushState({tab: tabName}, '', newUrl);
+            }
+        });
     });
-  });
 
-  // Listen for popstate (back/forward navigation)
-  window.addEventListener('popstate', function (event) {
-    if (event.state && event.state.tab) {
-      activateTab(event.state.tab, true);
-    } else {
-      // Fallback: if no state, parse the URL.
-      const tabName = getTabNameFromUrl();
-      activateTab(tabName, true);
-    }
-  });
+    // Listen for popstate (back/forward navigation)
+    window.addEventListener('popstate', function (event) {
+        if (event.state && event.state.tab) {
+            activateTab(event.state.tab, true);
+        } else {
+            // Fallback: if no state, parse the URL.
+            const tabName = getTabNameFromUrl();
+            activateTab(tabName, true);
+        }
+    });
 });
+
+let rightSidebarcontent = {};
+
+// Initialize rightSidebarcontent if tabsToLoad is defined and is an array
+if (Array.isArray(tabsToLoad)) {
+    tabsToLoad.forEach(tab => {
+        rightSidebarcontent[tab] = {
+            content: `${tab} Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor`,
+            opened: false
+        };
+    });
+}
+
+// Function to update sidebar content
+function setRightSidebarContent(content) {
+    const rightSidebar = document.getElementById('right-sidebar');
+    if (rightSidebar) {
+        rightSidebar.innerHTML = content;
+    } else {
+        console.warn("Right sidebar element not found.");
+    }
+}
+
+// Toggle sidebar state
+function toggleRightSidebar(currentTab) {
+    const rightSidebar = document.getElementById('right-sidebar');
+    const root = document.documentElement;
+
+    if (!rightSidebar || !rightSidebarcontent[currentTab]) return;
+
+    const isExpanded = rightSidebar.classList.toggle('right-expanded');
+    rightSidebarcontent[currentTab].opened = isExpanded;
+
+    root.style.setProperty('--right-sidebar-width', isExpanded ? '600px' : '0px');
+}
+
+// Attach event listeners to sidebar buttons
+document.querySelectorAll('#nav-sidebar .nav-link').forEach(button => {
+    button.addEventListener('click', () => {
+        const tabName = button.id.replace('tab-', ''); // Extract tab name
+        const rightSidebar = document.getElementById('right-sidebar');
+        const root = document.documentElement;
+
+        if (!rightSidebarcontent[tabName]) {
+            console.warn(`No content found for tab: ${tabName}`);
+            return;
+        }
+
+        setRightSidebarContent(rightSidebarcontent[tabName].content);
+
+        // Ensure sidebar state is consistent with the clicked tab
+        const shouldBeOpen = rightSidebarcontent[tabName].opened;
+        const isCurrentlyOpen = rightSidebar.classList.contains('right-expanded');
+
+        if (!shouldBeOpen && isCurrentlyOpen) {
+            console.log(`Tab "${tabName}" should be closed but is open.`);
+            toggleRightSidebar(tabName);
+        } else if (shouldBeOpen && !isCurrentlyOpen) {
+            console.log(`Tab "${tabName}" should be open but is closed.`);
+            toggleRightSidebar(tabName);
+        }
+    });
+});
+
+// Set initial content if tabsToLoad has elements
+if (tabsToLoad?.length > 0 && rightSidebarcontent[tabsToLoad[0]]?.content) {
+    setRightSidebarContent(rightSidebarcontent[tabsToLoad[0]].content);
+}

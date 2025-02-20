@@ -11,7 +11,7 @@ valid_routes = {item['route'] for item in sidebarelements}
 
 
 def check_p46_geoms(
-        id):  # todo @Bernhard: replace this check with API. Benchmark for 50505 local postgres (1 row retrieved starting from 1 in 1 s 443 ms (execution: 1 s 147 ms, fetching: 296 ms)
+        id):  # todo replace this check with API. Benchmark for 50505 local postgres (1 row retrieved starting from 1 in 1 s 443 ms (execution: 1 s 147 ms, fetching: 296 ms)
     sql = """
     WITH RECURSIVE p46_links AS (
           SELECT *
@@ -31,6 +31,8 @@ def check_p46_geoms(
           SELECT domain_id AS id FROM p46_links
           UNION
           SELECT range_id AS id FROM p46_links
+          UNION
+          SELECT %(id)s AS id
         )
     SELECT EXISTS (
       SELECT 1
@@ -49,7 +51,7 @@ def check_p46_geoms(
 
 
 def get_root_id(
-        id):  # todo @Bernhard alternative with api: Benchmarl for 77841: 1 row retrieved starting from 1 in 122 ms (execution: 80 ms, fetching: 42 ms)
+        id):  # todo alternative with api: Benchmarl for 77841: 1 row retrieved starting from 1 in 122 ms (execution: 80 ms, fetching: 42 ms)
     sql = """
             WITH RECURSIVE parent_chain AS (
               -- Anchor: start with the link where 77841 is the range_id
@@ -142,16 +144,17 @@ def getentity(id_: int, tab_name=None) -> str:
     data = {}
 
     def get_entity():
-        # Retrieve entity and convert it to a JSON-serializable dict.
         entity = Entity.get_entity(id_, Parser())
         return {'entity': json.dumps(entity.to_serializable(), ensure_ascii=False, indent=4)}
+
+    if tab_name == 'json':
+        return json.dumps(get_entity())
 
     def get_map_data():
         geom_there = check_p46_geoms(id_)
         if geom_there:
             first_geom = get_first_geom(id_)
             id_to_fetch = get_root_id(id_)
-            # If geometries exist, fetch linked entities recursively and build GeoJSON.
             entities = Entity.get_linked_entities_by_properties_recursive(
                 id_to_fetch, Parser(show='geometry', properties='P46'))
             features = {'type': 'FeatureCollection', 'features': []}
@@ -169,18 +172,21 @@ def getentity(id_: int, tab_name=None) -> str:
                     })
             return features
         else:
-            # Return an empty GeoJSON FeatureCollection if no geometry found.
             return {'type': 'FeatureCollection', 'features': []}
 
+    features = []
+    if tab_name == 'feature': #@Bernhard- hier baue ich mir das zusammen. Irgendwie kommt mir vor da sind alle siblings und andere Gräber auch drin.
+        entities = Entity.get_linked_entities_by_properties_recursive(
+            id_, Parser(properties='P46'))
+        for ent in entities:
+            features.append(ent)
+
     def get_file_data():
-        # Placeholder for additional file data
         file_data = {}
         return file_data
 
-    # Process based on the tab_name
     if tab_name == 'map':
         map_data = get_map_data()
-        # Check if the map data has any features; if not, abort with 404.
         if not map_data['features']:
             print('No spatial features found. Aborting with 404.')
             abort(404)
@@ -191,7 +197,8 @@ def getentity(id_: int, tab_name=None) -> str:
         data = get_entity()
 
     elif tab_name not in valid_routes:
-        print('Invalid tab name provided. Aborting with 404.')
-        abort(404)
+        if tab_name not in ['feature']:
+            print('Invalid tab name provided. Aborting with 404.')
+            abort(404)
 
-    return render_template(f'tabs/{tab_name}.html', data=json.dumps(data))
+    return render_template(f'tabs/{tab_name}.html', data=json.dumps(data), features=features)

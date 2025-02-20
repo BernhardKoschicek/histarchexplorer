@@ -16,6 +16,9 @@ function extendBounds(feature) {
     }
 }
 
+
+const onePointFeature = (mapData.features.length === 1 && mapData.features[0].geometry.type === 'Point');
+
 mapData.features.forEach(extendBounds);
 
 const center = bounds.getCenter();
@@ -24,7 +27,7 @@ const map = new maplibregl.Map({
     container: 'mymap',
     center: [center.lng, center.lat],
     style: 'https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5',
-    zoom: 14,
+    zoom: 17,
     maxPitch: 85,
     maxZoom: 25,
 });
@@ -35,10 +38,11 @@ map.on('load', () => {
     addLayers();
     addControls();
     addTerrain();
-    map.fitBounds(bounds, {padding: 200});
+    if (!notYetClickedTabs.includes('map') && !onePointFeature) map.fitBounds(bounds, {padding: 200});
     map.setFilter('this-polygon', ['all', ['==', 'main', true], ['==', '$type', 'Polygon']]);
     map.setFilter('this-linestring', ['all', ['==', 'main', true], ['==', '$type', 'LineString']]);
     map.setFilter('this-points', ['all', ['==', 'main', true], ['==', '$type', 'Point']]);
+    setPointer(mapVectorLayers)
 });
 
 function addTerrain() {
@@ -80,49 +84,43 @@ function addGeoJsonSources() {
 
 function addLayers() {
     const layers = [
-  { id: 'entity-polygon', type: 'fill', source: 'feature-data', color: '#92BCEA', opacity: 0.3, filterType: 'Polygon', systemClass: 'Place' },
-  { id: 'entity-outline', type: 'line', source: 'feature-data', color: '#355070', width: 2, filterType: 'Polygon', systemClass: 'Place' },
-  { id: 'entity-linestring', type: 'line', source: 'feature-data', color: '#4078C0', width: 2, filterType: 'LineString', systemClass: 'Place' },
-  { id: 'entity-points', type: 'circle', source: 'feature-data', color: '#3366BB', radius: 6, filterType: 'Point', systemClass: 'Place' },
-
-  { id: 'feature-polygon', type: 'fill', source: 'feature-data', color: '#57C4C4', opacity: 0.6, filterType: 'Polygon', systemClass: 'Feature' },
-  { id: 'feature-outline', type: 'line', source: 'feature-data', color: '#2E5F5F', width: 2, filterType: 'Polygon', systemClass: 'Feature' },
-  { id: 'feature-linestring', type: 'line', source: 'feature-data', color: '#5FDDD3', width: 4, filterType: 'LineString', systemClass: 'Feature' },
-  { id: 'feature-points', type: 'circle', source: 'feature-data', color: '#1B8282', radius: 6, filterType: 'Point', systemClass: 'Feature' },
-
-  { id: 'stratigraphic-unit-polygon', type: 'fill', source: 'feature-data', color: '#B38E5D', opacity: 0.6, filterType: 'Polygon', systemClass: 'Stratigraphic unit' },
-  { id: 'stratigraphic-unit-outline', type: 'line', source: 'feature-data', color: '#80623A', width: 2, filterType: 'Polygon', systemClass: 'Stratigraphic unit' },
-  { id: 'stratigraphic-unit-linestring', type: 'line', source: 'feature-data', color: '#C49A6C', width: 4, filterType: 'LineString', systemClass: 'Stratigraphic unit' },
-  { id: 'stratigraphic-unit-points', type: 'circle', source: 'feature-data', color: '#9D6A21', radius: 6, filterType: 'Point', systemClass: 'Stratigraphic unit' },
-
-  { id: 'artifact-polygon', type: 'fill', source: 'feature-data', color: '#D45C2C', opacity: 0.6, filterType: 'Polygon', systemClass: 'Artifact' },
-  { id: 'artifact-outline', type: 'line', source: 'feature-data', color: '#993D1A', width: 2, filterType: 'Polygon', systemClass: 'Artifact' },
-  { id: 'artifact-linestring', type: 'line', source: 'feature-data', color: '#F0784A', width: 4, filterType: 'LineString', systemClass: 'Artifact' },
-  { id: 'artifact-points', type: 'circle', source: 'feature-data', color: '#B5411D', radius: 6, filterType: 'Point', systemClass: 'Artifact' },
-
-  { id: 'human-remains-polygon', type: 'fill', source: 'feature-data', color: '#A36BAA', opacity: 0.6, filterType: 'Polygon', systemClass: 'Human remains' },
-  { id: 'human-remains-outline', type: 'line', source: 'feature-data', color: '#5D3F67', width: 2, filterType: 'Polygon', systemClass: 'Human remains' },
-  { id: 'human-remains-linestring', type: 'line', source: 'feature-data', color: '#85519C', width: 4, filterType: 'LineString', systemClass: 'Human remains' },
-  { id: 'human-remains-points', type: 'circle', source: 'feature-data', color: '#6D4D86', radius: 6, filterType: 'Point', systemClass: 'Human remains' },
-
-  { id: 'this-polygon', type: 'fill', source: 'feature-data', color: '#ff0000', opacity: 0.7, filterType: 'Polygon' },
-  { id: 'this-polygon-outline', type: 'line', source: 'feature-data', color: '#3e0505', width: 2, filterType: 'Polygon'},
-  { id: 'this-linestring', type: 'line', source: 'feature-data', color: '#ff0000', width: 2, filterType: 'LineString' },
-  { id: 'this-points', type: 'circle', source: 'feature-data', color: 'rgba(255,0,0,0.8)', radius: 8, filterType: 'Point' },
-
-  { id: 'highlight-polygon', type: 'fill', source: 'feature-data', color: '#FF4444', opacity: 0.5, filterType: 'Polygon' },
-  { id: 'highlight-polygon-outline', type: 'line', source: 'feature-data', color: 'rgba(255,255,255,0.8)', width: 3, filterType: 'Polygon'},
-  { id: 'highlight-linestring', type: 'line', source: 'feature-data', color: 'rgba(255,68,68,0.63)', width: 3, filterType: 'LineString' },
-  { id: 'highlight-points', type: 'circle', source: 'feature-data', color: 'rgba(255,68,68,0.86)', radius: 6, filterType: 'Point' }
-
-];
-
-
-
+        { id: 'entity-polygon', type: 'fill', source: 'feature-data', color: '#92BCEA', opacity: 0.3, filterType: 'Polygon', systemClass: 'Place' },
+        { id: 'entity-outline', type: 'line', source: 'feature-data', color: '#355070', width: 2, filterType: 'Polygon', systemClass: 'Place' },
+        { id: 'entity-linestring', type: 'line', source: 'feature-data', color: '#4078C0', width: 2, filterType: 'LineString', systemClass: 'Place' },
+        { id: 'entity-points', type: 'circle', source: 'feature-data', color: '#3366BB', radius: 9, filterType: 'Point', systemClass: 'Place' },
+        { id: 'feature-polygon', type: 'fill', source: 'feature-data', color: '#57C4C4', opacity: 0.6, filterType: 'Polygon', systemClass: 'Feature' },
+        { id: 'feature-outline', type: 'line', source: 'feature-data', color: '#2E5F5F', width: 2, filterType: 'Polygon', systemClass: 'Feature' },
+        { id: 'feature-linestring', type: 'line', source: 'feature-data', color: '#5FDDD3', width: 4, filterType: 'LineString', systemClass: 'Feature' },
+        { id: 'feature-points', type: 'circle', source: 'feature-data', color: '#1B8282', radius: 9, filterType: 'Point', systemClass: 'Feature' },
+        { id: 'stratigraphic-unit-polygon', type: 'fill', source: 'feature-data', color: '#B38E5D', opacity: 0.6, filterType: 'Polygon', systemClass: 'Stratigraphic unit' },
+        { id: 'stratigraphic-unit-outline', type: 'line', source: 'feature-data', color: '#80623A', width: 2, filterType: 'Polygon', systemClass: 'Stratigraphic unit' },
+        { id: 'stratigraphic-unit-linestring', type: 'line', source: 'feature-data', color: '#C49A6C', width: 4, filterType: 'LineString', systemClass: 'Stratigraphic unit' },
+        { id: 'stratigraphic-unit-points', type: 'circle', source: 'feature-data', color: '#9D6A21', radius: 9, filterType: 'Point', systemClass: 'Stratigraphic unit' },
+        { id: 'artifact-polygon', type: 'fill', source: 'feature-data', color: '#D45C2C', opacity: 0.6, filterType: 'Polygon', systemClass: 'Artifact' },
+        { id: 'artifact-outline', type: 'line', source: 'feature-data', color: '#993D1A', width: 2, filterType: 'Polygon', systemClass: 'Artifact' },
+        { id: 'artifact-linestring', type: 'line', source: 'feature-data', color: '#F0784A', width: 4, filterType: 'LineString', systemClass: 'Artifact' },
+        { id: 'artifact-points', type: 'circle', source: 'feature-data', color: '#B5411D', radius: 9, filterType: 'Point', systemClass: 'Artifact' },
+        { id: 'human-remains-polygon', type: 'fill', source: 'feature-data', color: '#A36BAA', opacity: 0.6, filterType: 'Polygon', systemClass: 'Human remains' },
+        { id: 'human-remains-outline', type: 'line', source: 'feature-data', color: '#5D3F67', width: 2, filterType: 'Polygon', systemClass: 'Human remains' },
+        { id: 'human-remains-linestring', type: 'line', source: 'feature-data', color: '#85519C', width: 4, filterType: 'LineString', systemClass: 'Human remains' },
+        { id: 'human-remains-points', type: 'circle', source: 'feature-data', color: '#6D4D86', radius: 9, filterType: 'Point', systemClass: 'Human remains' },
+        { id: 'this-polygon', type: 'fill', source: 'feature-data', color: '#ff0000', opacity: 0.7, filterType: 'Polygon' },
+        { id: 'this-polygon-outline', type: 'line', source: 'feature-data', color: '#3e0505', width: 2, filterType: 'Polygon' },
+        { id: 'this-linestring', type: 'line', source: 'feature-data', color: '#ff0000', width: 2, filterType: 'LineString' },
+        { id: 'this-points', type: 'circle', source: 'feature-data', color: 'rgba(255,0,0,0.8)', radius: 8, filterType: 'Point' },
+        { id: 'highlight-polygon', type: 'fill', source: 'feature-data', color: '#FF4444', opacity: 0.5, filterType: 'Polygon' },
+        { id: 'highlight-polygon-outline', type: 'line', source: 'feature-data', color: 'rgba(255,255,255,0.8)', width: 3, filterType: 'Polygon' },
+        { id: 'highlight-linestring', type: 'line', source: 'feature-data', color: 'rgba(255,68,68,0.63)', width: 3, filterType: 'LineString' },
+        { id: 'highlight-points', type: 'circle', source: 'feature-data', color: 'rgba(255,68,68,0.86)', radius: 9, filterType: 'Point' }
+    ];
 
     layers.forEach(layer => addLayer(layer));
-    highlightFeatures()
+    highlightFeatures();
 }
+
+
+const mapVectorLayers = ['feature-polygon', 'feature-points', 'feature-points', 'stratigraphic-unit-polygon', 'stratigraphic-unit-points', 'stratigraphic-unit-points', 'entity-polygon', 'entity-linestring', 'entity-points',
+    'artifact-polygon', 'artifact-linestring', 'artifact-points', 'human-remains-polygon', 'human-remains-linestring', 'human-remains-points']
 
 function addLayer({id, type, source, color, width = 1, opacity = 1, radius = 4, filterType, systemClass = null}) {
     const paintStyles = {
@@ -139,13 +137,12 @@ function addLayer({id, type, source, color, width = 1, opacity = 1, radius = 4, 
 map.on('click', (e) => {
     highlightFeatures()
     const clickedFeatures = map.queryRenderedFeatures(e.point, {
-        layers: ['feature-polygon', 'feature-points', 'feature-points', 'stratigraphic-unit-polygon', 'stratigraphic-unit-points', 'stratigraphic-unit-points', 'entity-polygon', 'entity-linestring', 'entity-points',
-                'artifact-polygon', 'artifact-linestring', 'artifact-points', 'human-remains-polygon', 'human-remains-linestring', 'human-remains-points']
+        layers: mapVectorLayers
     });
 
     if (!clickedFeatures.length) return;
 
-    const featureNames = clickedFeatures.map(f => f.properties.label + ' (' + f.properties.class + ')');
+    const featureNames = clickedFeatures.map(f => '<button class="map-popup-hoverlink" onclick="setSidebarContent(' + f.properties.id + ')" data-id="' + f.properties.id + '">' + f.properties.label + ' (' + f.properties.class + ') </button>');
     featureIds = clickedFeatures.map(f => f.properties.id);
 
     highlightFeatures(featureIds);
@@ -167,4 +164,50 @@ function showPopup(lngLat, featureNames) {
         .setLngLat(lngLat)
         .setHTML(featureNames.join('<br>'))
         .addTo(map);
+    document.querySelectorAll(".map-popup-hoverlink").forEach(button => {
+        button.addEventListener("mouseenter", () => {
+            const featureId = parseInt(button.getAttribute("data-id"));
+            highlightFeatures([featureId]); // Call the function with the feature ID
+        });
+
+        button.addEventListener("mouseleave", () => {
+            highlightFeatures(featureIds); // Optionally remove the highlight when mouse leaves
+
+        });
+    })
 }
+
+function setPointer(layers) {
+    layers.forEach(layer => {
+        map.on('mouseenter', layer, () => map.getCanvas().style.cursor = 'pointer');
+        map.on('mouseleave', layer, () => map.getCanvas().style.cursor = '');
+    });
+}
+
+function setSidebarContent(id) {
+
+    fetch(`/getentity/${id}/feature`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to load content for feature`);
+            }
+            return response.text(); // Get the HTML content
+        })
+        .then(html => {
+            document.getElementById('right-sidebar').innerHTML = html;
+            toggleRightSidebar('map')
+        })
+        .catch(error => console.error("Error loading right sidebar content:", error));
+}
+
+
+document.getElementById('tab-map').addEventListener('click', function (event) {
+    console.log('map clicked')
+    if (notYetClickedTabs.includes('map') && !onePointFeature) {
+        setTimeout(() => {
+            console.log('map clicked for the first time');
+            notYetClickedTabs = notYetClickedTabs.filter(item => item !== 'map');
+            map.fitBounds(bounds, {padding: 200});
+        }, 300);
+    }
+})

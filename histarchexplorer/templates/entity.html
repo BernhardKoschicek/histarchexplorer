@@ -15,11 +15,11 @@
                     {% for item in sidebarelements %}
                         <li class="nav-item d-none to-remove-{{ item.route }}" role="presentation">
                             <button
-                               class="nav-link d-flex align-items-center {{ 'active' if active_tab == item.route else '' }}"
-                               id="tab-{{ item.route }}" data-bs-toggle="tab"
-                               data-bs-target="#tab-pane-{{ item.route }}" role="tab"
-                               aria-controls="tab-pane-{{ item.route }}"
-                               aria-selected="{{ 'true' if loop.first else 'false' }}">
+                                    class="nav-link d-flex align-items-center {{ 'active' if active_tab == item.route else '' }}"
+                                    id="tab-{{ item.route }}" data-bs-toggle="tab"
+                                    data-bs-target="#tab-pane-{{ item.route }}" role="tab"
+                                    aria-controls="tab-pane-{{ item.route }}"
+                                    aria-selected="{{ 'true' if loop.first else 'false' }}">
                                 <i class="bi {{ item.icon }} fs-5"></i>
                                 <span class="ms-2">{{ item.route }}</span>
                             </button>
@@ -27,8 +27,8 @@
                     {% endfor %}
                     <li class="nav-item to-remove-spinner" role="presentation">
                         <button title="loading"
-                           class="nav-link d-flex align-items-center"
-                           id="tab-spinner">
+                                class="nav-link d-flex align-items-center"
+                                id="tab-spinner">
                             <i class="spinner-border"></i>
                         </button>
                     </li>
@@ -38,7 +38,7 @@
 
             <!-- Main content area - MUURI Tiles -->
             <div class="col flex-column grid">
-                <div class="entity-content">
+                <div class="entity-content bg-body-tertiary">
                     {% for item in sidebarelements %}
                         <div class="tab-pane fade d-none to-remove-{{ item.route }} {{ 'show active' if active_tab == item.route else '' }}"
                              id="tab-pane-{{ item.route }}" role="tabpanel" aria-labelledby="tab-{{ loop.index }}">
@@ -50,6 +50,13 @@
                             </div>
                         </div>
                     {% endfor %}
+                </div>
+            </div>
+            <div class="col flex-column grid">
+                <div id="right-sidebar" class="bg-body-secondary">
+                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet
+                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet
+                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet
                 </div>
             </div>
         </div>
