@@ -234,7 +234,7 @@
           {% for depiction in images %}
             {% set total_images = images|length %}
             {% if not depiction.main_image %}
-              <div class="{% if total_images > 1 %}item-half{% else %}item{% endif %}">
+              <div class="{% if loop.index <= 3 %}item-half{% else %}item{% endif %}">
                 <div class="item-content item-content-full">
                   <div class="image">
                     {% if depiction.iiif_base_path %}
