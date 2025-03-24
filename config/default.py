@@ -63,6 +63,10 @@ TYPE_DIVISIONS = {
     'position of find in grave': {
         'ids': [23440],
         'icon': ('css', 'bi bi-crosshair')},
+    'case study' : {
+        'ids': [8240],
+        'icon': ('css', 'bi bi-house')
+    }
 }
 
 
