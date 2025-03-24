@@ -47,7 +47,7 @@
       <div class="col flex-column grid">
 
         <!-- Hierarchy -->
-        <div class="item hierarchy-item">
+        <div class="item-half hierarchy-item">
           {% if ancestor_entities %}
             {% for entity in ancestor_entities %}
               <div class="hierarchy-button">
@@ -83,7 +83,7 @@
             <div class="entity-card__icon">
               <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
             </div>
-            <div class="entity-card__label">{{ entity.name }}</div>
+            <div class="hierarchy-card__label">{{ entity.name }}</div>
           {% else %}
             <div
                 class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
@@ -100,7 +100,7 @@
                       alt="{{ entity.system_class }}">
                 {% endif %}
               </div>
-              <div class="entity-card__label mb-0">{{ entity.name }}</div>
+              <div class="hierarchy-card-label mb-0">{{ entity.name }}</div>
               <div class="entity-type mb-0 ">
                 {% if entity.standard_type %}
                   <p>{{ entity.standard_type.label | upper }}</p>
@@ -145,8 +145,8 @@
             {% endif %}
           </div>
           </button>
-
         </div>
+
 
         <!-- Description -->
         {% if entity.description %}
@@ -160,6 +160,33 @@
           </div>
 
         {% endif %}
+
+        <!-- Attributes -->
+        {% if categorized_types %}
+          <div class="item-half">
+            <div class="item-content">
+              <span class="tile-label">ATTRIBUTES</span>
+              <div class="categorized-types">
+                {% for label, value in categorized_types.items() %}
+                  <p class="tile-sub-label text-uppercase mt-3">
+                    {{ value[0]['icon'] | safe }} {{ label }}</p>
+                  {% for type in value %}
+                    <div class="badge bg-dark-subtle text-wrap m-1">
+                      <h6 class="m-0 text-center">
+                        {{ type['type'].label }}
+                        {% if type['type'].value and type['type'].unit %}:
+                          {{ type['type'].value }}
+                          {{ type['type'].unit }}
+                        {% endif %}
+                      </h6>
+                    </div>
+                  {% endfor %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
 
         <!-- Map Location -->
         {% if entity.geometry %}
@@ -200,31 +227,6 @@
           </div>
         {% endif %}
 
-        <!-- Attributes -->
-        {% if categorized_types %}
-          <div class="item">
-            <div class="item-content">
-              <span class="tile-label">ATTRIBUTES</span>
-              <div class="categorized-types">
-                {% for label, value in categorized_types.items() %}
-                  <p class="tile-sub-label text-uppercase mt-3">
-                    {{ value[0]['icon'] | safe }} {{ label }}</p>
-                  {% for type in value %}
-                    <div class="badge bg-dark-subtle text-wrap m-1">
-                      <h6 class="m-0 text-center">
-                        {{ type['type'].label }}
-                        {% if type['type'].value and type['type'].unit %}:
-                          {{ type['type'].value }}
-                          {{ type['type'].unit }}
-                        {% endif %}
-                      </h6>
-                    </div>
-                  {% endfor %}
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-        {% endif %}
 
 
         <!-- All other images -->
