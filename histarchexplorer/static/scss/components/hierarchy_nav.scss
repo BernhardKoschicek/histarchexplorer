@@ -57,7 +57,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: end;
 
   button {
     transition: transform 0.2s ease-in-out;
@@ -86,9 +86,9 @@ button.btn-whitish[disabled] {
   opacity: 0.6;
 }
 
-.line {
+.hierarchy-line {
   background-color: grey;
-  height: 15px;
+  height: 30px;
   width: 1px;
   margin: 5px 0;
 }
@@ -123,4 +123,5 @@ button.btn-whitish[disabled] {
   background-color: lightgrey;
   padding-top: 1rem;
   display: grid;
+  height: calc(100vh - 106px);
 }
