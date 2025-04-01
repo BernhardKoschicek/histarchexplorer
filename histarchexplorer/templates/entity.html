@@ -3,7 +3,7 @@
 {% block content %}
 
     <script>
-        const tabsToLoad = {{ sidebarelements | sort(attribute='order') | map(attribute='route') | list | tojson }};
+        const tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
         const entityId = {{ entity_id }}
     </script>
 
@@ -12,9 +12,9 @@
             <!-- Navigation-Sidebar -->
             <div id="nav-sidebar" class="col col-auto d-none d-md-flex flex-column bg-body-tertiary align-items-center">
                 <ul class="nav nav-pills flex-column text-center w-100">
-                    {% for item in sidebarelements %}
+                    {% for item in sidebar_elements %}
                         <li class="nav-item d-none to-remove-{{ item.route }}" role="presentation">
-                            <button
+                            <a
                                     class="nav-link d-flex align-items-center {{ 'active' if active_tab == item.route else '' }}"
                                     id="tab-{{ item.route }}" data-bs-toggle="tab"
                                     data-bs-target="#tab-pane-{{ item.route }}" role="tab"
@@ -22,7 +22,7 @@
                                     aria-selected="{{ 'true' if loop.first else 'false' }}">
                                 <i class="bi {{ item.icon }} fs-5"></i>
                                 <span class="ms-2">{{ item.route }}</span>
-                            </button>
+                            </a>
                         </li>
                     {% endfor %}
                     <li class="nav-item to-remove-spinner" role="presentation">
@@ -39,7 +39,7 @@
             <!-- Main content area - MUURI Tiles -->
             <div class="col flex-column grid">
                 <div class="entity-content bg-body-tertiary">
-                    {% for item in sidebarelements %}
+                    {% for item in sidebar_elements %}
                         <div class="tab-pane fade d-none to-remove-{{ item.route }} {{ 'show active' if active_tab == item.route else '' }}"
                              id="tab-pane-{{ item.route }}" role="tabpanel" aria-labelledby="tab-{{ loop.index }}">
                             <div id="pane-content-{{ item.route }}">

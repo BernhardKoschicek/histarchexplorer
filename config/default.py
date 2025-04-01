@@ -18,7 +18,7 @@ REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 API_URL = 'https://thanados.openatlas.eu/api/'
-#API_URL = 'https://demo-dev.openatlas.eu/api/'
+# API_URL = 'https://demo-dev.openatlas.eu/api/'
 API_PROXY = ''
 OPENATLAS_CASE_STUDY_IDS: list[int] = []
 
@@ -64,25 +64,24 @@ TYPE_DIVISIONS = {
     'position of find in grave': {
         'ids': [23440],
         'icon': ('css', 'bi bi-crosshair')},
-    'case study' : {
+    'case study': {
         'ids': [8240],
         'icon': ('css', 'bi bi-house')
     }
 }
 
-
 SIDEBAR_ICONS = {
-'images': {
-    'grave.svg': [26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713],
-},
-'css_icon_class': {
-    'bi bi-geo-alt-fill': [22378, 73],
-    'bi bi-house-door': [26197],
-    'bi bi-geo-yelp': [13362],
-    # 'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthroplogy
-}}
+    'images': {
+        'grave.svg': [26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713],
+    },
+    'css_icon_class': {
+        'bi bi-geo-alt-fill': [22378, 73],
+        'bi bi-house-door': [26197],
+        'bi bi-geo-yelp': [13362],
+        # 'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthroplogy
+    }}
 
 SIDEBAR_OPTIONS = [
-    {'icon':'bi bi-info-circle', 'route':'overview', 'order': 1},
-    {'icon':'bi bi-map', 'route':'map', 'order': 2},
+    {'order': 1, 'route': 'overview', 'icon': 'bi bi-info-circle'},
+    {'order': 2, 'route': 'map', 'icon': 'bi bi-map'},
 ]

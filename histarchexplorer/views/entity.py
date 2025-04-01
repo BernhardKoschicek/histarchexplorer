@@ -5,9 +5,10 @@ from flask import render_template, abort, jsonify, g
 
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
+from histarchexplorer.views.landing import landing
 
-sidebarelements = app.config['SIDEBAR_OPTIONS']
-valid_routes = {item['route'] for item in sidebarelements}
+sidebar_elements = app.config['SIDEBAR_OPTIONS']
+valid_routes = {item['route'] for item in sidebar_elements}
 
 
 def check_p46_geoms(
@@ -104,6 +105,7 @@ def check_geom(id):
 
     return id if result and result[0] else None
 
+
 def get_first_geom(id):
     """Recursively finds the first entity with geometry."""
     id_to_return = check_geom(id)
@@ -132,11 +134,14 @@ def entity(id_: int, tab_name="overview") -> str:
     if tab_name not in valid_routes:
         abort(404)
 
-    return render_template('entity.html', sidebarelements=[
-        {**item, 'order': 0} if item['route'] == tab_name else item
-        for item in sidebarelements
-    ], page_name="landing", active_tab=tab_name,
-                           entity_id=id_)
+    return render_template(
+        'entity.html',
+        sidebar_elements=[
+            {**item, 'order': 0} if item['route'] == tab_name else item
+            for item in sidebar_elements],
+        page_name="landing",
+        active_tab=tab_name,
+        entity_id=id_)
 
 
 @app.route('/getentity/<int:id_>/<tab_name>')
@@ -147,8 +152,8 @@ def getentity(id_: int, tab_name=None) -> str:
         entity = Entity.get_entity(id_, Parser())
         return {'entity': json.dumps(entity.to_serializable(), ensure_ascii=False, indent=4)}
 
-    if tab_name == 'json':
-        return json.dumps(get_entity())
+    def get_entity_object():
+        return Entity.get_entity(id_, Parser())
 
     def get_map_data():
         geom_there = check_p46_geoms(id_)
@@ -199,21 +204,23 @@ def getentity(id_: int, tab_name=None) -> str:
     def get_file_data():
         file_data = {}
         return file_data
-
+    entity_object = None
     if tab_name == 'map':
         map_data = get_map_data()
         if not map_data['features']:
             print('No spatial features found. Aborting with 404.')
             abort(404)
         data['spatial'] = map_data
-
-
     elif tab_name == 'overview':
-        data = get_entity()
-
+        data=get_entity()
+        entity_object = get_entity_object()
     elif tab_name not in valid_routes:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
 
-    return render_template(f'tabs/{tab_name}.html', data=json.dumps(data), features=features)
+    return render_template(
+        f'tabs/{tab_name}.html',
+        data=json.dumps(data),
+        bla=entity_object,
+        features=features)
