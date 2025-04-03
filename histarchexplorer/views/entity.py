@@ -238,31 +238,7 @@ def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
     raise ValueError(f"Entity with id {id_} not found.")
 
 
-def get_related_entities(
-        main_entity: Entity,
-        entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
-    related_entities: dict[str, Any] = defaultdict(lambda: defaultdict(list))
-    for subunit in entities:
-        if subunit.id == main_entity.id:
-            continue
-        match subunit.system_class:
-            case 'Group' | 'Person':
-                related_entities[subunit.system_class][subunit.name].append(
-                    subunit)
-            case _:
-                if not subunit.types:
-                    continue
-                for type_ in subunit.types:
-                    label = type_.type_hierarchy[0]['label']
-                    if label in app.config['STANDARD_TYPES']:
-                        related_entities[label][type_.label].append(subunit)
-    return related_entities
-    #print(related_entities.keys())
-
-
-def get_ancestor_entities(
-        main_entity: Entity,
-        entities: list[Entity]) -> list[Entity]:
+def get_ancestor_entities(main_entity: Entity, entities: list[Entity]) -> list[dict]:
     ancestor_entities = []
     current_entity = main_entity
 
@@ -270,14 +246,16 @@ def get_ancestor_entities(
         # If there is a parent, get the actual entity it points to
         if current_entity.parent:
             parent_entity = next(
-                (entity for entity in entities if
-                 entity.id == current_entity.parent.relation_to_id),
+                (entity for entity in entities if entity.id == current_entity.parent.relation_to_id),
                 None
             )
             if parent_entity:
-                ancestor_entities.append(parent_entity)
+                ancestor_entities.append({
+                    'id': parent_entity.id,
+                    'name': parent_entity.name,
+                    'system_class': parent_entity.system_class
+                })
                 current_entity = parent_entity  # Move up to the next level
-                # in hierarchy
             else:
                 break  # Exit if no parent entity
         else:
