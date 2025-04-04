@@ -1,99 +1,79 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="relative-wrapper">
-  <!-- Normal Search Form -->
-  <form method="POST" action="/search" id="static-search-form">
-    <div class="input-group mb-3">
-      <input type="text" id="search-input" name="query" value="{{ query or '' }}" placeholder="Search..." class="form-control" autocomplete="off">
-      <button type="submit" class="btn btn-primary">Search</button>
+  <div class="container" style="padding-top: 120px;">
+    <div class="relative-wrapper">
+      <!-- Normal Search Form -->
+      <form method="POST" action="/search" id="static-search-form">
+        <div class="input-group mb-3">
+          <input type="text" id="search-input" name="query"
+                 value="{{ query or '' }}" placeholder="Search..."
+                 class="form-control" autocomplete="off">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </form>
+      <!-- Live Search Popup Container -->
+      <div id="live-results" class="live-popup"></div>
     </div>
-  </form>
-  <!-- Live Search Popup Container -->
-  <div id="live-results" class="live-popup"></div>
-</div>
 
-<!-- Static Search Results (displayed after form submission) -->
-{% if results %}
-  <h2 class="mt-5">Static Search Results:</h2>
-  <ul>
-    {% for result in results %}
-      <li class="mb-2">
-        <strong>
-          <a href="/search_result/{{ result['id'].split('/')[-1] }}" style="text-decoration: none; color: inherit;">
-            {{ result['name'] or "Unnamed" }}
-          </a>
-          ({{ result['system_class'] }})
-        </strong><br>
-        {% if result['description'] %}
-          {{ result['description'][:300] }}<br>
-        {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
-{% elif query %}
-  <p><em>No results found for "{{ query }}"</em></p>
-{% endif %}
+    <!-- Static Search Results (displayed after form submission) -->
+    {% if results %}
+      <h2 class="mt-5">Static Search Results:</h2>
+      <ul>
+        {% for result in results %}
+          <li class="mb-2">
+            <strong>
+              <a href="/search_result/{{ result['id'].split('/')[-1] }}"
+                 style="text-decoration: none; color: inherit;">
+                {{ result['name'] or "Unnamed" }}
+              </a>
+              ({{ result['system_class'] }})
+            </strong><br>
+            {% if result['description'] %}
+              {{ result['description'][:300] }}<br>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% elif query %}
+      <p><em>No results found for "{{ query }}"</em></p>
+    {% endif %}
+  </div>
 
-<!-- Inline CSS -->
-<style>
-.relative-wrapper {
-  position: relative;
-}
-.live-popup {
-  position: absolute;
-  top: 100%; /* Immediately below the form */
-  left: 0;
-  right: 0;
-  background: #fff;
-  color: #000;
-  border: 1px solid #ccc;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  z-index: 1000;
-  max-height: 300px;
-  overflow-y: auto;
-  display: none; /* Hidden by default */
-  padding: 8px;
-  font-size: 16px;
-}
-.live-popup.show {
-  display: block;
-}
-</style>
 
-<!-- Inline JavaScript -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const input = document.getElementById('search-input');
-  const resultsBox = document.getElementById('live-results');
+  <!-- Inline JavaScript -->
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          const input = document.getElementById('search-input');
+          const resultsBox = document.getElementById('live-results');
 
-  if (!input) {
-    console.error("Live search: Input field not found!");
-    return;
-  }
+          if (!input) {
+              console.error("Live search: Input field not found!");
+              return;
+          }
 
-  // Live search: update popup as user types
-  input.addEventListener('input', async function() {
-    const query = input.value.trim();
-    if (query.length < 3) {
-      resultsBox.innerHTML = "<p style='padding:8px; color:gray;'>Type at least 3 characters...</p>";
-      resultsBox.classList.remove('show');
-      return;
-    }
+          // Live search: update popup as user types
+          input.addEventListener('input', async function () {
+              const query = input.value.trim();
+              if (query.length < 3) {
+                  resultsBox.innerHTML = "<p style='padding:8px; color:gray;'>Type at least 3 characters...</p>";
+                  resultsBox.classList.remove('show');
+                  return;
+              }
 
-    resultsBox.innerHTML = `<p style="padding:8px; color:blue;">
+              resultsBox.innerHTML = `<p style="padding:8px; color:blue;">
       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
       Loading live results for "${query}"...
     </p>`;
-    resultsBox.classList.add('show');
+              resultsBox.classList.add('show');
 
-    try {
-      const res = await fetch(`/search_live?q=${encodeURIComponent(query)}`);
-      const liveResults = await res.json();
+              try {
+                  const res = await fetch(`/search_live?q=${encodeURIComponent(query)}`);
+                  const liveResults = await res.json();
 
-      if (!Array.isArray(liveResults) || liveResults.length === 0) {
-        resultsBox.innerHTML = `<p style="padding:8px; color:orange;">No live results found for "${query}".</p>`;
-      } else {
-        resultsBox.innerHTML = liveResults.map(r => `
+                  if (!Array.isArray(liveResults) || liveResults.length === 0) {
+                      resultsBox.innerHTML = `<p style="padding:8px; color:orange;">No live results found for "${query}".</p>`;
+                  } else {
+                      resultsBox.innerHTML = liveResults.map(r => `
           <div class="p-2">
             <strong>
               <a href="/search_result/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
@@ -103,20 +83,20 @@ document.addEventListener("DOMContentLoaded", function() {
             <small>${r.description ? r.description.slice(0, 150) + '…' : ''}</small>
           </div>
         `).join('');
-      }
-    } catch (err) {
-      console.error("Live search error:", err);
-      resultsBox.innerHTML = `<p style="padding:8px; color:red;">Error loading live results.</p>`;
-    }
-  });
+                  }
+              } catch (err) {
+                  console.error("Live search error:", err);
+                  resultsBox.innerHTML = `<p style="padding:8px; color:red;">Error loading live results.</p>`;
+              }
+          });
 
-  // Hide live search popup when clicking outside the relative-wrapper
-  document.addEventListener('click', function(e) {
-    const container = document.querySelector('.relative-wrapper');
-    if (container && !container.contains(e.target)) {
-      resultsBox.classList.remove('show');
-    }
-  });
-});
-</script>
+          // Hide live search popup when clicking outside the relative-wrapper
+          document.addEventListener('click', function (e) {
+              const container = document.querySelector('.relative-wrapper');
+              if (container && !container.contains(e.target)) {
+                  resultsBox.classList.remove('show');
+              }
+          });
+      });
+  </script>
 {% endblock %}
