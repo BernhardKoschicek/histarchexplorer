@@ -57,7 +57,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
 
   button {
     transition: transform 0.2s ease-in-out;
@@ -86,15 +86,42 @@ button.btn-whitish[disabled] {
   opacity: 0.6;
 }
 
-.line {
+.hierarchy-line {
   background-color: grey;
-  height: 15px;
+  height: 30px;
   width: 1px;
   margin: 5px 0;
 }
 
+.hierarchy-card-label {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.7vw;
+  font-weight: 600;
+  margin-bottom: rem(10);
+  text-transform: uppercase;
+  color: var(--text-color2);
+  padding: 0.5rem;
+}
+
+@media (max-width: 769px) {
+  .hierarchy-card-label {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1921px) {
+  .hierarchy-card-label {
+    font-size: 1.4rem;
+  }
+}
+
+
 .hierarchy-item {
   background-color: lightgrey;
-  padding: 2rem;
+  padding-top: 1rem;
   display: grid;
+  height: calc(100vh - 106px);
 }

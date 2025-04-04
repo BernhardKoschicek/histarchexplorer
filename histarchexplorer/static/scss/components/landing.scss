@@ -85,7 +85,6 @@
   }
 }
 
-
 .item-wide {
   width: calc(100% - 30px); // full width of three tiles
 }
@@ -176,6 +175,9 @@
   }
 }
 
+
+
+
 //Categorized-types
 .badge.bg-secondary.text-wrap {
   font-size: 1.1rem;
@@ -252,6 +254,7 @@
     font-size: 1.2rem;
   }
 }
+
 .entity-card__icon {
   display: flex;
   justify-content: center;
@@ -264,37 +267,7 @@
 }
 
 
-//Sidebar
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  background-color: var(--card-bg);
-  height: calc(100vh - var(--navbar-height));
-  color: black;
-  text-align: center;
 
-  @media (max-width: 766px) {
-    position: static;
-    height: max-content;
-    overflow-y: visible;
-  }
-
-}
-
-.sidebar-content {
-  height: calc(100vh - var(--navbar-height));
-  padding: 1rem;
-  align-items: center;
-
-  @media (max-width: 766px) {
-    position: static;
-    height: max-content;
-    overflow-y: visible;
-  }
-}
 
 .super-entity {
   font-weight: lighter;
@@ -316,7 +289,12 @@
   justify-content: center;
   font-size: 1em;
   color: black;
+  text-align: center;
+  padding: 0.5rem;
+}
 
+.entity-country {
+  text-align: center;
 }
 
 @media (max-width: 992px) {

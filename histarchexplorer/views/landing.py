@@ -17,13 +17,14 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
             'type': type_, 'icon': type_.division['icon']})
     sorted_divisions = dict(sorted(
         divisions.items(),
-        key=lambda x: (x[0] == 'other', x[0])
+        key=lambda x: (x[0] == x[0] == 'case study', 'other',  x[0])
     ))
+    print(sorted_divisions)
 
     return sorted_divisions
 
 
-@app.route('/entity/<int:id_>')
+@app.route('/entityx/<int:id_>')
 def landing(id_: int) -> str:
     entities = Entity.get_linked_entities_by_properties_recursive(
         id_,
