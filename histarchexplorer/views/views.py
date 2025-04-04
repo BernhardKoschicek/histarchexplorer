@@ -7,7 +7,8 @@ from histarchexplorer import app
 from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.database.settings import get_map_settings
 from histarchexplorer.utils.cerberos import get_view_class_count
-
+from flask import jsonify
+import requests
 
 @app.route('/')
 def index() -> str:
@@ -23,9 +24,54 @@ def index() -> str:
         view_classes=view_classes)
 
 
-@app.route('/search')
-def search() -> str:
-    return render_template('search.html')
+import requests
+from flask import render_template, request
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    results = []
+    query = ''
+
+    if request.method == 'POST':
+        query = request.form.get('query', '').strip()
+        if query:
+            # Update the URL to search across multiple system classes
+            url = f"https://thanados.openatlas.eu/api/search/all/{query}"  # Change from 'place' to 'all'
+            print(f"📡 Requesting: {url}")
+            try:
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()
+                data = response.json()
+                results = data.get("results", [])
+
+                print("🧪 RAW API RESPONSE:")
+                print(results)
+
+                if not isinstance(results, list):
+                    print("⚠️ Unexpected format")
+                    results = []
+                else:
+                    print(f"✅ Found {len(results)} result(s)")
+
+            except Exception as e:
+                print(f"❌ Search failed: {e}")
+
+    return render_template('search.html', results=results or [], query=query)
+
+@app.route('/search_result/<int:entity_id>')
+def search_result_detail(entity_id: int):
+    url = f"https://thanados.openatlas.eu/api/entity/{entity_id}"
+    print(f"📡 Fetching entity from: {url}")
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        entity = data['features'][0]
+    except Exception as e:
+        print(f"❌ Failed to fetch detail: {e}")
+        return render_template("not_found.html", id=entity_id), 404
+
+    return render_template('search_detail.html', entity=entity)
 
 
 @app.route('/language=<language>')
@@ -40,3 +86,29 @@ def elias() -> str:
     for i in range(10):
         hello.append(str(i))
     return render_template('elias.html', liste=hello)
+
+
+from flask import jsonify, request
+import requests
+
+@app.route('/search_live')
+def search_live():
+    query = request.args.get('q', '').strip()
+    if len(query) < 3:
+        return jsonify([])  # Return empty list for short queries
+
+    # Use "all" instead of "place" to search across everything
+    api_url = f"https://thanados.openatlas.eu/api/search/all/{query}"
+    print(f"📡 LIVE Requesting: {api_url}")
+    try:
+        response = requests.get(api_url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        results = data.get("results", [])
+        if not isinstance(results, list):
+            results = []
+        print(f"✅ LIVE Found {len(results)} result(s)")
+        return jsonify(results)
+    except Exception as e:
+        print(f"❌ Live search failed: {e}")
+        return jsonify([]), 500
