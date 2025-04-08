@@ -12293,7 +12293,6 @@ textarea.form-control-lg {
 
 .grid-muuri {
   position: relative;
-  top: var(--navbar-height);
 }
 
 .item.muuri-item-dragging {
@@ -12885,7 +12884,6 @@ button.btn-whitish[disabled] {
 }
 
 .entity-content {
-  height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));
   transition: width 0.3s ease;
