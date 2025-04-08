@@ -12291,9 +12291,9 @@ textarea.form-control-lg {
   font-size: 3.5rem;
 }
 
-.grid-overview {
+.grid-muuri {
   position: relative;
-  height: calc(100vh - var(--navbar-height));
+  top: var(--navbar-height);
 }
 
 .item.muuri-item-dragging {
@@ -12762,7 +12762,7 @@ button.btn-whitish[disabled] {
 
 /* Sidebar */
 :root {
-  --sidebar-width: 70px; /* Initial width */
+  --sidebar-width: 60px; /* Initial width */
   --right-sidebar-width: 0px;
 }
 
@@ -12885,8 +12885,7 @@ button.btn-whitish[disabled] {
 }
 
 .entity-content {
-  background-color: #a3baae;
-  max-height: calc(100vh - var(--navbar-height));
+  height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));
   transition: width 0.3s ease;

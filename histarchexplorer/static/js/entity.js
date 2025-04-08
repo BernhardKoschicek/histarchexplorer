@@ -11,7 +11,7 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
     if (nav_sidebar.classList.contains('expanded')) {
         root.style.setProperty('--sidebar-width', '150px');
     } else {
-        root.style.setProperty('--sidebar-width', '70px');
+        root.style.setProperty('--sidebar-width', '60px');
     }
 });
 

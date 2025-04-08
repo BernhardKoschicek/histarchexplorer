@@ -1,4 +1,4 @@
-let grid = new Muuri('.grid-overview');
+let grid = new Muuri('.grid-muuri');
 
 // var grid = new Muuri('.grid', {dragEnabled: true});
 
