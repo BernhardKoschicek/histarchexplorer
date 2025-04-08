@@ -5,7 +5,9 @@ from flask import render_template, abort, jsonify, g
 
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
-from histarchexplorer.views.landing import landing
+from histarchexplorer.views.landing import landing, categorized_types #was soll das tun? tut das was?
+from histarchexplorer.models.types import Types
+from collections import defaultdict
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
 valid_routes = {item['route'] for item in sidebar_elements}
@@ -229,7 +231,8 @@ def getentity(id_: int, tab_name=None) -> str:
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
         entity=entity_object,
-        features=features)
+        features=features,
+        categorized_types=categorized_types(main_entity))
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
     for entity in entities:
@@ -262,6 +265,19 @@ def get_ancestor_entities(main_entity: Entity, entities: list[Entity]) -> list[d
             break
     ancestor_entities.reverse()
     return ancestor_entities
+
+
+def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
+    divisions = defaultdict(list)
+    for type_ in main_entity.types:
+        divisions[type_.division['label']].append({
+            'type': type_, 'icon': type_.division['icon']})
+    sorted_divisions = dict(sorted(
+        divisions.items(),
+        key=lambda x: (x[0] == x[0] == 'case study', 'other',  x[0])
+    ))
+
+    return sorted_divisions
 
 def get_parser_for_getentity(id_: int) -> Parser:
     simple_entity = Entity.get_entity(id_, Parser(show=['None']))

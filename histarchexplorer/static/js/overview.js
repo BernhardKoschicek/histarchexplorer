@@ -25,6 +25,8 @@ function getEntityIcon(entity) {
         return `/static/images/entity_icons/${systemClass}.png`;
     }
 }
+
+
 document.getElementById("overview-content").innerHTML =
     `
      <div class="col flex-column grid-muuri">
@@ -94,6 +96,29 @@ document.getElementById("overview-content").innerHTML =
           </div>
         </div>
        </div>
+       
+       ${entity.categorized_types ? `
+  <div class="item-half">
+    <div class="item-content">
+      <span class="tile-label">ATTRIBUTES</span>
+      <div class="categorized-types">
+        ${Object.entries(entity.categorized_types).map(([label, value]) => `
+          <p class="tile-sub-label text-uppercase mt-3">
+            ${value[0].icon} ${label}
+          </p>
+          ${value.map(type => `
+            <div class="badge bg-dark-subtle text-wrap m-1">
+              <h6 class="m-0 text-center">
+                ${type.type.label}
+                ${type.type.value && type.type.unit ? `: ${type.type.value} ${type.type.unit}` : ''}
+              </h6>
+            </div>
+          `).join('')}
+        `).join('')}
+      </div>
+    </div>
+  </div>
+` : ''}
 
        <div class="item item-half">
        <h1>3</h1>
