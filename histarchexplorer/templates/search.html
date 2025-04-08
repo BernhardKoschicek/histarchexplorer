@@ -2,101 +2,217 @@
 {% block content %}
   <div class="container" style="padding-top: 120px;">
     <div class="relative-wrapper">
-      <!-- Normal Search Form -->
-      <form method="POST" action="/search" id="static-search-form">
-        <div class="input-group mb-3">
-          <input type="text" id="search-input" name="query"
-                 value="{{ query or '' }}" placeholder="Search..."
-                 class="form-control" autocomplete="off">
-          <button type="submit" class="btn btn-primary">Search</button>
-        </div>
-      </form>
-      <!-- Live Search Popup Container -->
-      <div id="live-results" class="live-popup"></div>
+      <div class="static-search-form-wrapper">
+        <!-- 🔍 Search Form -->
+        <form method="POST" action="/search" id="static-search-form">
+          <div class="form-area-wrapper">
+            <!-- 🧠 Multi-select Dropdown with Choices.js -->
+            <div class="mb-4">
+              <label for="system-class-select" class="form-label">Filter by Type (system_class):</label>
+              <select class="form-select" id="system-class-select" name="system_class[]" multiple>
+                <optgroup label="Actors">
+                  <option value="person" {% if 'person' in system_classes %}selected{% endif %}>Person</option>
+                  <option value="group" {% if 'group' in system_classes %}selected{% endif %}>Group</option>
+                </optgroup>
+                <optgroup label="Items">
+                  <option value="artifact" {% if 'artifact' in system_classes %}selected{% endif %}>Artifact</option>
+                  <option value="human_remains" {% if 'human_remains' in system_classes %}selected{% endif %}>Human Remains</option>
+                </optgroup>
+                <optgroup label="Events">
+                  <option value="acquisition" {% if 'acquisition' in system_classes %}selected{% endif %}>Acquisition</option>
+                  <option value="event" {% if 'event' in system_classes %}selected{% endif %}>Event</option>
+                  <option value="activity" {% if 'activity' in system_classes %}selected{% endif %}>Activity</option>
+                  <option value="creation" {% if 'creation' in system_classes %}selected{% endif %}>Creation</option>
+                  <option value="move" {% if 'move' in system_classes %}selected{% endif %}>Move</option>
+                  <option value="production" {% if 'production' in system_classes %}selected{% endif %}>Production</option>
+                  <option value="modification" {% if 'modification' in system_classes %}selected{% endif %}>Modification</option>
+                </optgroup>
+                <optgroup label="Places">
+                  <option value="place" {% if 'place' in system_classes %}selected{% endif %}>Place</option>
+                  <option value="stratigraphic_unit" {% if 'stratigraphic_unit' in system_classes %}selected{% endif %}>Stratigraphic Unit</option>
+                  <option value="feature" {% if 'feature' in system_classes %}selected{% endif %}>Feature</option>
+                </optgroup>
+                <optgroup label="Sources">
+                  <option value="source" {% if 'source' in system_classes %}selected{% endif %}>Source</option>
+                  <option value="bibliography" {% if 'bibliography' in system_classes %}selected{% endif %}>Bibliography</option>
+                  <option value="external_reference" {% if 'external_reference' in system_classes %}selected{% endif %}>External Reference</option>
+                  <option value="edition" {% if 'edition' in system_classes %}selected{% endif %}>Edition</option>
+                </optgroup>
+                <optgroup label="Files">
+                  <option value="file" {% if 'file' in system_classes %}selected{% endif %}>File</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- 🔍 Text Input + Button -->
+            <div class="input-group mb-3">
+              <input type="text" id="search-input" name="query"
+                     value="{{ query or '' }}" placeholder="Search..."
+                     class="form-control" autocomplete="off">
+              <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+
+          </div>
+        </form>
+      </div>
     </div>
 
-    <!-- Static Search Results (displayed after form submission) -->
-    {% if results %}
-      <h2 class="mt-5">Static Search Results:</h2>
-      <ul>
-        {% for result in results %}
-          <li class="mb-2">
-            <strong>
-              <a href="/search_result/{{ result['id'].split('/')[-1] }}"
-                 style="text-decoration: none; color: inherit;">
-                {{ result['name'] or "Unnamed" }}
-              </a>
-              ({{ result['system_class'] }})
-            </strong><br>
-            {% if result['description'] %}
-              {{ result['description'][:300] }}<br>
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
+    <!-- 👉 Show hint before any search -->
+    {% if not results and not query %}
+      <div style="padding: 100px 0; text-align: center; color: #888;">
+        <em>Start typing above to see live results or press enter to run a search.</em>
+      </div>
+    {% endif %}
+
+    <!-- 📄 Static Search Results -->
+    {% if results is defined and results|length > 0 %}
+      <div class="mt-5" id="static-results">
+        <h2>Static Search Results:</h2>
+        <ul>
+          {% for result in results %}
+            <li class="mb-2">
+              <strong>
+                <a href="/search_result/{{ result['id'].split('/')[-1] }}"
+                   style="text-decoration: none; color: inherit;">
+                  {{ result['name'] or "Unnamed" }}
+                </a>
+                ({{ result['system_class'] }})
+              </strong><br>
+              {% if result['description'] %}
+                {{ result['description'][:300] }}<br>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
     {% elif query %}
       <p><em>No results found for "{{ query }}"</em></p>
     {% endif %}
   </div>
 
+  <!-- ✅ Choices.js CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<div id="live-results" class="live-popup"></div>
+  <!-- ✅ Layout & Style Fixes -->
+  <style>
+  #live-results {
+    display: none;
+    position: fixed; /* <-- KEY CHANGE */
+    top: 270px; /* adjust based on your layout */
+    left: 35%;
+    transform: translateX(-50%);
+    width: 600px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 2000;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+  }
 
-  <!-- Inline JavaScript -->
+  #live-results.show {
+    display: block;
+  }
+
+  .relative-wrapper,
+  .form-area-wrapper,
+  .static-search-form-wrapper {
+    position: relative;
+    overflow: visible;
+  }
+
+  .choices__list--dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 9999 !important;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .container {
+    overflow: visible;
+  }
+
+  #system-class-select {
+    margin-bottom: 1rem;
+  }
+</style>
+
+
   <script>
-      document.addEventListener("DOMContentLoaded", function () {
-          const input = document.getElementById('search-input');
-          const resultsBox = document.getElementById('live-results');
+    document.addEventListener("DOMContentLoaded", function () {
+      const input = document.getElementById('search-input');
+      const resultsBox = document.getElementById('live-results');
 
-          if (!input) {
-              console.error("Live search: Input field not found!");
-              return;
+      if (input) {
+        input.addEventListener('input', async function () {
+          const query = input.value.trim();
+          if (query.length < 3) {
+            resultsBox.innerHTML = "<p style='padding:8px; color:gray;'>Type at least 3 characters...</p>";
+            resultsBox.classList.remove('show');
+            return;
           }
 
-          // Live search: update popup as user types
-          input.addEventListener('input', async function () {
-              const query = input.value.trim();
-              if (query.length < 3) {
-                  resultsBox.innerHTML = "<p style='padding:8px; color:gray;'>Type at least 3 characters...</p>";
-                  resultsBox.classList.remove('show');
-                  return;
-              }
+          resultsBox.innerHTML = `<p style="padding:8px; color:blue;">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading live results for "${query}"...
+          </p>`;
+          resultsBox.classList.add('show');
 
-              resultsBox.innerHTML = `<p style="padding:8px; color:blue;">
-      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-      Loading live results for "${query}"...
-    </p>`;
-              resultsBox.classList.add('show');
+          try {
+            const selectedOptions = Array.from(document.querySelectorAll('#system-class-select option:checked'))
+  .map(opt => opt.value);
 
-              try {
-                  const res = await fetch(`/search_live?q=${encodeURIComponent(query)}`);
-                  const liveResults = await res.json();
+const classParams = selectedOptions.map(cls => `system_class=${encodeURIComponent(cls)}`).join('&');
+const url = `/search_live?q=${encodeURIComponent(query)}&${classParams}`;
 
-                  if (!Array.isArray(liveResults) || liveResults.length === 0) {
-                      resultsBox.innerHTML = `<p style="padding:8px; color:orange;">No live results found for "${query}".</p>`;
-                  } else {
-                      resultsBox.innerHTML = liveResults.map(r => `
-          <div class="p-2">
-            <strong>
-              <a href="/search_result/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
-                ${r.name || 'Unnamed'}
-              </a>
-            </strong><br>
-            <small>${r.description ? r.description.slice(0, 150) + '…' : ''}</small>
-          </div>
-        `).join('');
-                  }
-              } catch (err) {
-                  console.error("Live search error:", err);
-                  resultsBox.innerHTML = `<p style="padding:8px; color:red;">Error loading live results.</p>`;
-              }
-          });
+const res = await fetch(url);
 
-          // Hide live search popup when clicking outside the relative-wrapper
-          document.addEventListener('click', function (e) {
-              const container = document.querySelector('.relative-wrapper');
-              if (container && !container.contains(e.target)) {
-                  resultsBox.classList.remove('show');
-              }
-          });
-      });
+            const liveResults = await res.json();
+
+            if (!Array.isArray(liveResults) || liveResults.length === 0) {
+              resultsBox.innerHTML = `<p style="padding:8px; color:orange;">No live results found for "${query}".</p>`;
+            } else {
+              resultsBox.innerHTML = liveResults.map(r => `
+                <div class="p-2">
+                  <strong>
+                    <a href="/search_result/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
+                      ${r.name || 'Unnamed'}
+                    </a>
+                  </strong><br>
+                  <small>${r.description ? r.description.slice(0, 150) + '…' : ''}</small>
+                </div>
+              `).join('');
+            }
+          } catch (err) {
+            console.error("Live search error:", err);
+            resultsBox.innerHTML = `<p style="padding:8px; color:red;">Error loading live results.</p>`;
+          }
+        });
+
+        document.addEventListener('click', function (e) {
+          const container = document.querySelector('.relative-wrapper');
+          if (container && !container.contains(e.target)) {
+            resultsBox.classList.remove('show');
+          }
+        });
+      }
+
+      const element = document.getElementById('system-class-select');
+      if (element) {
+        new Choices(element, {
+          removeItemButton: true,
+          shouldSort: false,
+          placeholder: true,
+          placeholderValue: 'Select one or more types',
+          maxItemCount: 15
+        });
+      }
+    });
   </script>
 {% endblock %}

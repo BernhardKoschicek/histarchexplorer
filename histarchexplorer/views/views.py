@@ -33,36 +33,48 @@ def search():
     results = []
     query = ''
     category = 'all'
+    system_classes = []
 
     if request.method == 'POST':
         query = request.form.get('query', '').strip()
         category = request.form.get('category', 'all').strip()
+        system_classes = request.form.getlist('system_class[]')
 
-        if category in app.config['VIEW_CLASSES']:
-            system_class = app.config['VIEW_CLASSES'][category][0]
+        if not system_classes:
+            if category in app.config['VIEW_CLASSES']:
+                system_class = app.config['VIEW_CLASSES'][category][0]
+            else:
+                system_class = "all"
+            url = f"https://thanados.openatlas.eu/api/search/{system_class}/{query}"
+            print(f"📡 Requesting: {url}")
+            try:
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()
+                data = response.json()
+                results = data.get("results", []) if isinstance(data.get("results", []), list) else []
+                print(f"✅ Found {len(results)} result(s)")
+            except Exception as e:
+                print(f"❌ Search failed: {e}")
         else:
-            system_class = "all"
-
-        url = f"https://thanados.openatlas.eu/api/search/{system_class}/{query}"
-        print(f"📡 Requesting: {url}")
-        try:
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-            results = data.get("results", [])
-            if not isinstance(results, list):
-                results = []
-            print(f"✅ Found {len(results)} result(s)")
-        except Exception as e:
-            print(f"❌ Search failed: {e}")
+            for sc in system_classes:
+                url = f"https://thanados.openatlas.eu/api/search/{sc}/{query}"
+                print(f"📡 Requesting: {url}")
+                try:
+                    response = requests.get(url, timeout=10)
+                    response.raise_for_status()
+                    data = response.json()
+                    if isinstance(data.get("results"), list):
+                        results.extend(data["results"])
+                except Exception as e:
+                    print(f"❌ Search failed for {sc}: {e}")
 
     return render_template(
         'search.html',
-
         results=results,
         query=query,
-        category=category)
-
+        category=category,
+        system_classes=system_classes
+    )
 
 
 @app.route('/search_result/<int:entity_id>')
@@ -102,37 +114,29 @@ import requests
 @app.route('/search_live')
 def search_live():
     query = request.args.get('q', '').strip()
-    category = request.args.get('category', 'all').strip()
+    system_classes = request.args.getlist('system_class')  # multiple values like system_class=place&system_class=artifact
 
     if len(query) < 3:
         return jsonify([])
 
-    VIEW_CLASSES = {
-        'actors': ('person', 'group'),
-        'items': ('artifact', 'human_remains'),
-        'events': ('acquisition', 'event', 'activity', 'creation', 'move',
-                   'production', 'modification'),
-        'places': ('place', 'stratigraphic_unit', 'feature'),
-        'sources': ('source', 'bibliography', 'external_reference', 'edition'),
-        'files': ('file',)
-    }
-    if category in app.config['VIEW_CLASSES']:
-        system_class = app.config['VIEW_CLASSES'][category][0]
-    else:
-        system_class = "all"
+    if not system_classes:
+        system_classes = ['all']
 
-    api_url = f"https://thanados.openatlas.eu/api/search/{system_class}/{query}"
-    print(f"📡 LIVE Requesting: {api_url}")
-    try:
-        response = requests.get(api_url, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        results = data.get("results", [])
-        if not isinstance(results, list):
-            results = []
-        print(f"✅ LIVE Found {len(results)} result(s)")
-        return jsonify(results)
-    except Exception as e:
-        print(f"❌ Live search error: {e}")
-        return jsonify([]), 500
+    results = []
+
+    for system_class in system_classes:
+        api_url = f"https://thanados.openatlas.eu/api/search/{system_class}/{query}"
+        print(f"📡 LIVE Requesting: {api_url}")
+        try:
+            response = requests.get(api_url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            class_results = data.get("results", [])
+            if isinstance(class_results, list):
+                results.extend(class_results)
+        except Exception as e:
+            print(f"❌ Live search error for {system_class}: {e}")
+
+    print(f"✅ LIVE Found {len(results)} result(s) total")
+    return jsonify(results)
 
