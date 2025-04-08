@@ -264,7 +264,7 @@
                   li.classList.add('mb-2');
                   li.innerHTML = `
             <strong>
-              <a href="/search_result/${result.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
+              <a href="/entity/${result.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
                 ${result.name || 'Unnamed'}
               </a>
               (${result.system_class})
@@ -334,7 +334,7 @@
                           liveResultsBox.innerHTML = liveResults.map(r => `
                 <div class="p-2">
                   <strong>
-                    <a href="/search_result/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
+                    <a href="/entity/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
                       ${r.name || 'Unnamed'}
                     </a>
                   </strong><br>
