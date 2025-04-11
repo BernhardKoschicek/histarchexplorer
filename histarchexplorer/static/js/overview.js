@@ -81,15 +81,7 @@ document.getElementById("overview-content").innerHTML =
     ` : ''}
     </div>
     
-       <div class="item">
-       <h1>TEST Blabla</h1>
-       </div>
-       
-        <div class="item">
-        <h1>2</h1>
-        <p> 2. Muuri</p>
-       </div>
-       
+      
        <div class="${entity.description_class}">
         <div class="item-content">
           <div class="muuri-description">
@@ -147,6 +139,16 @@ document.getElementById("overview-content").innerHTML =
        <p> Ja, was ist denn das?</p>
        </div>
     </div>
+    
+     <div class="item">
+       <h1>TEST Blabla</h1>
+       </div>
+       
+        <div class="item">
+        <h1>2</h1>
+        <p> 2. Muuri</p>
+       </div>
+       
 
 `;
 
