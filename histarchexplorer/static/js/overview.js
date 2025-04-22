@@ -147,7 +147,6 @@ document.getElementById("overview-content").innerHTML =
         <h1>2</h1>
         <p> 2. Muuri</p>
        </div>
-       
 
 `;
 

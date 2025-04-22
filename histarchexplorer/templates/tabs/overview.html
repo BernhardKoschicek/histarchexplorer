@@ -10,6 +10,10 @@
 <script> const categorized_types = JSON.parse(JSON.parse({{ data|tojson }}).categorized_types)</script>
 <script> const gisData = entity.geometry ? entity.geometry : null</script>
 <script> const entityName = entity.name</script>
+<script>
+  console.log("Data:", {{ data | tojson | safe }});
+</script>
+
 
 <div id="overview-content"></div>
 <script src="../../static/js/overview.js"></script>
