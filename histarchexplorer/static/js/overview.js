@@ -165,63 +165,28 @@ function initializeMuuri() {
     const gridElement = document.querySelector('.grid-muuri');
     if (!gridElement) return;
 
-    const grid = new Muuri(gridElement, {
-        layoutOnResize: true,
-    });
-
+    const grid = new Muuri(gridElement, { layoutOnResize: true });
     window.muuriGrid = grid;
 
     const container = gridElement.parentElement;
-
-    const resizeObserver = new ResizeObserver(() => {
-        forceMuuriLayout();
-    });
-
     if (container) {
-        resizeObserver.observe(container);
+        new ResizeObserver(forceMuuriLayout).observe(container);
     }
 
     window.addEventListener('resize', forceMuuriLayout);
 }
 
 function forceMuuriLayout() {
-    if (window.muuriGrid) {
-        window.muuriGrid.synchronize();
-        window.muuriGrid.refreshItems();
-        window.muuriGrid.layout(true);
+    const grid = window.muuriGrid;
+    if (grid) {
+        grid.synchronize();
+        grid.refreshItems();
+        grid.layout(true);
     }
 }
-
-let resizeTimeout;
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        forceMuuriLayout();
-    }, 300);
-});
 
 window.requestAnimationFrame(() => {
     initializeMuuri();
-
-    function reLayoutMuuri() {
-  setTimeout(() => {
-    const gridEl = document.querySelector('.grid-muuri');
-    const gridInstance = gridEl?._gridInstance;
-    if (gridInstance) {
-      gridInstance.refreshItems().layout();
-    }
-  }, 300); // Allow CSS transitions to finish
-}
-
-const sidebarToggleBtn = document.querySelector('#toggleSidebar');
-    if (sidebarToggleBtn) {
-        sidebarToggleBtn.addEventListener('click', () => {
-            document.body.classList.toggle('sidebar-collapsed');
-            reLayoutMuuri();
-        });
-    }
-
-
 
 
     const mapContainer = document.getElementById('muuri-map');
