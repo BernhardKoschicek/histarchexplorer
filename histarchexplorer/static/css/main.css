@@ -126,7 +126,6 @@ body {
 
 main {
   overflow: auto;
-  max-height: calc(100vh - var(--navbar-height));
 }
 
 body {
@@ -229,6 +228,7 @@ body {
 
 #index-container {
   height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
+  margin-top: var(--navbar-height);
 }
 @media (max-width: 47.9375em) {
   #index-container {
@@ -12143,6 +12143,10 @@ textarea.form-control-lg {
 
 .accordion-button:not(.collapsed) {
   background-color: #94c694;
+}
+
+.content-container {
+  margin-top: var(--navbar-height);
 }
 
 .entity-cards {

@@ -138,10 +138,7 @@ document.getElementById("overview-content").innerHTML =
        <p> Ja, was ist denn das?</p>
        </div>
     </div>
-    
-     <div class="item">
-       <h1>TEST Blabla</h1>
-       </div>
+   
        
         <div class="item">
         <h1>2</h1>
