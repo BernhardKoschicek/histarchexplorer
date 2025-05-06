@@ -181,6 +181,48 @@ document.getElementById("overview-content").innerHTML =
         <p> 2. Muuri</p>
        </div>
        
+      ${entity.relations && entity.relations.length > 0 ? `
+  <div class="item item-wide">
+    <div class="item-content">
+      <div class="muuri-references">
+        <p class="tile-label text-uppercase">References</p>
+        <ul class="no-bullets">
+          ${entity.relations
+            .filter(rel => ['bibliography', 'edition', 'external_reference'].includes(rel.relation_system_class))
+            .map(rel => {
+              const icon = rel.relation_system_class === 'bibliography'
+                ? '<i class="bi bi-book"></i>'
+                : '<i class="bi bi-box-arrow-up-right"></i>';
+
+              const name = rel.relation_system_class === 'external_reference'
+                ? (() => {
+                    const parts = rel.label.split('/');
+                    return `<a href="${rel.label}" class="reference-name" target="_blank" rel="noopener">${parts.slice(0, 3).join('/')}</a>`;
+                  })()
+                : `<a href="/entity/${rel.relation_to_id}" class="reference-name">${rel.label}</a>`;
+
+              const description = rel.relation_description
+                ? `<p class="reference-description">${rel.relation_description}</p>`
+                : '';
+
+              return `
+                <li>
+                  <div class="reference-content">
+                    <div class="reference-header">
+                      ${icon}
+                      ${name}
+                    </div>
+                    ${description}
+                  </div>
+                </li>
+              `;
+            }).join('')}
+        </ul>
+      </div>
+    </div>
+  </div>
+` : ''}
+
        
        ${related_entities ? `
   <div class="item item-wide">
