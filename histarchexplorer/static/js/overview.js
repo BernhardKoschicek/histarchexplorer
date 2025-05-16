@@ -1,3 +1,6 @@
+var grid = new Muuri('.grid');
+
+/*
 console.log("related_entities:", related_entities);
 
 function geometryCollectionToFeatureCollection(geometryCollection) {
@@ -32,7 +35,7 @@ const systemClassMap = {
     'source': 'sources',
     'file': 'files'
 };
-/*Icons for Hierarchy */
+/!*Icons for Hierarchy *!/
 function getEntityIcon(entity) {
     const systemClass = entity.system_class.toLowerCase();
     if (['feature', 'stratigraphic unit'].includes(systemClass)) {
@@ -384,4 +387,4 @@ const expandButton = document.getElementById('expand-button');
 const tabName = 'map';
 expandButton.addEventListener('click', event => {
     window.activateTab('map');
-});
+});*/
