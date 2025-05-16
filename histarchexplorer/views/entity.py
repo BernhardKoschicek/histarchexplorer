@@ -1,12 +1,12 @@
 import json
+from collections import defaultdict
+
+from flask import abort, g, render_template
 
 from histarchexplorer import app
-from flask import render_template, abort, jsonify, g
-
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
-from collections import defaultdict
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
 valid_routes = {item['route'] for item in sidebar_elements}
