@@ -1,29 +1,31 @@
-// Wrap gisData point into a FeatureCollection as MapLibre expects
+// Ensure gisData is always an array
+const gisArray = Array.isArray(gisData) ? gisData : [gisData];
+
+// Wrap gisArray into a FeatureCollection
 const featureCollection = {
   type: "FeatureCollection",
-  features: [
-    {
-      type: "Feature",
-      geometry: {
-        type: gisData.type,
-        coordinates: gisData.coordinates
-      },
-      properties: {
-        title: gisData.title,
-        description: gisData.description,
-        shapeType: gisData.shapeType,
-        locationId: gisData.locationId
-      }
+  features: gisArray.map((item) => ({
+    type: "Feature",
+    geometry: {
+      type: item.type,
+      coordinates: item.coordinates
+    },
+    properties: {
+      title: item.title,
+      description: item.description,
+      shapeType: item.shapeType,
+      locationId: item.locationId
     }
-  ]
+  }))
 };
+
 
 // Initialize MapLibre map
 const overview_map = new maplibregl.Map({
   container: 'muuri-map',
   style: 'https://api.maptiler.com/maps/bright/style.json?key=E7Jrgaazm79UlTuEI5f5',
-  center: featureCollection.features[0].geometry.coordinates,
-  zoom: 12,
+  center: [0, 0],
+  zoom: 10,
   interactive: true
 });
 
@@ -37,16 +39,38 @@ overview_map.on('load', () => {
     data: featureCollection
   });
 
-const marker = new maplibregl.Marker()
-  .setLngLat(featureCollection.features[0].geometry.coordinates)
-  .setPopup(
-    new maplibregl.Popup().setHTML(
-      `<b>${entityName}</b><p><b>${gisData.title}</b> ${gisData.description}</p>`
-    )
-  )
-  .addTo(overview_map);
+  // Add a layer for click and hover interactions
+  overview_map.addLayer({
+    id: 'point-layer',
+    type: 'circle',
+    source: 'point-data',
+    paint: {
+      'circle-radius': 6,
+      'circle-color': '#007cbf'
+    }
+  });
 
-  // Optional: popup on click
+  // Add one marker per point
+  featureCollection.features.forEach((feature) => {
+    console.log(feature.geometry.coordinates);
+    new maplibregl.Marker()
+      .setLngLat(feature.geometry.coordinates)
+      .setPopup(
+        new maplibregl.Popup().setHTML(
+          `<b>${entityName}</b><p><b>${feature.properties.title}</b> ${feature.properties.description}</p>`
+        )
+      )
+      .addTo(overview_map);
+  });
+
+  // Fit map to all points
+  const bounds = new maplibregl.LngLatBounds();
+  featureCollection.features.forEach((f) => {
+    bounds.extend(f.geometry.coordinates);
+  });
+  overview_map.fitBounds(bounds, { padding: 40 });
+
+  // Optional: popup on layer click
   overview_map.on('click', 'point-layer', (e) => {
     const props = e.features[0].properties;
     const coords = e.features[0].geometry.coordinates;
@@ -56,7 +80,7 @@ const marker = new maplibregl.Marker()
       .addTo(overview_map);
   });
 
-  // Change cursor
+  // Change cursor on hover
   overview_map.on('mouseenter', 'point-layer', () => {
     overview_map.getCanvas().style.cursor = 'pointer';
   });
@@ -64,7 +88,6 @@ const marker = new maplibregl.Marker()
     overview_map.getCanvas().style.cursor = '';
   });
 });
-
 
 // Expand/Shrink logic
 const expandButton = document.getElementById('expand-button');
