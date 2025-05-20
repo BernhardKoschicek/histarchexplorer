@@ -21,10 +21,10 @@ const featureCollection = {
 // Initialize MapLibre map
 const overview_map = new maplibregl.Map({
   container: 'muuri-map',
-  style: 'https://api.maptiler.com/maps/basic/style.json?key=E7Jrgaazm79UlTuEI5f5',
+  style: 'https://api.maptiler.com/maps/bright/style.json?key=E7Jrgaazm79UlTuEI5f5',
   center: featureCollection.features[0].geometry.coordinates,
-  zoom: 13,
-  interactive: false
+  zoom: 12,
+  interactive: true
 });
 
 // Add zoom scale
@@ -37,15 +37,14 @@ overview_map.on('load', () => {
     data: featureCollection
   });
 
-  overview_map.addLayer({
-    id: 'point-layer',
-    type: 'circle',
-    source: 'point-data',
-    paint: {
-      'circle-radius': 6,
-      'circle-color': '#007cbf'
-    }
-  });
+const marker = new maplibregl.Marker()
+  .setLngLat(featureCollection.features[0].geometry.coordinates)
+  .setPopup(
+    new maplibregl.Popup().setHTML(
+      `<b>${entityName}</b><p><b>${gisData.title}</b> ${gisData.description}</p>`
+    )
+  )
+  .addTo(overview_map);
 
   // Optional: popup on click
   overview_map.on('click', 'point-layer', (e) => {
