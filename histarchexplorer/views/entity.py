@@ -167,10 +167,12 @@ def get_entities(tab_name: str = None) -> str:
             tab_name=tab_name)
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
-def get_entity(id_: int, tab_name=None) -> str:
 
+
+def get_entity(id_: int, tab_name=None) -> str:
     data = {}
     entity_ = None
+    related_entities = {}
 
     # entities = Entity.get_linked_entities_by_properties_recursive(
     #     id_,
@@ -214,25 +216,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     total_images = 0
     # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
 
-    # def get_related_entities(
-    #         main_entity: Entity,
-    #         entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
-    #     related_entities: dict[str, Any] = defaultdict(lambda: defaultdict(list))
-    #     for subunit in entities:
-    #         if subunit.id == main_entity.id:
-    #             continue
-    #         match subunit.system_class:
-    #             case 'Group' | 'Person':
-    #                 related_entities[subunit.system_class][subunit.name].append(
-    #                     subunit)
-    #             case _:
-    #                 if not subunit.types:
-    #                     continue
-    #                 for type_ in subunit.types:
-    #                     label = type_.type_hierarchy[0]['label']
-    #                     if label in app.config['STANDARD_TYPES']:
-    #                         related_entities[label][type_.label].append(subunit.to_serializable())
-    #     return related_entities
+
 
     if tab_name == 'feature':
         entities = Entity.get_linked_entities_by_properties_recursive(
@@ -267,7 +251,16 @@ def get_entity(id_: int, tab_name=None) -> str:
 
     elif tab_name == 'overview':
         # data = get_entity()
+        entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            Parser(
+                properties=['P67'],
+                limit=0,
+                format='lpx'
+        ))
+        main_entity = get_main_entity(id_, entities)
         entity_ = Entity.get_entity(id_, Parser())
+        related_entities = get_related_entities(main_entity, entities)
 
         data = {
             'entity': json.dumps(
@@ -279,12 +272,9 @@ def get_entity(id_: int, tab_name=None) -> str:
                 ensure_ascii=False,
                 indent=4)
         }
-        # entities = Entity.get_linked_entities_by_properties_recursive(
-        #     id_,
-        #     get_parser_for_getentity(id_)
-        # )
+
         images = []
-        #  related_entities = get_related_entities(main_entity, entities)
+
         # related_entities_json = json.dumps(related_entities, ensure_ascii=False, indent=4)
 
         for image in entity_.depictions:
@@ -315,7 +305,8 @@ def get_entity(id_: int, tab_name=None) -> str:
         initial_images=initial_images,
         more_images=more_images,
         total_images=total_images,
-    )
+        related_entities=related_entities or {})
+
     # related_entities=related_entities_json)
 
 
@@ -350,6 +341,27 @@ def get_ancestor_entities(main_entity: Entity, entities: list[Entity]) -> list[d
             break
     ancestor_entities.reverse()
     return ancestor_entities
+
+
+def get_related_entities(
+        main_entity: Entity,
+        entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
+    related_entities: dict[str, Any] = defaultdict(lambda: defaultdict(list))
+    for subunit in entities:
+        if subunit.id == main_entity.id:
+            continue
+        match subunit.system_class:
+            case 'Group' | 'Person':
+                related_entities[subunit.system_class][subunit.name].append(
+                    subunit)
+            case _:
+                if not subunit.types:
+                    continue
+                for type_ in subunit.types:
+                    label = type_.type_hierarchy[0]['label']
+                    if label in app.config['STANDARD_TYPES']:
+                        related_entities[label][type_.label].append(subunit.to_serializable())
+    return related_entities
 
 
 def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
