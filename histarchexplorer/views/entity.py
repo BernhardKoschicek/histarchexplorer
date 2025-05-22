@@ -155,6 +155,7 @@ def entities(tab_name="") -> str:
     return render_template(
         'entity.html',
         view_classes=view_classes,
+        entities=entities,
         sidebar_elements=sidebar_elements,
         entity_id=0, page_name="landing",
         active_tab=tab_name, )
