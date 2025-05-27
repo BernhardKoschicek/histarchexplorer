@@ -742,7 +742,12 @@ def reset() -> Response:
             index_map INT,
             img_map   TEXT,
             greyscale   BOOLEAN,
-            shown_entities  JSONB
+            shown_entities  JSONB, --classes
+            shown_types JSONB, --types
+            hidden_entities  JSONB, --classes
+            hidden_types JSONB, --types
+            shown_ids JSONB, --ids
+            hidden_ids JSONB --ids
         );
 
         INSERT INTO tng.settings (index_img, index_map, img_map, greyscale, 
