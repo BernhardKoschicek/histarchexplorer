@@ -171,7 +171,7 @@ def get_entities(tab_name: str = None) -> str:
 
 def get_entity(id_: int, tab_name=None) -> str:
     data = {}
-    entity_ = None
+    main_entity = None
     related_entities = {}
 
     # entities = Entity.get_linked_entities_by_properties_recursive(
@@ -254,16 +254,16 @@ def get_entity(id_: int, tab_name=None) -> str:
         entities = Entity.get_linked_entities_by_properties_recursive(
             id_,
             get_parser_for_landing(id_))
-        entity_= get_main_entity(id_, entities)
-        related_entities = get_related_entities(entity_, entities)
+        main_entity= get_main_entity(id_, entities)
+        related_entities = get_related_entities(main_entity, entities)
 
         data = {
             'entity': json.dumps(
-                entity_.to_serializable(),
+                main_entity.to_serializable(),
                 ensure_ascii=False,
                 indent=4),
             'categorized_types': json.dumps(
-                categorized_types(entity_),
+                categorized_types(main_entity),
                 ensure_ascii=False,
                 indent=4)
         }
@@ -272,7 +272,7 @@ def get_entity(id_: int, tab_name=None) -> str:
 
         # related_entities_json = json.dumps(related_entities, ensure_ascii=False, indent=4)
 
-        for image in entity_.depictions:
+        for image in main_entity.depictions:
             if image.main_image:
                 main_image = serialize_image(image)
             else:
@@ -293,8 +293,8 @@ def get_entity(id_: int, tab_name=None) -> str:
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
-        entity=entity_,
-        categorized_types=categorized_types(entity_) if entity_ else None,
+        entity=main_entity,
+        categorized_types=categorized_types(main_entity) if main_entity else None,
         features=features,
         main_image=main_image,
         initial_images=initial_images,
@@ -333,16 +333,7 @@ def get_parser_for_landing(id_: int) -> Parser:
         limit=0,
         format='lpx')
 
-def add_entity_object_to_relation(
-        main_entity: Entity,
-        entities: list[Entity]) -> None:
-    if not main_entity.relations:
-        return None
-    for relation in main_entity.relations:
-        for relation_entity in entities:
-            if int(relation_entity.id) == int(relation.relation_to_id):
-                relation.related_entity = relation_entity
-    return None
+
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
     for entity in entities:
