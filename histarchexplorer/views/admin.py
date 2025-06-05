@@ -26,7 +26,7 @@ from histarchexplorer.utils import helpers
 @app.route('/admin/<tab>/<entry>')
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
-    if current_user.group not in ['admin', 'manager']:
+    if current_user.group not in ['admin', 'manager', 'editor']:
         abort(403)
 
     # todo: this will be obsolete if we change to dict instead to named tuples
@@ -205,8 +205,7 @@ FROM tng.links l
 @app.route('/admin/add_entry', methods=['POST'])
 @login_required
 def add_entry() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    require_edit_access()
     language = session.get(
         'language',
         request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
@@ -274,8 +273,7 @@ def add_entry() -> Response:
 @app.route('/admin/delete_entry/<id>/<tab>')
 @login_required
 def delete_entry(tab: str, id_: int) -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    require_edit_access()
 
     g.cursor.execute(f'SELECT config_class FROM tng.config WHERE id = {id_}')
     result = g.cursor.fetchone()
@@ -292,8 +290,7 @@ def delete_entry(tab: str, id_: int) -> Response:
 @app.route('/admin/delete_link/<link_id>/<tab>/<entry>')
 @login_required
 def delete_link(link_id: int,  tab: str, entry: str) -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    require_edit_access()
 
     g.cursor.execute('DELETE FROM tng.links WHERE id = %(link_id)s',
                      {'link_id': int(link_id)})
@@ -311,8 +308,7 @@ def add_link(
         role: int,
         tab: str,
         entry: str) -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    require_edit_access()
     g.cursor.execute(
         f'INSERT INTO tng.links (domain_id, range_id, property, attribute, sortorder) '
         f'VALUES ({domain}, {range_}, {prop}, NULLIF({role}, 0), COALESCE((SELECT (sortorder + 1) FROM tng.links WHERE sortorder IS NOT NULL ORDER BY sortorder DESC LIMIT 1),1))')
@@ -323,8 +319,7 @@ def add_link(
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
 def edit_entry() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    require_edit_access()
 
     language = session.get(
         'language',
@@ -379,8 +374,7 @@ def edit_entry() -> Response:
 @app.route('/edit_map', methods=['POST'])
 @login_required
 def edit_map() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    require_edit_access()
 
     name = request.form.get('name')
     display_name = request.form.get('displayname')
@@ -423,8 +417,7 @@ def edit_map() -> Response:
 @app.route('/admin/add_map', methods=['POST'])
 @login_required
 def add_map() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    require_edit_access()
 
     name = request.form.get('name')
     displayname = request.form.get('displayname')
@@ -452,8 +445,7 @@ def add_map() -> Response:
 @app.route('/admin/delete_map/<int:map_id>')
 @login_required
 def delete_map(map_id: int) -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    require_edit_access()
 
     try:
         g.cursor.execute('DELETE FROM tng.maps WHERE id = %(map_id)s',
@@ -508,8 +500,7 @@ def deselect_entities() -> Response:
 @app.route('/reset')
 @login_required
 def reset() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    require_edit_access()
     sql_path = os.path.join(current_app.root_path, 'sql', 'admin_reset.sql')
     with open(sql_path, 'r', encoding='utf-8') as file:
         sql_script = file.read()
@@ -517,6 +508,12 @@ def reset() -> Response:
 
     return redirect(url_for('admin'))
 
+
+ALLOWED_GROUPS = ['admin', 'manager', 'editor']
+
+def require_edit_access():
+    if current_user.group not in ALLOWED_GROUPS:
+        abort(403)
 
 # @app.route('/sortlinks', methods=['POST'])
 # def sort_links() -> Response:
