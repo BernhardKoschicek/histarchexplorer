@@ -10,10 +10,18 @@ from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
 
+
+
+
+
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
+
+from histarchexplorer.views import vocabulary
+app.register_blueprint(vocabulary.vocabulary_bp)
+
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
