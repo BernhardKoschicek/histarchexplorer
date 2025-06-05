@@ -508,7 +508,7 @@ def reset() -> Response:
 
     return redirect(url_for('admin'))
 
-
+#TODO: remove editor form ALLOWED_GROUPS
 ALLOWED_GROUPS = ['admin', 'manager', 'editor']
 
 def require_edit_access():
