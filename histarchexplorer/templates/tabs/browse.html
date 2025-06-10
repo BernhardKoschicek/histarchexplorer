@@ -20,45 +20,7 @@
         }
     ];
 
-    if (fieldHasValues(filteredEntities{{ tab_name }}, "begin")) {
-        filteredEntities{{ tab_name }}.forEach(entity => {
-            entity.beginBP = calculateTimeBP(entity.begin);
-        });
-        columns{{ tab_name }}.push({
-            title: "Begin",
-            field: "begin",
-            formatter: function (cell) {
-                const value = cell.getValue();
-                if (!value) return '';
-                return makeLocalDate(value).localdate;
-            },
-            sorter: function (a, b) {
-                return calculateTimeBP(a) - calculateTimeBP(b);
-            },
-            headerFilter: minMaxFilterEditor,
-            headerFilterFunc: minMaxFilterFunction,
-            headerFilterLiveFilter: false,
-        });
-    }
 
-
-    if (fieldHasValues(filteredEntities{{ tab_name }}, "end")) {
-        columns{{ tab_name }}.push({
-            title: "End",
-            field: "end",
-            formatter: function (cell) {
-                const value = cell.getValue();
-                if (!value) return '';
-                return makeLocalDate(value).localdate;
-            },
-            sorter: function (a, b) {
-                return calculateTimeBP(a) - calculateTimeBP(b);
-            },
-            headerFilter: minMaxFilterEditor,
-            headerFilterFunc: minMaxFilterFunction,
-            headerFilterLiveFilter: false,
-        });
-    }
 
 
     if (fieldHasValues(filteredEntities{{ tab_name }}, "description")) {
@@ -77,8 +39,8 @@
             title: "Class",
             field: "class",
             editor: "input",
-            headerFilter: "list",
-            headerFilterParams: {valuesLookup: true, clearable: true}
+            headerFilter: "input",
+            headerFilterFunc: "like"
         });
     }
 
@@ -88,6 +50,40 @@
             title: "Type", field: "type", editor: "input",
             headerFilter: "input",
             headerFilterFunc: "like"
+        });
+    }
+
+        if (fieldHasValues(filteredEntities{{ tab_name }}, "begin")) {
+        filteredEntities{{ tab_name }}.forEach(entity => {
+            entity.beginBP = calculateTimeBP(entity.begin);
+        });
+        columns{{ tab_name }}.push({
+            title: "Begin",
+            field: "begin",
+            formatter: function (cell) {
+                const value = cell.getValue();
+                if (!value) return '';
+                return makeLocalDate(value).localdate;
+            },
+            sorter: function (a, b) {
+                return calculateTimeBP(a) - calculateTimeBP(b);
+            },
+        });
+    }
+
+
+    if (fieldHasValues(filteredEntities{{ tab_name }}, "end")) {
+        columns{{ tab_name }}.push({
+            title: "End",
+            field: "end",
+            formatter: function (cell) {
+                const value = cell.getValue();
+                if (!value) return '';
+                return makeLocalDate(value).localdate;
+            },
+            sorter: function (a, b) {
+                return calculateTimeBP(a) - calculateTimeBP(b);
+            },
         });
     }
 
