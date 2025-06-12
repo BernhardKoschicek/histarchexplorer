@@ -281,7 +281,7 @@
 
                         </div>
                         <p class="reference-description">
-                          {{ item.description | join(' ') | replace('\r\n', ' ') | trim }}
+                          {{ item.description }}
                           {% for relation in item.relations %}
                             {% if entity.id == relation.relation_to_id %}
                               {{ relation.relation_description }}
