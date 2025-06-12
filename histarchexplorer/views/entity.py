@@ -573,7 +573,8 @@ def get_parser_for_landing(id_: int) -> Parser:
     return Parser(
         properties=properties,
         limit=0,
-        format='lpx')
+        format='lpx',
+        centroid='true')
 
 
 
