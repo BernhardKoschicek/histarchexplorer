@@ -1,39 +1,63 @@
-from flask import render_template, request, jsonify
+from flask import jsonify, render_template, request, current_app
 from histarchexplorer import app
-from histarchexplorer.services import search_service
 
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    results, query, category, system_classes = [], '', 'all', []
+    """
+    Handles the main search page, displaying results from the search service.
+    """
+    search_service = current_app.search_service
+
+    results = []
+    query = ''
+    category = 'all'
+    system_classes = []
 
     if request.method == 'POST':
         query = request.form.get('query', '').strip()
         category = request.form.get('category', 'all').strip()
         system_classes = request.form.getlist('system_class[]')
-        results = search_service.search_entities(query, category, system_classes)
+
+        results = search_service.perform_search(
+            query,
+            category,
+            system_classes)
 
     return render_template(
         'search.html',
         results=results,
         query=query,
         category=category,
-        system_classes=system_classes
-    )
+        system_classes=system_classes)
 
 
 @app.route('/search_result/<int:entity_id>')
 def search_result_detail(entity_id: int):
-    entity = search_service.fetch_entity_detail(entity_id)
+    """
+    Displays detailed information for a specific search result entity.
+    """
+    search_service = current_app.search_service
+    entity = search_service.get_entity_detail(entity_id)
+
+    if entity is None:
+        current_app.logger.warning(
+            f"Entity with ID {entity_id} not found or error fetching.")
+        return render_template('error.html', message="Entity not found."), 404
+
     return render_template('search_detail.html', entity=entity)
 
 
 @app.route('/search_live')
 def search_live():
+    """
+    Provides live search results for autocomplete features.
+    """
+    search_service = current_app.search_service
+
     query = request.args.get('q', '').strip()
     system_classes = request.args.getlist('system_class')
-    if len(query) < 3:
-        return jsonify([])
 
-    results = search_service.search_live_results(query, system_classes)
+    results = search_service.perform_live_search(query, system_classes)
+
     return jsonify(results)
