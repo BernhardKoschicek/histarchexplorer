@@ -298,7 +298,7 @@
               aria-labelledby="{{ tab.id }}" tabindex="0">
               <div class="accordion" id="{{ tab.label }}accordion">
                 {% for entry in entities %}
-                  {% if entry.config_class in tab.filter %}
+                  {% if entry.config_class == tab.id %}
                     <div class="accordion-item">
                       <h2 class="accordion-header">
                         <button

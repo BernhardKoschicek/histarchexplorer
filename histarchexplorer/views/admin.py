@@ -12,7 +12,6 @@ from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.config import (
     get_config_data, update_jsonb_column)
-from histarchexplorer.database.config_classes import get_config_classes
 from histarchexplorer.database.config_properties import get_config_properties
 from histarchexplorer.database.map import get_base_map, get_base_map_by_id
 from histarchexplorer.database.settings import (
@@ -58,59 +57,27 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     for row in config_list:
         row['name'] = helpers.get_translation(row['name'])
 
-    mainproject = []
-    projects = []
-    persons = []
-    institutions = []
-    roles = []
-
-    for row in get_config_classes():
-        if row.name in ['main-project']:
-            mainproject.append(row.id)
-        if row.name in ['project']:
-            projects.append(row.id)
-        if row.name in ['person']:
-            persons.append(row.id)
-        if row.name in ['institution']:
-            institutions.append(row.id)
-        if row.name in ['role']:
-            roles.append(row.id)
-
     tabs = [
         {
             'label': _('main-project'),
             'target': 'nav-main-project',
-            'filter': mainproject,
-            'id': 5
-
-        },
-        {
+            'id': g.config_classes['main-project']
+        }, {
             'label': _('projects'),
             'target': 'nav-projects',
-            'filter': projects,
-            'id': 1
-
-        },
-        {
+            'id': g.config_classes['project']
+        }, {
             'label': _('persons'),
             'target': 'nav-persons',
-            'filter': persons,
-            'id': 2
-        },
-        {
+            'id': g.config_classes['person']
+        }, {
             'label': _('institutions'),
             'target': 'nav-institutions',
-            'filter': institutions,
-            'id': 4
-        },
-        {
+            'id': g.config_classes['institution']
+        }, {
             'label': _('attributes'),
             'target': 'nav-attributes',
-            'filter': roles,
-            'id': 3
-        }
-    ]
-    # print(tabs)
+            'id': g.config_classes['role']}]
 
     g.cursor.execute("""
                      SELECT l.id        AS link_id,
@@ -127,7 +94,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                      FROM tng.links l
                               JOIN tng.config s ON l.domain_id = s.id
                               JOIN tng.config e ON l.range_id = e.id
-                              JOIN tng.config_properties cp ON l.property = 
+                              JOIN tng.config_properties cp ON l.property =
                                                                cp.id
                               LEFT JOIN tng.config r ON l.attribute = r.id
                      UNION ALL
@@ -145,7 +112,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                      FROM tng.links l
                               JOIN tng.config s ON l.range_id = s.id
                               JOIN tng.config e ON l.domain_id = e.id
-                              JOIN tng.config_properties cp ON l.property = 
+                              JOIN tng.config_properties cp ON l.property =
                                                                cp.id
                               LEFT JOIN tng.config r ON l.attribute = r.id
                      ORDER BY sortorder
@@ -270,7 +237,7 @@ def add_entry() -> Response:
         flash(f'Error adding entry {name}: {str(e)}', 'danger')
         return redirect(url_for('admin') + current_tab)
 
-    #return redirect(url_for('admin') + current_tab)
+    # return redirect(url_for('admin') + current_tab)
 
 
 @app.route('/admin/delete_entry/<id>/<tab>')
@@ -439,7 +406,7 @@ def add_map() -> Response:
 
     try:
         g.cursor.execute('''
-                         INSERT INTO tng.maps (name, display_name, 
+                         INSERT INTO tng.maps (name, display_name,
                                                sortorder, tilestring)
                          VALUES (%s, %s, %s, %s)
                          RETURNING id

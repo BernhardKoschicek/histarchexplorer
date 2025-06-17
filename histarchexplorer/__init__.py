@@ -6,7 +6,9 @@ from flask_babel import Babel
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
+
 from histarchexplorer.database.settings import get_main_image_table
+from histarchexplorer.services.config_classes import get_config_classes
 from histarchexplorer.services.search import SearchService
 
 app = Flask(__name__, instance_relative_config=True)
@@ -86,9 +88,13 @@ def before_request() -> None:
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     session['language'] = get_locale()
+    g.language = session.get(
+        'language',
+        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
     g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
+    g.config_classes = get_config_classes()
 
 
 @app.context_processor

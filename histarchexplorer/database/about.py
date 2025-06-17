@@ -1,6 +1,23 @@
 from flask import g
 
 
+def get_projects() -> tuple[str]:
+    g.cursor.execute(
+        """SELECT 
+            c.id,
+            c.name,
+            c.description,
+            c.website,
+            c.legal_notice,
+            c.imprint,
+            c.config_class,
+            cc.name as class_name
+        FROM 
+            tng.config as c
+		JOIN  tng.config_classes as cc ON c.config_class = cc.id 
+		WHERE cc.name IN ('project', 'main-project');""")
+    return g.cursor.fetchall()
+
 def get_institutions():
     institutions_sql = """
         SELECT 

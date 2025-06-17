@@ -2,13 +2,29 @@
 {% block content %}
   <div class="container">
     <div class="py-5">
-      <h2>{{ _('Project') |upper }} <span class="text-body-secondary"> | {{ project.name|upper }}</span></h2>
-      <p class="mt-2"> {{ project.description | replace("\n", "<br>") | safe }}
-      </p>
+      <div class="team-card">
+        <div class="row">
+          <h2>
+            {{ _('Project') | upper }}
+            <span
+              class="text-body-secondary"> | {{ project.name| upper }}</span>
+          </h2>
+          <div class="row">
+            <p class="mt-2">
+              {{ project.description | replace("\n", "<br>") | safe }}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="team-card">
       <div class="row">
-        <h2>TEAM <span class="text-body-secondary"> | ABOUT US</span></h2>
+        <h2>
+          {{ _('Team') | upper }}
+          <span class="text-body-secondary">
+            | {{ _('about us') | upper }}
+          </span>
+        </h2>
 
         <!-- Team Members -->
         <div class="row">
@@ -25,12 +41,15 @@
                   <li>{{ role | capitalize }}</li>
                 {% endfor %}
                 <li class="mt-3">
-                  <i title="email" class="bi bi-envelope me-1 text-body-secondary"></i>
-                  <a href="mailto:{{ person.email }}" class="text-body-secondary text-decoration-none">{{ person.email }}</a>
+                  <i title="email"
+                     class="bi bi-envelope me-1 text-body-secondary"></i>
+                  <a href="mailto:{{ person.email }}"
+                     class="text-body-secondary text-decoration-none">{{ person.email }}</a>
                 </li>
                 {% if person.affiliation %}
                   <li>
-                    <i title="institution" class="bi bi-briefcase me-1 text-body-secondary"></i>
+                    <i title="institution"
+                       class="bi bi-briefcase me-1 text-body-secondary"></i>
                     <a href="{{ person.website }}" target="_blank"
                        class="text-body-secondary text-decoration-none">{{ person.affiliation }}</a>
                   </li>
@@ -39,25 +58,31 @@
             </div>
           {% endfor %}
         </div>
-
       </div>
     </div>
 
     <div class="sponsor-container text-center py-5">
-      <h2>{{ _('Sponsors')|upper }} <span class="text-body-secondary"> | {{ _('Cooperations')|upper }}</span></h2>
+      <h2>
+        {{ _('Sponsors') | upper }}
+        <span class="text-body-secondary"> | {{ _('Cooperations')|upper }}</span>
+      </h2>
       <div class="row">
         {% for institution in institutions %}
           <div class="col-md-3 text-center">
             <h6 class="pt-3 fst-italic">{{ institution.role | upper }}</h6>
             {% if institution.image %}
-              <a href="{{ institution.website if institution.website }}" target="_blank">
-                <img class="mt-2" src="{{ institution.image if institution.image }}" alt="{{ institution.name }}'s Logo">
+              <a href="{{ institution.website if institution.website }}"
+                 target="_blank">
+                <img class="mt-2"
+                     src="{{ institution.image if institution.image }}"
+                     alt="{{ institution.name }}'s Logo">
               </a>
             {% else %}
               <h5 class="py-3">{{ institution.name }}</h5>
               <a href="{{ institution.website }}" target="_blank">Website</a>
             {% endif %}
-            <p class="text-body-secondary">{{ institution.address | replace("\n", "<br>") | safe }}</p>
+            <p
+              class="text-body-secondary">{{ institution.address | replace("\n", "<br>") | safe }}</p>
           </div>
         {% endfor %}
       </div>
