@@ -12356,7 +12356,7 @@ textarea.form-control-lg {
 
 @media (max-width: 1400px) {
   .item-middle {
-    width: calc(100% - 20px);
+    width: 75%;
   }
 }
 @media (max-width: 766px) {
@@ -12368,14 +12368,16 @@ textarea.form-control-lg {
   width: calc((100% - 20px) / 3 / 2 * 5 + 10px);
 }
 
-@media (max-width: 766px) {
-  .item-5-6 {
-    width: calc(100% - 20px);
-  }
-}
 @media (max-width: 1400px) {
   .item-5-6 {
     width: calc((100% - 20px) / 4 * 3);
+  }
+}
+@media (max-width: 766px) {
+  .item-5-6 {
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
   }
 }
 .item-half {
@@ -12397,7 +12399,9 @@ textarea.form-control-lg {
 }
 @media (max-width: 766px) {
   .item-half {
-    width: calc(100% - 10px);
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
   }
 }
 .item-wide {
@@ -12428,7 +12432,7 @@ textarea.form-control-lg {
     width: calc(100% - 10px);
   }
 }
-@media (max-width: 992px) {
+@media (max-width: 766px) {
   .item,
   .item-half,
   .item-middle,
@@ -12562,6 +12566,11 @@ textarea.form-control-lg {
   max-height: 700px;
   overflow: auto;
   margin-top: 1.5rem;
+}
+@media (max-height: 766px) {
+  #expand-button {
+    margin-top: 0px;
+  }
 }
 #expand-button i {
   font-size: 1.2rem;
@@ -12804,6 +12813,7 @@ button.btn-whitish[disabled] {
   max-width: 80%;
   margin: auto;
   display: grid;
+  margin-bottom: 1.25rem;
 }
 @media (min-width: 1921px) or (max-width: 769px) {
   .attribute-area {

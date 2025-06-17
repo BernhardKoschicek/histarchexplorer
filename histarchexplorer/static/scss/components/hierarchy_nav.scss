@@ -137,6 +137,7 @@ button.btn-whitish[disabled] {
   max-width: 80%;
   margin: auto;
   display: grid;
+  margin-bottom: rem(20);
 
   @media (min-width: 1921px) or (max-width: 769px) {
     max-width: 90%;
@@ -145,3 +146,4 @@ button.btn-whitish[disabled] {
     align-content: center;
     align-items: center;
   }}
+

@@ -154,7 +154,7 @@
           <div class="categorized-types">
             {% for label, value in categorized_types.items() %}
               <p class="tile-sub-label text-uppercase mt-3">
-                {{ value[0]['icon'] | safe }} {{ label }}</p>
+                {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
               {% for type in value %}
                 <div class="badge bg-dark-subtle text-wrap m-1">
                   <h6 class="m-0 text-center">
