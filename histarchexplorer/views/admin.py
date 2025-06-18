@@ -12,12 +12,15 @@ from werkzeug import Response
 from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.config import (
-    get_config_data, update_jsonb_column)
+    check_if_config_entry_exist, get_config_data, update_jsonb_column)
 from histarchexplorer.database.admin import get_config_properties
-from histarchexplorer.database.map import get_base_map, get_base_map_by_id
+from histarchexplorer.database.map import (check_if_map_id_exist,
+                                           get_base_map, \
+                                           get_base_map_by_id)
 from histarchexplorer.database.settings import (
     get_hidden_entities, get_map_settings, get_shown_entities)
-from histarchexplorer.services.admin import Admin, set_hidden_entities
+from histarchexplorer.services.admin import Admin, EntryNotFound, \
+    set_hidden_entities
 from histarchexplorer.utils import helpers
 
 
@@ -172,74 +175,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         view_classes=view_classes)
 
 
-@app.route('/admin/add_entry', methods=['POST'])
-@login_required
-def add_entry() -> Response:
-    check_manager_user()
-    language = session.get(
-        'language',
-        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
-    category = request.form.get('category') or ''
-    current_tab = 'nav-' + category
-    description = request.form.get('description') or ''
-    name = request.form.get('name') or ''
-    address = request.form.get('address') or ''
-    mail = request.form.get('mail') or ''
-    website = request.form.get('website') or ''
-    orcid = request.form.get('orcid') or ''
-    legal_notice = request.form.get('legalnotice') or ''
-    imprint = request.form.get('imprint') or ''
-    image = request.form.get('image') or ''
-
-    config_class_map = {
-        'projects': 1,  # option for config_class=2 project vs 1=main_project?
-        'persons': 2,
-        'institutions': 4,
-        'attributes': 3,
-        'main-project': 5
-    }
-
-    try:
-        tab_config_class = config_class_map.get(category)
-        if tab_config_class == 5:
-            flash(f'Error adding entry {name}: Only one main project allowed',
-                  'danger')
-            return redirect(url_for('admin') + current_tab)
-
-        g.cursor.execute('''
-                         INSERT INTO tng.config (name, email, website,
-                                                 orcid_id,
-                                                 image, config_class)
-                         VALUES ('{"de": "Stefan Eichert", "en": "Stefan 
-                         Eichert"}'::jsonb,
-                                 NULLIF(%s, ''),
-                                 NULLIF(%s, ''),
-                                 NULLIF(%s, ''),
-                                 NULLIF(%s, ''),
-                                 %s)
-                         RETURNING id
-                         ''', (mail, website, orcid, image, tab_config_class))
-
-        new_entry_id = g.cursor.fetchone()[0]
-        config_id = new_entry_id
-
-        update_jsonb_column('name', name, language, config_id)
-        update_jsonb_column('address', address, language, config_id)
-        update_jsonb_column('description', description, language, config_id)
-        update_jsonb_column('imprint', imprint, language, config_id)
-        update_jsonb_column('legal_notice', legal_notice, language, config_id)
-
-        flash('Entry added successfully!', 'success')
-        return redirect(
-            url_for('admin') + current_tab + '/' + current_tab + str(
-                new_entry_id))
-
-    except Exception as e:
-        flash(f'Error adding entry {name}: {str(e)}', 'danger')
-        return redirect(url_for('admin') + current_tab)
-
-    # return redirect(url_for('admin') + current_tab)
-
 
 @app.route('/admin/delete_entry/<id>/<tab>')
 @login_required
@@ -292,20 +227,16 @@ def add_link(
     return redirect(url_for('admin') + tab + '/' + entry)
 
 
-@app.route('/edit_entry', methods=['POST', 'GET'])
+@app.route('/admin/add_entry', methods=['POST'])
 @login_required
-def edit_entry() -> Response:
+def add_entry() -> Response:
     check_manager_user()
-
     language = session.get(
         'language',
-        request.accept_languages.best_match(
-            app.config['LANGUAGES'].keys()))
-
+        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
+    category = request.form.get('category') or ''
+    current_tab = 'nav-' + category
     description = request.form.get('description') or ''
-    config_id = request.form.get('config_id') or ''
-    current_tab = request.form.get('current_tab') or ''
-    current_entry = request.form.get('current_entry') or ''
     name = request.form.get('name') or ''
     address = request.form.get('address') or ''
     mail = request.form.get('mail') or ''
@@ -315,79 +246,101 @@ def edit_entry() -> Response:
     imprint = request.form.get('imprint') or ''
     image = request.form.get('image') or ''
 
-    editsql = """
-              UPDATE tng.config
-              SET email    = NULLIF(%(email)s, ''),
-                  website  = NULLIF(%(website)s, ''),
-                  orcid_id = NULLIF(%(orcid_id)s, ''),
-                  image    = NULLIF(%(image)s, '')
-              WHERE id = %(id)s; \
-              """
     try:
-        g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s',
-                         {'id': int(config_id)})
-        result = g.cursor.fetchone()
-        if result:
-            g.cursor.execute(editsql,
-                             {'email': mail, 'website': website,
-                              'orcid_id': orcid, 'id': config_id,
-                              'image': image})
-            flash(f'"{name}" updated successfully', 'success')
-        else:
-            flash(f'Error updating {name}', 'danger')
+        tab_config_class = g.config_classes.get(category)
+        if tab_config_class == 5:
+            flash(f'Error adding entry {name}: Only one main project allowed',
+                  'danger')
+            return redirect(url_for('admin') + current_tab)
+
+        g.cursor.execute('''
+                         INSERT INTO tng.config (name, email, website,
+                                                 orcid_id,
+                                                 image, config_class)
+                         VALUES ('{"de": "Stefan Eichert", "en": "Stefan 
+                         Eichert"}'::jsonb,
+                                 NULLIF(%s, ''),
+                                 NULLIF(%s, ''),
+                                 NULLIF(%s, ''),
+                                 NULLIF(%s, ''),
+                                 %s)
+                         RETURNING id
+                         ''', (mail, website, orcid, image, tab_config_class))
+
+        new_entry_id = g.cursor.fetchone()[0]
+        config_id = new_entry_id
+
+        update_jsonb_column('name', name, language, config_id)
+        update_jsonb_column('address', address, language, config_id)
+        update_jsonb_column('description', description, language, config_id)
+        update_jsonb_column('imprint', imprint, language, config_id)
+        update_jsonb_column('legal_notice', legal_notice, language, config_id)
+
+        flash('Entry added successfully!', 'success')
+        return redirect(
+            url_for('admin') + current_tab + '/' + current_tab + str(
+                new_entry_id))
+
     except Exception as e:
-        flash(f'Error updating {name}: {str(e)}', 'danger')
+        flash(f'Error adding entry {name}: {str(e)}', 'danger')
+        return redirect(url_for('admin') + current_tab)
 
-    update_jsonb_column('address', address, language, config_id)
-    update_jsonb_column('description', description, language, config_id)
-    update_jsonb_column('imprint', imprint, language, config_id)
-    update_jsonb_column('legal_notice', legal_notice, language, config_id)
-    update_jsonb_column('name', name, language, config_id)
+    # return redirect(url_for('admin') + current_tab)
 
-    return redirect(url_for('admin') + current_tab + '/' + current_entry)
+@app.route('/edit_entry', methods=['POST', 'GET'])
+@login_required
+def edit_entry() -> Response:
+    check_manager_user()
+    form_data = {
+        'config_id': request.form.get('config_id', type=int),
+        'name': request.form.get('name', ''),
+        'email': request.form.get('mail', ''),
+        'website': request.form.get('website', ''),
+        'orcid_id': request.form.get('orcid', ''),
+        'image': request.form.get('image', ''),
+        'address': request.form.get('address', ''),
+        'description': request.form.get('description', ''),
+        'imprint': request.form.get('imprint', ''),
+        'legal_notice': request.form.get('legalnotice', '')}
+    try:
+        Admin.edit_entry(form_data, language=g.language)
+        flash(f'"{form_data["name"]}" updated successfully', 'success')
+    except EntryNotFound:
+        flash(f'No config entry found with ID {form_data["config_id"]}',
+              'danger')
+    except Exception as e:
+        flash(f'Error updating "{form_data["name"]}": {e}', 'danger')
+
+    return redirect(
+        url_for(
+            'admin',
+            entry=request.form.get('current_entry'),
+            tab=request.form.get('current_tab')))
 
 
-@app.route('/edit_map', methods=['POST'])
+@app.route('/admin/edit_map', methods=['POST'])
 @login_required
 def edit_map() -> Response:
     check_manager_user()
+    form_data = {
+        'name': request.form.get('name', ''),
+        'display_name': request.form.get('displayname', ''),
+        'sortorder': request.form.get('inputorder', ''),
+        'tilestring': request.form.get('description', ''),
+        'map_id': request.form.get('map_id')}
 
-    name = request.form.get('name')
-    display_name = request.form.get('displayname')
-    sortorder = request.form.get('inputorder') or ''
-    tilestring = request.form.get('description')
-    # current_tab = request.form.get('current_tab')
-    map_id = request.form.get('map_id')
-
-    editsql = """
-              UPDATE tng.maps
-              SET name         = NULLIF(%(name)s, ''),
-                  display_name = NULLIF(%(display_name)s, ''),
-                  sortorder    = CASE
-                                     WHEN %(sortorder)s = '' THEN NULL
-                                     ELSE CAST(%(sortorder)s AS integer) END,
-                  tilestring   = NULLIF(%(tilestring)s, '')
-              WHERE id = %(map_id)s \
-              """
+    if not form_data['map_id']:
+        flash('Map ID is required', 'map danger')
+        return redirect(url_for('admin'))
+    if not check_if_map_id_exist(int(form_data['map_id'])):
+        flash(f'Map with ID {form_data["map_id"]} not found', 'map danger')
+        return redirect(url_for('admin'))
 
     try:
-        g.cursor.execute('SELECT id FROM tng.maps WHERE id = %(map_id)s',
-                         {'map_id': map_id})
-        result = g.cursor.fetchone()
-        if result:
-            g.cursor.execute(editsql, {
-                'name': name,
-                'display_name': display_name,
-                'sortorder': sortorder,
-                'tilestring': tilestring,
-                'map_id': map_id
-            })
-            flash('Map updated successfully', 'map success')
-        else:
-            flash(f'Error updating map {map_id}', 'map danger')
+        Admin.update_map(form_data)
+        flash('Map updated successfully', 'map success')
     except Exception as e:
-        flash(f'Error updating map {map_id}: {str(e)}', 'map danger')
-
+        flash(f'Error updating map {form_data["map_id"]}: {e}', 'map danger')
     return redirect(url_for('admin'))
 
 
@@ -395,60 +348,45 @@ def edit_map() -> Response:
 @login_required
 def add_map() -> Response:
     check_manager_user()
-
-    name = request.form.get('name')
-    displayname = request.form.get('displayname')
-    inputorder = request.form.get('inputorder')
-    description = request.form.get('description')
-
+    data = {
+        'name': request.form.get('name'),
+        'display_name': request.form.get('displayname'),
+        'sort_order': request.form.get('inputorder'),
+        'tile_string': request.form.get('description')}
     try:
-        g.cursor.execute('''
-                         INSERT INTO tng.maps (name, display_name,
-                                               sortorder, tilestring)
-                         VALUES (%s, %s, %s, %s)
-                         RETURNING id
-                         ''', (name, displayname, inputorder, description))
-
-        new_map_id = g.cursor.fetchone()[0]
-
-        flash('Map added successfully!', 'map success')
-        return redirect(url_for('admin') + '/maps/' + str(new_map_id))
-
+        map_id = Admin.add_new_map(data)
+        flash(
+            f"Map {data['name']} with ID {map_id} added successfully!",
+            'map success')
     except Exception as e:
-        flash(f'Error adding map {name}: {str(e)}', 'map danger')
-        return redirect(url_for('admin') + '/maps')
-
-    # return redirect(url_for('admin'))
+        flash(f"Error adding map {data['name']}: {e}", 'map danger')
+    return redirect(url_for('admin'))
 
 
 @app.route('/admin/delete_map/<int:map_id>')
 @login_required
 def delete_map(map_id: int) -> Response:
     check_manager_user()
-
     try:
-        g.cursor.execute('DELETE FROM tng.maps WHERE id = %(map_id)s',
-                         {'map_id': map_id})
+        Admin.delete_map(map_id)
         flash('Map deleted successfully!', 'map success')
     except Exception as e:
         flash(f'Error deleting map: {str(e)}', 'map danger')
+    return redirect(url_for('admin'))
 
-    return redirect(url_for('admin') + '/maps')
 
-
-@app.route('/choose_index_background', methods=['POST'])
+@app.route('/admin/choose_index_background', methods=['POST'])
 def choose_index_background() -> Response:
-    form = request.form
     settings = {
-        'index_map': form.get('mapselection'),
-        'index_img': form.get('default_img'),
-        'img_map': form.get('imgmap'),
-        'greyscale': form.get('greyscale') == 'on'}
+        'index_map': request.form.get('mapselection'),
+        'index_img': request.form.get('default_img'),
+        'img_map': request.form.get('imgmap'),
+        'greyscale': request.form.get('greyscale') == 'on'}
     Admin.set_index_background(settings)
     return redirect(url_for('admin'))
 
 
-@app.route('/admin/select_entities', methods=['GET', 'POST'])
+@app.route('/admin/select_entities', methods=['POST'])
 def select_entities() -> Response:
     if request.method == 'POST':
         Admin.set_shown_entities(request.form.getlist('selected_entities'))
@@ -456,7 +394,7 @@ def select_entities() -> Response:
     return redirect(url_for('admin'))
 
 
-@app.route('/admin/deselect_entities', methods=['GET', 'POST'])
+@app.route('/admin/deselect_entities', methods=['POST'])
 def deselect_entities() -> Response:
     if request.method == 'POST':
         Admin.set_hidden_entities(request.form.getlist('selected_entities'))

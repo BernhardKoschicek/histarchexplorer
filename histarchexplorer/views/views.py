@@ -12,11 +12,13 @@ from histarchexplorer.utils.cerberos import get_view_class_count
 @app.route('/')
 def index() -> str:
     map_data = get_map_settings()
-    map_ = get_map_tilestring(map_data)
+    map_ = None
+    if index_map := map_data.index_map:
+        map_ = get_map_tilestring(index_map).tilestring
     view_classes = get_view_class_count()
     return render_template(
         'index.html',
-        map=map_.tilestring,
+        map=map_,
         map_data=map_data,
         view_classes=view_classes)
 
