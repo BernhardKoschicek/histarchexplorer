@@ -497,6 +497,14 @@ def get_entity(id_: int, tab_name=None) -> str:
             id_,
             get_parser_for_landing(id_))
         main_entity= get_main_entity(id_, entities)
+
+        print('=== DEBUG PERSON ENTITY ===')
+        print('ID:', main_entity.id)
+        print('Name:', main_entity.name)
+        print('Class:', main_entity.system_class)
+        print('Formated date:', main_entity.formated_date)
+        print('Types (Chronology):', [(t.label, t.root) for t in main_entity.types if t.root == 'Chronology'])
+
         related_entities = get_related_entities(main_entity, entities)
 
         data = {
