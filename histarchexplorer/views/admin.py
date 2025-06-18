@@ -227,65 +227,38 @@ def add_link(
     return redirect(url_for('admin') + tab + '/' + entry)
 
 
+# views/admin.py
 @app.route('/admin/add_entry', methods=['POST'])
 @login_required
 def add_entry() -> Response:
     check_manager_user()
-    language = session.get(
-        'language',
-        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
-    category = request.form.get('category') or ''
-    current_tab = 'nav-' + category
-    description = request.form.get('description') or ''
-    name = request.form.get('name') or ''
-    address = request.form.get('address') or ''
-    mail = request.form.get('mail') or ''
-    website = request.form.get('website') or ''
-    orcid = request.form.get('orcid') or ''
-    legal_notice = request.form.get('legalnotice') or ''
-    imprint = request.form.get('imprint') or ''
-    image = request.form.get('image') or ''
+
+    form_data = {
+        'category':      request.form.get('category', ''),
+        'name':          request.form.get('name', ''),
+        'email':         request.form.get('mail', ''),
+        'website':       request.form.get('website', ''),
+        'orcid_id':      request.form.get('orcid', ''),
+        'image':         request.form.get('image', ''),
+        'address':       request.form.get('address', ''),
+        'description':   request.form.get('description', ''),
+        'imprint':       request.form.get('imprint', ''),
+        'legal_notice':  request.form.get('legalnotice', '')    }
+
+    current_tab   = 'nav-' + form_data['category']
+    redirect_base = url_for('admin') + current_tab
 
     try:
-        tab_config_class = g.config_classes.get(category)
-        if tab_config_class == 5:
-            flash(f'Error adding entry {name}: Only one main project allowed',
-                  'danger')
-            return redirect(url_for('admin') + current_tab)
-
-        g.cursor.execute('''
-                         INSERT INTO tng.config (name, email, website,
-                                                 orcid_id,
-                                                 image, config_class)
-                         VALUES ('{"de": "Stefan Eichert", "en": "Stefan 
-                         Eichert"}'::jsonb,
-                                 NULLIF(%s, ''),
-                                 NULLIF(%s, ''),
-                                 NULLIF(%s, ''),
-                                 NULLIF(%s, ''),
-                                 %s)
-                         RETURNING id
-                         ''', (mail, website, orcid, image, tab_config_class))
-
-        new_entry_id = g.cursor.fetchone()[0]
-        config_id = new_entry_id
-
-        update_jsonb_column('name', name, language, config_id)
-        update_jsonb_column('address', address, language, config_id)
-        update_jsonb_column('description', description, language, config_id)
-        update_jsonb_column('imprint', imprint, language, config_id)
-        update_jsonb_column('legal_notice', legal_notice, language, config_id)
-
+        new_id = Admin.add_entry(form_data, g.language)
         flash('Entry added successfully!', 'success')
-        return redirect(
-            url_for('admin') + current_tab + '/' + current_tab + str(
-                new_entry_id))
+        return redirect(f"{redirect_base}/{current_tab}{new_id}")
 
+    except Admin.TooManyMainProjects:
+        flash(f'Error adding entry {form_data["name"]}: Only one main project allowed', 'danger')
     except Exception as e:
-        flash(f'Error adding entry {name}: {str(e)}', 'danger')
-        return redirect(url_for('admin') + current_tab)
+        flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
 
-    # return redirect(url_for('admin') + current_tab)
+    return redirect(redirect_base)
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required

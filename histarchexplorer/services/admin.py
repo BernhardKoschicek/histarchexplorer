@@ -1,5 +1,5 @@
 from histarchexplorer.database.admin import (
-    add_new_map, delete_map,  set_hidden_entities,
+    add_new_map, create_config_entry, delete_map, set_hidden_entities,
     set_index_background,
     set_shown_entities, update_config_entry, update_map)
 
@@ -7,6 +7,8 @@ class EntryNotFound(Exception):
     pass
 
 class Admin:
+    class TooManyMainProjects(Exception):
+        pass
 
     @staticmethod
     def set_hidden_entities(form: list[str]) -> None:
@@ -33,5 +35,9 @@ class Admin:
         return update_map(data)
 
     @staticmethod
+    def add_entry(data: dict, language: str) -> int:
+        return create_config_entry(data, language)
+
+    @staticmethod
     def edit_entry(data: dict, language: str) -> None:
-        update_config_entry(data, language)
+        return update_config_entry(data, language)

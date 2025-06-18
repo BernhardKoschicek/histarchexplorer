@@ -76,23 +76,74 @@ def update_map(data: dict[str, str]) -> None:
         """,
         data)
 
+def check_if_main_project_exist() -> bool:
+    g.cursor.execute("SELECT 1 FROM tng.config WHERE config_class = 5 LIMIT 1")
+    return g.cursor.fetchone() is not None
+
+def create_config_entry(data: dict, language: str) -> int:
+    cur = g.cursor
+    cat = data['category']
+    config_class = g.config_class_map.get(cat)
+    if config_class is None:
+        raise ValueError(f"Unknown category {cat}")
+
+    # your “only one main project” rule
+    if config_class == 5 and check_if_main_project_exist():
+        raise 404
+
+    # 1) insert the bare row; all JSONB cols default to '{}' on creation
+    cur.execute(
+        """
+        INSERT INTO tng.config
+            (email, website, orcid_id, image, config_class)
+        VALUES
+            (NULLIF(%s, ''), NULLIF(%s, ''), NULLIF(%s, ''), NULLIF(%s, ''), %s)
+        RETURNING id
+        """,
+        (data['email'], data['website'], data['orcid_id'], data['image'], config_class)
+    )
+    config_id = cur.fetchone()[0]
+
+    # 2) now “warm‐up” all your JSONB columns (including name) via the same helper you use in updates
+    _upsert_jsonb_fields(config_id, data, language)
+
+    return config_id
 
 def update_config_entry(data: dict, language: str) -> None:
+    """
+    Update both the flat columns (email, website, orcid_id, image)
+    and the JSONB columns (address, description, imprint, legal_notice, name)
+    for the given config_id.
+    """
     cur = g.cursor
     config_id = data['config_id']
 
-    if check_if_config_entry_exist(config_id) is None:
+    # 1) ensure it exists
+    if not check_if_config_entry_exist(config_id):
         raise 404
 
-    cur.execute("""
-                UPDATE tng.config
-                SET email    = NULLIF(%(email)s, ''),
-                    website  = NULLIF(%(website)s, ''),
-                    orcid_id = NULLIF(%(orcid_id)s, ''),
-                    image    = NULLIF(%(image)s, '')
-                WHERE id = %(config_id)s
-                """, data)
+    # 2) update the flat columns in one statement
+    cur.execute(
+        """
+        UPDATE tng.config
+           SET email    = NULLIF(%(email)s, ''),
+               website  = NULLIF(%(website)s, ''),
+               orcid_id = NULLIF(%(orcid_id)s, ''),
+               image    = NULLIF(%(image)s, '')
+         WHERE id = %(config_id)s
+        """,
+        data
+    )
 
+    # 3) update all JSONB columns via helper
+    _upsert_jsonb_fields(cur, config_id, data, language)
+
+def _upsert_jsonb_fields(config_id: int, data: dict, language: str) -> None:
+    """
+    Loop over each JSONB column in the whitelist and either set or remove
+    the [language] key based on whether data[col] is truthy.
+    """
+    cur = g.cursor
     for col in ['address', 'description', 'imprint', 'legal_notice', 'name']:
         val = data.get(col, '')
         if val:
@@ -100,13 +151,15 @@ def update_config_entry(data: dict, language: str) -> None:
                 f"""
                 UPDATE tng.config
                    SET {col} = jsonb_set(
-                        COALESCE({col}, '{{}}'),
-                        %s,
-                        %s::jsonb,
-                        true)
+                                 COALESCE({col}, '{{}}'),
+                                 %s,
+                                 %s::jsonb,
+                                 true
+                              )
                  WHERE id = %s
                 """,
-                ([language], json.dumps(val), config_id))
+                ([language], json.dumps(val), config_id)
+            )
         else:
             cur.execute(
                 f"""
@@ -114,4 +167,6 @@ def update_config_entry(data: dict, language: str) -> None:
                    SET {col} = COALESCE({col}, '{{}}') - %s
                  WHERE id = %s
                 """,
-                (language, config_id))
+                (language, config_id)
+            )
+
