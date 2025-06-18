@@ -1,4 +1,5 @@
-from flask import jsonify, render_template, request, current_app
+from flask import g, jsonify, render_template, request
+
 from histarchexplorer import app
 
 
@@ -7,7 +8,7 @@ def search():
     """
     Handles the main search page, displaying results from the search service.
     """
-    search_service = current_app.search_service
+    search_service = g.search_service
 
     results = []
     query = ''
@@ -32,6 +33,22 @@ def search():
         system_classes=system_classes)
 
 
+@app.route('/search_live')
+def search_live():
+    """
+    Provides live search results for autocomplete features.
+    """
+    search_service = g.search_service
+
+    query = request.args.get('q', '').strip()
+    system_classes = request.args.getlist('system_class')
+
+    results = search_service.perform_live_search(query, system_classes)
+
+    return jsonify(results)
+
+
+
 # @app.route('/search_result/<int:entity_id>')
 # def search_result_detail(entity_id: int):
 #     """
@@ -43,21 +60,7 @@ def search():
 #     if entity is None:
 #         current_app.logger.warning(
 #             f"Entity with ID {entity_id} not found or error fetching.")
-#         return render_template('error.html', message="Entity not found."), 404
+#         return render_template('error.html', message="Entity not found."),
+#         404
 #
 #     return render_template('search_detail.html', entity=entity)
-
-
-@app.route('/search_live')
-def search_live():
-    """
-    Provides live search results for autocomplete features.
-    """
-    search_service = current_app.search_service
-
-    query = request.args.get('q', '').strip()
-    system_classes = request.args.getlist('system_class')
-
-    results = search_service.perform_live_search(query, system_classes)
-
-    return jsonify(results)

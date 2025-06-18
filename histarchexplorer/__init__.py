@@ -15,7 +15,6 @@ from histarchexplorer.services.search import SearchService
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
-app.search_service = SearchService(app)
 babel = Babel(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
@@ -96,6 +95,7 @@ def before_request() -> None:
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
     g.config_classes = get_config_classes()
+    g.search_service = SearchService(app)
 
 
 @app.context_processor
