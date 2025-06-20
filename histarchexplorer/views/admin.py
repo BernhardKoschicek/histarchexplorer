@@ -108,9 +108,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             row['config_property'])
         row['role'] = helpers.get_translation(row['role'])
 
-    class_items = get_entities_count_by_case_study()
-    entities_dict = {k: v for k, v in class_items.items() if
-                     k not in app.config['CLASSES_TO_SKIP']}
+    class_items = {
+        k: v for k, v in get_entities_count_by_case_study().items()
+        if k not in app.config['CLASSES_TO_SKIP']}
 
     return render_template(
         "admin.html",
@@ -123,7 +123,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         config_properties=config_list,
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
-        class_items=entities_dict,
+        class_items=class_items,
         shown_entities=g.settings.shown_entities,
         hidden_entities=g.settings.hidden_entities,
         view_classes=app.config['VIEW_CLASSES'])

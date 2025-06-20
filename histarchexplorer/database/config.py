@@ -3,8 +3,6 @@ from typing import Any
 from flask import g
 
 
-
-
 def get_config_data(language: str) -> Any:
     g.cursor.execute(
         f"SELECT * FROM tng.config ORDER BY (name->>'{language}')")

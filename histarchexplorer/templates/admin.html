@@ -10,7 +10,6 @@
 
     {% include 'admin/maps.html' %}
 
-
     <div class="card mt-5 mb-5">
       <div class="card-body">
         <h5 class="card-title">{{ _('About Section content') |upper }}</h5>
@@ -424,7 +423,8 @@
                                       data-property=""
                                       data-direction="" data-role=""
                                       data-tab="{{ tab.target }}"
-                                      data-entry="{{ tab.target }}{{ entry.id }}"
+                                      data-entry="
+                                        {{ tab.target }}{{ entry.id }}"
                                       class="btn btn-primary"
                                       onclick="saveLinkValues(this)"
                                       style="min-width: 125px" disabled>
