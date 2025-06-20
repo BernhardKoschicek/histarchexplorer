@@ -4,7 +4,7 @@ from typing import Optional
 
 from flask import (
     abort, current_app, flash, g, redirect, render_template,
-    request, session, url_for)
+    request, url_for)
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
@@ -14,13 +14,12 @@ from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.admin import get_config_properties
 from histarchexplorer.database.config import (
     get_config_data)
-from histarchexplorer.database.map import (check_if_map_id_exist,
-                                           get_base_map, \
-                                           get_base_map_by_id)
-from histarchexplorer.database.settings import (
-    get_hidden_entities, get_map_settings, get_shown_entities)
+from histarchexplorer.database.map import (check_if_map_id_exist
+
+                                           )
 from histarchexplorer.services.admin import Admin, EntryNotFound
 from histarchexplorer.utils import helpers
+from histarchexplorer.utils.view_util import construct_admin_tabs
 
 
 @app.route('/admin/')
@@ -30,13 +29,10 @@ from histarchexplorer.utils import helpers
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     check_manager_user()
 
-    # todo: this will be obsolete if we change to dict instead to named tuples
-    language = session.get(
-        'language',
-        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
-
+    # Todo: merge this with the classes from the about site!
     entities = []
-    for item in get_config_data(language):
+    print(get_config_data(g.language))
+    for item in get_config_data(g.language):
         entity = {'id': item.id, 'config_class': item.config_class,
                   'website': item.website, 'email': item.email,
                   'orcid_id': item.orcid_id, 'image': item.image}
@@ -52,35 +48,13 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
         entities.append(entity)
 
-    # todo: this will be obsolete if we change to dict instead to named tuples
     config_properties = get_config_properties()
+    print(config_properties)
     colnames = [desc[0] for desc in g.cursor.description]
     config_list = [dict(zip(colnames, row)) for row in config_properties]
 
     for row in config_list:
         row['name'] = helpers.get_translation(row['name'])
-
-    tabs = [
-        {
-            'label': _('main-project'),
-            'target': 'nav-main-project',
-            'id': g.config_classes['main-project']
-        }, {
-            'label': _('projects'),
-            'target': 'nav-projects',
-            'id': g.config_classes['project']
-        }, {
-            'label': _('persons'),
-            'target': 'nav-persons',
-            'id': g.config_classes['person']
-        }, {
-            'label': _('institutions'),
-            'target': 'nav-institutions',
-            'id': g.config_classes['institution']
-        }, {
-            'label': _('attributes'),
-            'target': 'nav-attributes',
-            'id': g.config_classes['role']}]
 
     g.cursor.execute("""
                      SELECT l.id        AS link_id,
@@ -134,44 +108,25 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             row['config_property'])
         row['role'] = helpers.get_translation(row['role'])
 
-    map_data = get_base_map()
-    if map_id := request.args.get('map_id'):
-        # Todo: int(map_id) can create problems. Find use case.
-        map_data = get_base_map_by_id(int(map_id))
-
-    map_settings = get_map_settings()
-    settings = {
-        'img': map_settings.index_img,
-        'map': map_settings.index_map,
-        'img_map': map_settings.img_map,
-        'greyscale': map_settings.greyscale,
-        'not_sel': 'map' if map_settings.img_map == 'image' else 'image'}
-
     class_items = get_entities_count_by_case_study()
     entities_dict = {k: v for k, v in class_items.items() if
                      k not in app.config['CLASSES_TO_SKIP']}
-
-    shown_entities = get_shown_entities()
-    hidden_entities = get_hidden_entities()
-    print(shown_entities)
-    print(hidden_entities)
-    view_classes = app.config['VIEW_CLASSES']
 
     return render_template(
         "admin.html",
         config_data=entities,
         entities=entities,
-        tabs=tabs,
+        tabs=construct_admin_tabs(),
         activetab=tab,
         activeentry=entry,
         links_data=links_list,
         config_properties=config_list,
-        maps=map_data,
-        settings=settings,
+        maps=Admin.get_maps(),
+        settings=g.settings.get_map_settings(),
         class_items=entities_dict,
-        shown_entities=shown_entities,
-        hidden_entities=hidden_entities,
-        view_classes=view_classes)
+        shown_entities=g.settings.shown_entities,
+        hidden_entities=g.settings.hidden_entities,
+        view_classes=app.config['VIEW_CLASSES'])
 
 
 @app.route('/admin/delete_entry/<int:id_>/<tab>')

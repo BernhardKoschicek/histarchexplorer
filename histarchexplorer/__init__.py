@@ -10,6 +10,7 @@ from histarchexplorer.database.settings import get_main_image_table
 from histarchexplorer.services.about import Project
 from histarchexplorer.services.config_classes import get_config_classes
 from histarchexplorer.services.search import SearchService
+from histarchexplorer.services.settings import Settings
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
@@ -96,6 +97,7 @@ def before_request() -> None:
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
     g.config_classes = get_config_classes()
+    g.settings = Settings.initialize_settings()
     # Todo: this is basically the same as
     #   config_classes but with 's' and attributes instead of role
     g.config_class_map = {

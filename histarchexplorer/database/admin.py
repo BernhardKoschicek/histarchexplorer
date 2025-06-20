@@ -208,3 +208,5 @@ def delete_link(id_: int) -> None:
         WHERE id = %(link_id)s
         """, {
             'link_id': id_})
+
+

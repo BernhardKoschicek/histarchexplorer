@@ -898,56 +898,7 @@
       </div>
     </div>
 
-
-  <form method="POST" action="{{ url_for('choose_index_background') }}">
-    <div class="card mt-5 mb-5">
-      <div class="card-body">
-        <h5 class="card-title">{{ _('Index Page Options') | upper }}</h5>
-
-        <div class="form-check form-switch mt-3 mb-3">
-          <input class="form-check-input" type="checkbox" id="greyscaleSwitch"
-                 name="greyscale" {% if
-                           settings.greyscale %} checked {% endif %}>
-          <label class="form-check-label"
-                 for="greyscaleSwitch">Greyscale</label>
-        </div>
-        <div class="form-group row">
-          <div class="col-md-6">
-            <label for="selectMap" class="form-label">Select Map
-              Background</label>
-            <select class="form-control" id="selectMap" name="mapselection">
-              {% for map in maps %}
-                <option {% if map.id== settings.map %} selected {% endif %}
-                                                       value="{{ map.id }}"
-                                                       data-tilestring="{{ map.tilestring }}">{{ map.display_name }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label for="defaultImg" class="form-label">Define Default
-              Background Image</label>
-            <input type="text" class="form-control" id="defaultImg"
-                   name="default_img"
-                   value="{{ settings.img }}">
-          </div>
-
-          <div class="col-md-3 mt-3">
-            <select class="form-control" id="ImgMap" name="imgmap">
-              <option selected
-                      value="{{ settings.img_map }}">{{ settings.img_map|capitalize }}
-              </option>
-              <option
-                value="{{ settings.not_sel }}">{{ settings.not_sel|capitalize }}</option>
-            </select>
-          </div>
-        </div>
-
-        <button type="submit"
-                class="btn btn-primary m-2 float-end">{{ _('save')|capitalize }}</button>
-      </div>
-    </div>
-  </form>
+    {% include 'admin/index_page_options.html' %}
 
   </div>
 
