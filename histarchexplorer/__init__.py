@@ -86,6 +86,8 @@ def get_type_divisions():
 def before_request() -> None:
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    if request.path.startswith('/reset'):
+        return None
     session['language'] = get_locale()
     g.language = session.get(
         'language',

@@ -1,5 +1,5 @@
-import json
 import os
+import subprocess
 from typing import Optional
 
 from flask import (
@@ -11,16 +11,15 @@ from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
-from histarchexplorer.database.config import (
-    check_if_config_entry_exist, get_config_data, update_jsonb_column)
 from histarchexplorer.database.admin import get_config_properties
+from histarchexplorer.database.config import (
+    get_config_data)
 from histarchexplorer.database.map import (check_if_map_id_exist,
                                            get_base_map, \
                                            get_base_map_by_id)
 from histarchexplorer.database.settings import (
     get_hidden_entities, get_map_settings, get_shown_entities)
-from histarchexplorer.services.admin import Admin, EntryNotFound, \
-    set_hidden_entities
+from histarchexplorer.services.admin import Admin, EntryNotFound
 from histarchexplorer.utils import helpers
 
 
@@ -175,7 +174,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         view_classes=view_classes)
 
 
-
 @app.route('/admin/delete_entry/<id>/<tab>')
 @login_required
 def delete_entry(tab: str, id_: int) -> Response:
@@ -227,38 +225,41 @@ def add_link(
     return redirect(url_for('admin') + tab + '/' + entry)
 
 
-# views/admin.py
 @app.route('/admin/add_entry', methods=['POST'])
 @login_required
 def add_entry() -> Response:
     check_manager_user()
 
     form_data = {
-        'category':      request.form.get('category', ''),
-        'name':          request.form.get('name', ''),
-        'email':         request.form.get('mail', ''),
-        'website':       request.form.get('website', ''),
-        'orcid_id':      request.form.get('orcid', ''),
-        'image':         request.form.get('image', ''),
-        'address':       request.form.get('address', ''),
-        'description':   request.form.get('description', ''),
-        'imprint':       request.form.get('imprint', ''),
-        'legal_notice':  request.form.get('legalnotice', '')    }
+        'category': request.form.get('category', ''),
+        'name': request.form.get('name', ''),
+        'email': request.form.get('mail', ''),
+        'website': request.form.get('website', ''),
+        'orcid_id': request.form.get('orcid', ''),
+        'image': request.form.get('image', ''),
+        'address': request.form.get('address', ''),
+        'description': request.form.get('description', ''),
+        'imprint': request.form.get('imprint', ''),
+        'legal_notice': request.form.get('legalnotice', '')}
 
-    current_tab   = 'nav-' + form_data['category']
+    current_tab = 'nav-' + form_data['category']
     redirect_base = url_for('admin') + current_tab
 
     try:
-        new_id = Admin.add_entry(form_data, g.language)
+        new_id = Admin.add_entry(form_data)
         flash('Entry added successfully!', 'success')
         return redirect(f"{redirect_base}/{current_tab}{new_id}")
 
     except Admin.TooManyMainProjects:
-        flash(f'Error adding entry {form_data["name"]}: Only one main project allowed', 'danger')
+        flash(
+            f'Error adding entry {form_data["name"]}: Only one main project '
+            f'allowed',
+            'danger')
     except Exception as e:
         flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
 
     return redirect(redirect_base)
+
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
@@ -276,7 +277,7 @@ def edit_entry() -> Response:
         'imprint': request.form.get('imprint', ''),
         'legal_notice': request.form.get('legalnotice', '')}
     try:
-        Admin.edit_entry(form_data, language=g.language)
+        Admin.edit_entry(form_data)
         flash(f'"{form_data["name"]}" updated successfully', 'success')
     except EntryNotFound:
         flash(f'No config entry found with ID {form_data["config_id"]}',
@@ -376,14 +377,24 @@ def deselect_entities() -> Response:
 
 
 # Todo: This reset button is only here for development purpose.
+
+
 @app.route('/reset')
 @login_required
 def reset() -> Response:
-    # check_manager_user()
-    sql_path = os.path.join(current_app.root_path, 'sql', 'admin_reset.sql')
-    with open(sql_path, 'r', encoding='utf-8') as file:
-        sql_script = file.read()
-    g.cursor.execute(sql_script)
+    # Avoid exposing password in command line
+    env = os.environ.copy()
+    env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
+    subprocess.run([
+        'psql',
+        '-U', current_app.config['DATABASE_USER'],
+        '-h', current_app.config['DATABASE_HOST'],
+        '-p', str(current_app.config['DATABASE_PORT']),
+        '-d', current_app.config['DATABASE_NAME'],
+        '-f', os.path.join(current_app.root_path, 'sql', 'reset.sql')],
+        env=env,
+        check=True)
+
     return redirect(url_for('admin'))
 
 

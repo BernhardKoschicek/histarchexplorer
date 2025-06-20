@@ -35,9 +35,9 @@ class Admin:
         return update_map(data)
 
     @staticmethod
-    def add_entry(data: dict, language: str) -> int:
-        return create_config_entry(data, language)
+    def add_entry(data: dict) -> int:
+        return create_config_entry(data)
 
     @staticmethod
-    def edit_entry(data: dict, language: str) -> None:
-        return update_config_entry(data, language)
+    def edit_entry(data: dict) -> None:
+        return update_config_entry(data)
