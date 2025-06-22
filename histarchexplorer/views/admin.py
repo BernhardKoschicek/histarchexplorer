@@ -247,17 +247,17 @@ def edit_map() -> Response:
         'map_id': request.form.get('map_id')}
 
     if not form_data['map_id']:
-        flash('Map ID is required', 'map danger')
+        flash('Map ID is required', 'danger')
         return redirect(url_for('admin'))
     if not check_if_map_id_exist(int(form_data['map_id'])):
-        flash(f'Map with ID {form_data["map_id"]} not found', 'map danger')
+        flash(f'Map with ID {form_data["map_id"]} not found', 'danger')
         return redirect(url_for('admin'))
 
     try:
         Admin.update_map(form_data)
-        flash('Map updated successfully', 'map success')
+        flash('Map updated successfully', 'success')
     except Exception as e:
-        flash(f'Error updating map {form_data["map_id"]}: {e}', 'map danger')
+        flash(f'Error updating map {form_data["map_id"]}: {e}', 'danger')
     return redirect(url_for('admin'))
 
 
@@ -274,9 +274,10 @@ def add_map() -> Response:
         map_id = Admin.add_new_map(data)
         flash(
             f"Map {data['name']} with ID {map_id} added successfully!",
-            'map success')
+            ''
+            'success')
     except Exception as e:
-        flash(f"Error adding map {data['name']}: {e}", 'map danger')
+        flash(f"Error adding map {data['name']}: {e}", 'danger')
     return redirect(url_for('admin'))
 
 
@@ -286,9 +287,9 @@ def delete_map(map_id: int) -> Response:
     check_manager_user()
     try:
         Admin.delete_map(map_id)
-        flash('Map deleted successfully!', 'map success')
+        flash('Map deleted successfully!', 'success')
     except Exception as e:
-        flash(f'Error deleting map: {str(e)}', 'map danger')
+        flash(f'Error deleting map: {str(e)}', 'danger')
     return redirect(url_for('admin'))
 
 

@@ -8,6 +8,8 @@
       <span class="text-body-secondary"> | {{ _('DB Interface') }}</span>
     </h3>
 
+    {{ ui.flash_messages() }}
+
     <div class="card mt-5 mb-5">
       <div class="card-body">
         <h5 class="card-title">{{ _('tools') | upper }}</h5>
@@ -28,24 +30,6 @@
     <div class="card mt-5 mb-5">
       <div class="card-body">
         <h5 class="card-title">{{ _('About Section content') |upper }}</h5>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="flash-messages mt-5 mb-5">
-              {% for category, message in messages %}
-                {% if category in ["success", "danger"] %}
-                  <div
-                    class="alert alert-{{ category }} alert-dismissible fade show"
-                    role="alert">
-                    {{ message }}
-                    {{ ui.close_button("alert") }}
-                  </div>
-                {% endif %}
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-
-
         <nav>
           <div class="nav nav-pills mt-3 mb-2" id="nav-tab" role="tablist">
             {% for tab in tabs %}
