@@ -47,7 +47,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                     entity[column])
 
         entities.append(entity)
-
+    print(entities)
     config_properties = get_config_properties()
     print(config_properties)
     colnames = [desc[0] for desc in g.cursor.description]
@@ -333,7 +333,7 @@ def reset() -> Response:
         '-h', current_app.config['DATABASE_HOST'],
         '-p', str(current_app.config['DATABASE_PORT']),
         '-d', current_app.config['DATABASE_NAME'],
-        '-f', os.path.join(current_app.root_path, 'sql', 'reset.sql')],
+        '-f', os.path.join(current_app.root_path, 'sql', 'test.sql')],
         env=env,
         check=True)
 

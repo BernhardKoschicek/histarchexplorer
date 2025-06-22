@@ -1,6 +1,26 @@
 from flask import g
 
 
+def get_config_entities() -> tuple[str]:
+    g.cursor.execute(
+        f"""SELECT 
+            c.id,
+            c.name,
+            c.description,
+            c.website,
+            c.legal_notice,
+            c.imprint,
+            c.config_class,
+            c.address, 
+            c.email,
+            c.image,      
+            c.orcid_id,
+            cc.name as class_name 
+        FROM 
+            tng.config as c
+		JOIN  tng.config_classes as cc ON c.config_class = cc.id;""")
+    return g.cursor.fetchall()
+
 def get_projects() -> tuple[str]:
     g.cursor.execute(
         f"""SELECT 

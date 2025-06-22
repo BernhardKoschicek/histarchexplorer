@@ -7,7 +7,7 @@ from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.services.about import Project
+from histarchexplorer.services.about import ConfigEntities
 from histarchexplorer.services.config_classes import get_config_classes
 from histarchexplorer.services.search import SearchService
 from histarchexplorer.services.settings import Settings
@@ -106,6 +106,7 @@ def before_request() -> None:
         'institutions': 4,
         'attributes': 3,
         'main-project': 5}
+    g.config_entities = ConfigEntities.get_all_localized()
     g.search_service = SearchService(app)
 
 
