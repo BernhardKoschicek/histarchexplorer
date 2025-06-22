@@ -7,11 +7,11 @@
           <h2>
             {{ _('Project') | upper }}
             <span
-              class="text-body-secondary"> | {{ project.name| upper }}</span>
+              class="text-body-secondary"> | {{ project.name.display.label | upper }}</span>
           </h2>
           <div class="row">
             <p class="mt-2">
-              {{ project.description | replace("\n", "<br>") | safe }}
+              {{ project.description.display.label | replace("\n", "<br>") | safe }}
             </p>
           </div>
         </div>
@@ -32,9 +32,9 @@
             <div class="col-lg-4 text-center">
               <img class="rounded-circle"
                    src="{{ person.image if person.image else '/static/images/team/cool_dude2.jpg' }}"
-                   alt="{{ person.name }}'s Foto" width="140" height="140">
+                   alt="{{ person.name.display.label }}'s Foto" width="140" height="140">
               <div class="team-card__member">
-                <p>{{ person.name }}</p>
+                <p>{{ person.name.display.label }}</p>
               </div>
               <ul class="list-unstyled">
                 {% for role in person.roles[project.id_] %}
@@ -79,17 +79,17 @@
                  target="_blank">
                 <img class="mt-2"
                      src="{{ institution.image if institution.image }}"
-                     alt="{{ institution.name }}'s Logo">
+                     alt="{{ institution.name.display.label }}'s Logo">
               </a>
             {% else %}
-              <h5 class="py-3">{{ institution.name }}</h5>
+              <h5 class="py-3">{{ institution.name.display.label }}</h5>
               {% if institution.website %}
-                <a href="{{ institution.website }}" target="_blank">institution.name</a>
+                <a href="{{ institution.website }}" target="_blank">institution.name.display.label</a>
               {% endif %}
             {% endif %}
             {% if institution.address %}
               <p class="text-body-secondary">
-                {{ institution.address | replace("\n", "<br>") | safe }}
+                {{ institution.address.display.label | replace("\n", "<br>") | safe }}
               </p>
             {% endif %}
           </div>
@@ -107,7 +107,7 @@
       <div class="col-md-5 team-card">
         <div class="en" style="display: block;">
           <h4>{{ _('Imprint') |upper }}</h4>
-          <p>{{ project.imprint | replace("\n", "<br>") | safe }}</p>
+          <p>{{ project.imprint.display.label | replace("\n", "<br>") | safe }}</p>
         </div>
       </div>
     </div>

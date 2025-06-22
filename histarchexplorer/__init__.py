@@ -7,8 +7,9 @@ from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.services.about import ConfigEntities
-from histarchexplorer.services.config_classes import get_config_classes
+from histarchexplorer.services.config import get_config_classes
+from histarchexplorer.services.config_entities import ConfigEntity, \
+    ConfigProperty
 from histarchexplorer.services.search import SearchService
 from histarchexplorer.services.settings import Settings
 
@@ -93,10 +94,12 @@ def before_request() -> None:
     g.language = session.get(
         'language',
         request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
+    g.preferred_langauge = app.config['PREFERRED_LANGUAGE']
     g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
     g.config_classes = get_config_classes()
+    g.config_properties = ConfigProperty.get_all()
     g.settings = Settings.initialize_settings()
     # Todo: this is basically the same as
     #   config_classes but with 's' and attributes instead of role
@@ -106,8 +109,9 @@ def before_request() -> None:
         'institutions': 4,
         'attributes': 3,
         'main-project': 5}
-    g.config_entities = ConfigEntities.get_all_localized()
+    g.config_entities = ConfigEntity.get_all_localized()
     g.search_service = SearchService(app)
+    return None
 
 
 @app.context_processor

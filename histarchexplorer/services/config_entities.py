@@ -5,20 +5,43 @@ from typing import Any
 from flask import g
 from flask_babel import lazy_gettext as _
 
+
 from histarchexplorer.database.about import (
     get_affiliations, get_config_entities, get_project_roles_sql)
+from histarchexplorer.database.admin import get_config_properties
 
 
 @dataclass()
-class ConfigEntities:
+class ConfigProperty:
     id_: int
-    name: str
-    description: str
+    name: dict[str, str | dict[str, str]]
+    domain: int
+    range_: int
+    direction: str
+
+    @classmethod
+    def get_all(cls) -> list['ConfigProperty']:
+        properties = []
+
+        for property_ in get_config_properties():
+            properties.append(ConfigProperty(
+                id_=property_.id,
+                name=add_display(property_.name),
+                domain=property_.domain,
+                range_=property_.range,
+                direction=property_.direction))
+        return properties
+
+@dataclass()
+class ConfigEntity:
+    id_: int
+    name: dict[str, str | dict[str, str]]
+    description: dict[str, str | dict[str, str]]
     website: str
-    legal_notice: str
-    imprint: str
+    legal_notice: dict[str, str | dict[str, str]]
+    imprint: dict[str, str | dict[str, str]]
     config_class: int
-    address: str
+    address: dict[str, str | dict[str, str]]
     email: str
     image: str
     orcid_id: str
@@ -28,19 +51,19 @@ class ConfigEntities:
     affiliations: list[dict[str, Any]] | None
 
     @classmethod
-    def get_all_localized(cls) -> list['ConfigEntities']:
+    def get_all_localized(cls) -> list['ConfigEntity']:
         entities = []
 
         for entry in get_config_entities():
-            entities.append(ConfigEntities(
+            entities.append(ConfigEntity(
                 id_=entry.id,
-                name=localize(entry.name),
-                description=localize(entry.description),
+                name=add_display(entry.name),
+                description=add_display(entry.description),
                 website=entry.website,
-                legal_notice=localize(entry.legal_notice),
-                imprint=localize(entry.imprint),
+                legal_notice=add_display(entry.legal_notice),
+                imprint=add_display(entry.imprint),
                 config_class=entry.config_class,
-                address=localize(entry.address),
+                address=add_display(entry.address),
                 email=entry.email,
                 image=entry.image,
                 orcid_id=entry.orcid_id,
@@ -57,8 +80,8 @@ class ConfigEntities:
     @classmethod
     def group_by_class_name(
             cls,
-            entities: list['ConfigEntities']) \
-            -> dict[str, list['ConfigEntities']]:
+            entities: list['ConfigEntity']) \
+            -> dict[str, list['ConfigEntity']]:
         grouped = {}
         for entity in entities:
             grouped.setdefault(entity.class_name, []).append(entity)
@@ -89,17 +112,17 @@ def get_person_affiliations(id_: int) -> list[dict[str, Any]]:
 
 
 def localize(data: dict[str, str] | None) -> str | None:
-    preferred_lang = g.language
+    selected_lang = g.language
     if not isinstance(data, dict):
         return data
 
-    # Try preferred language
-    if preferred_lang in data and data[preferred_lang]:
-        return data[preferred_lang]
+    # Try selected language
+    if selected_lang in data and data[selected_lang]:
+        return data[selected_lang]
 
-    # Fallback to English
-    if 'en' in data and data['en']:
-        return data['en']
+    # Fallback to g.preferred_langauge
+    if g.preferred_langauge  in data and data[g.preferred_langauge ]:
+        return data[g.preferred_langauge ]
 
     # Fallback to any filled value
     for value in data.values():
@@ -107,3 +130,18 @@ def localize(data: dict[str, str] | None) -> str | None:
             return value
 
     return None
+
+def add_display(data: dict[str, Any]) -> dict[str, Any] | None:
+    if not data:
+        return {}
+    result = data.copy()
+    label = localize(data)
+
+    for lang, value in data.items():
+        if value == label:
+            result['display'] = {'language': lang, 'label': label}
+            break
+    else:
+        result['display'] = {'language': None, 'label': label}
+
+    return result

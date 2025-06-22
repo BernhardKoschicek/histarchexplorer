@@ -56,44 +56,44 @@
                     <div class="accordion-item">
                       <h2 class="accordion-header">
                         <button
-                          class="accordion-button {% if activeentry != tab.target + entry.id|string %}collapsed{% endif %}"
+                          class="accordion-button {% if activeentry != tab.target + entry.id_|string %}collapsed{% endif %}"
                           type="button" data-bs-toggle="collapse"
-                          data-bs-target="#{{ tab.target }}{{ entry.id }}"
-                          aria-expanded="{{ ((tab.target + entry.id|string == activeentry)|string)|lower }}"
-                          aria-controls="{{ tab.target }}{{ entry.id }}">
+                          data-bs-target="#{{ tab.target }}{{ entry.id_ }}"
+                          aria-expanded="{{ ((tab.target + entry.id_|string == activeentry)|string)|lower }}"
+                          aria-controls="{{ tab.target }}{{ entry.id_ }}">
                           {% if entry.name.display %}
                             {{ entry.name.display.label or '' }} {% endif %}
                         </button>
                       </h2>
-                      <div id="{{ tab.target }}{{ entry.id }}"
-                           class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string %} show {% endif %}"
+                      <div id="{{ tab.target }}{{ entry.id_ }}"
+                           class="accordion-collapse collapse {% if activeentry == tab.target + entry.id_|string %} show {% endif %}"
                            data-bs-parent="#{{ tab.label }}accordion">
                         <div class="accordion-body">
                           <form method="POST"
                                 action="{{ url_for('edit_entry') }}"
                                 class="projectForm needs-validation"
-                                id="form{{ entry.id }}"
+                                id="form{{ entry.id_ }}"
                                 novalidate>
                             <input type="hidden" name="config_id"
-                                   value="{{ entry.id }}">
+                                   value="{{ entry.id_ }}">
                             <input type="hidden" name="current_tab"
                                    value="{{ tab.target }}">
                             <input type="hidden" name="current_entry"
-                                   value="{{ tab.target + entry.id|string }}">
+                                   value="{{ tab.target + entry.id_|string }}">
 
                             <div class="row needs-validation">
                               <div class="col-md-4">
-                                <label for="InputName{{ entry.id }}"
+                                <label for="InputName{{ entry.id_ }}"
                                        class="form-label">
                                   {{ _('name')|capitalize }}
                                   {% if not entry.name[CURRENT_LANGUAGE] %} (
                                     {{ entry.name.display.language|upper }}
                                     ) {% endif %}</label>
                                 <input type="text" class="form-control"
-                                       id="InputName{{ entry.id }}"
+                                       id="InputName{{ entry.id_ }}"
                                        name="name"
                                        value="{{ entry.name[CURRENT_LANGUAGE] or '' }}"
-                                       aria-describedby="NameHelp{{ entry.id }}"
+                                       aria-describedby="NameHelp{{ entry.id_ }}"
                                        disabled
                                   {% if not entry.name[CURRENT_LANGUAGE] %}
                                        placeholder="{{ entry.name.display.label or '' }}"{% endif %}
@@ -109,8 +109,7 @@
                               </div>
 
                               <div class="col-md-8">
-                                <label for="InputDescription{{ entry.id }}"
-                                       class="form-label">
+                                <label for="InputDescription{{ entry.id_ }}" class="form-label">
                                   {{ _('description')|capitalize }}
                                   {% if entry.description != {} %}
                                     {% if not entry.description[CURRENT_LANGUAGE] %}
@@ -118,9 +117,9 @@
                                       {{ entry.description.display.language|upper }}
                                       ) {% endif %}{% endif %}</label>
                                 <textarea class="form-control"
-                                          id="InputDescription{{ entry.id }}"
+                                          id="InputDescription{{ entry.id_ }}"
                                           name="description"
-                                          aria-describedby="descriptionHelp{{ entry.id }}"
+                                          aria-describedby="descriptionHelp{{ entry.id_ }}"
                                   {% if entry.description != {} %}
                                     {% if not entry.description[CURRENT_LANGUAGE] %}
                                           placeholder="{{ entry.description.display.label or '' }}"
@@ -138,7 +137,7 @@
                             <div class="row needs-validation mt-4">
                               {% if tab.target == 'nav-institutions' %}
                                 <div class="col-lg col-md-12">
-                                  <label for="InputAddress{{ entry.id }}"
+                                  <label for="InputAddress{{ entry.id_ }}"
                                          class="form-label">
                                     {{ _('address')|capitalize }}
                                     {% if entry.address != {} %}
@@ -149,9 +148,9 @@
                                       {% endif %}
                                     {% endif %}</label>
                                   <textarea class="form-control"
-                                            id="InputAddress{{ entry.id }}"
+                                            id="InputAddress{{ entry.id_ }}"
                                             name="address"
-                                            aria-describedby="addressHelp{{ entry.id }}"
+                                            aria-describedby="addressHelp{{ entry.id_ }}"
                                     {% if entry.address != {} %}
                                       {% if not entry.address[CURRENT_LANGUAGE] %}
                                             placeholder="{{ entry.address.display.label or '' }}"
@@ -186,13 +185,13 @@
 
                               {% if tab.target in ['nav-institutions', 'nav-persons'] %}
                                 <div class="col-lg col-md-12">
-                                  <label for="InputMail{{ entry.id }}"
+                                  <label for="InputMail{{ entry.id_ }}"
                                          class="form-label">{{ _('e-mail')|capitalize }}</label>
                                   <input type="email" class="form-control"
-                                         id="InputMail{{ entry.id }}"
+                                         id="InputMail{{ entry.id_ }}"
                                          name="mail"
                                          value="{{ entry.email or '' }}"
-                                         aria-describedby="mailHelp{{ entry.id }}"
+                                         aria-describedby="mailHelp{{ entry.id_ }}"
                                          disabled>
                                   <div
                                     class="invalid-feedback">{{ _('Please provide a valid mail address: someone@somemail.com') }}.
@@ -210,13 +209,13 @@
 
                               {% if tab.target in ['nav-main-project', 'nav-projects', 'nav-institutions'] %}
                                 <div class="col-lg col-md-12">
-                                  <label for="InputWebsite{{ entry.id }}"
+                                  <label for="InputWebsite{{ entry.id_ }}"
                                          class="form-label">{{ _('website')|capitalize }}</label>
                                   <input type="url" class="form-control"
-                                         id="InputWebsite{{ entry.id }}"
+                                         id="InputWebsite{{ entry.id_ }}"
                                          name="website"
                                          value="{{ entry.website or '' }}"
-                                         aria-describedby="websiteHelp{{ entry.id }}"
+                                         aria-describedby="websiteHelp{{ entry.id_ }}"
                                          disabled>
                                   <div
                                     class="invalid-feedback">{{ _('Please provide a valid website url: https://someurl.com') }}
@@ -226,13 +225,13 @@
 
                               {% if tab.target == 'nav-persons' %}
                                 <div class="col-lg col-md-12">
-                                  <label for="InputOrcid{{ entry.id }}"
+                                  <label for="InputOrcid{{ entry.id_ }}"
                                          class="form-label">ORCID-ID</label>
                                   <input type="text" class="form-control"
-                                         id="InputOrcid{{ entry.id }}"
+                                         id="InputOrcid{{ entry.id_ }}"
                                          name="orcid"
                                          value="{{ entry.orcid_id or '' }}"
-                                         aria-describedby="orcidHelp{{ entry.id }}"
+                                         aria-describedby="orcidHelp{{ entry.id_ }}"
                                          disabled>
                                 </div>
                                 <div class="col-lg col-md-4">
@@ -255,7 +254,7 @@
                             {% if tab.target == 'nav-main-project' %}
                               <div class="row needs-validation mt-4">
                                 <div class="col-md-6">
-                                  <label for="Imprint{{ entry.id }}"
+                                  <label for="Imprint{{ entry.id_ }}"
                                          class="form-label">
                                     {{ _('imprint')|capitalize }}
                                     {% if entry.imprint != {} %}
@@ -264,9 +263,9 @@
                                         {{ entry.imprint.display.language|upper }}
                                         ) {% endif %}{% endif %}</label>
                                   <textarea class="form-control"
-                                            id="Imprint{{ entry.id }}"
+                                            id="Imprint{{ entry.id_ }}"
                                             name="imprint"
-                                            aria-describedby="imprint{{ entry.id }}"
+                                            aria-describedby="imprint{{ entry.id_ }}"
                                     {% if entry.imprint != {} %}
                                       {% if not entry.imprint[CURRENT_LANGUAGE] %}
                                             placeholder="{{ entry.imprint.display.label or '' }}"
@@ -281,8 +280,7 @@
                                       </div>{% endif %}{% endif %}
                                 </div>
                                 <div class="col-md-6">
-                                  <label for="legalNotice{{ entry.id }}"
-                                         class="form-label">
+                                  <label for="legalNotice{{ entry.id_ }}" class="form-label">
                                     {{ _('legal notice')|capitalize }}
                                     {% if entry.legal_notice != {} %}
                                       {% if not entry.legal_notice[CURRENT_LANGUAGE] %}
@@ -290,9 +288,9 @@
                                         {{ entry.legal_notice.display.language|upper }}
                                         ) {% endif %}{% endif %}</label>
                                   <textarea class="form-control"
-                                            id="legalNotice{{ entry.id }}"
+                                            id="legalNotice{{ entry.id_ }}"
                                             name="legalnotice"
-                                            aria-describedby="legalnotice{{ entry.id }}"
+                                            aria-describedby="legalnotice{{ entry.id_ }}"
                                     {% if entry.legal_notice != {} %}
                                       {% if not entry.legal_notice[CURRENT_LANGUAGE] %}
                                             placeholder="{{ entry.legal_notice.display.label or '' }}"
@@ -312,27 +310,27 @@
 
                             <div class="mt-3 text-end">
                               <button type="button" class="btn btn-primary"
-                                      id='edit{{ entry.id }}'
-                                      onclick="changeEdit({{ entry.id }}, true)">{{ _('Edit') }}
+                                      id='edit{{ entry.id_ }}'
+                                      onclick="changeEdit({{ entry.id_ }}, true)">{{ _('Edit') }}
                               </button>
                               <button type="button"
                                       class="btn btn-danger{% if tab.id == 5 %} d-none-at-all{% endif %}"
-                                      id='delete{{ entry.id }}'
-                                      value="{{ entry.id }}"
-                                      onclick="deleteEntry({{ entry.id }}, '{{ entry.name[CURRENT_LANGUAGE] }}', '{{ tab.target }}')"
+                                      id='delete{{ entry.id_ }}'
+                                      value="{{ entry.id_ }}"
+                                      onclick="deleteEntry({{ entry.id_ }}, '{{ entry.name[CURRENT_LANGUAGE] }}', '{{ tab.target }}')"
                                       data-bs-toggle="modal"
                                       data-bs-target="#deleteModal">{{ _('Delete') }}
                               </button>
                               <button type="button"
                                       class="btn btn-secondary d-none"
-                                      id='cancel{{ entry.id }}'
-                                      onclick="changeEdit({{ entry.id }}, false)">{{ _('Cancel') }}
+                                      id='cancel{{ entry.id_ }}'
+                                      onclick="changeEdit({{ entry.id_ }}, false)">{{ _('Cancel') }}
                               </button>
 
                               <button type="submit"
                                       class="btn btn-primary d-none"
-                                      id='save{{ entry.id }}'
-                                      value="{{ entry.id }}">{{ _('Save') }}
+                                      id='save{{ entry.id_ }}'
+                                      value="{{ entry.id_ }}">{{ _('Save') }}
                               </button>
 
                             </div>
@@ -342,7 +340,7 @@
                             <hr>
                             <div id="{{ tab.target }}-links" class="link-divs">
                               {% for link in links_data %}
-                                {% if link.start_id == entry.id %}
+                                {% if link.start_id == entry.id_ %}
 
                                   <div class="d-flex mb-2"
                                        data-order="{{ link.sortorder }}"
@@ -363,7 +361,7 @@
                                            value="{{ link.role['label'] }}">
                                     <button class="btn btn-danger"
                                             id='delete{{ link.id }}'
-                                            onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name.label }}', '{{ link.config_property.label }}', '{{ link.end_name.label }}', '{{ tab.target }}', '{{ tab.target + entry.id|string }}', )"
+                                            onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name.label }}', '{{ link.config_property.label }}', '{{ link.end_name.label }}', '{{ tab.target }}', '{{ tab.target + entry.id_|string }}', )"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteModal"
                                             style="min-width: 125px">{{ _('Delete') }}
@@ -385,8 +383,8 @@
                                   {% if tab.id == row.domain %}
                                     <option data-range="{{ row.range }}"
                                             data-direction="{{ row.direction }}"
-                                            data-entry="{{ entry.id }}"
-                                            value="{{ row.id }}">{{ row.name['label'] }}
+                                            data-entry="{{ entry.id_ }}"
+                                            value="{{ row.id }}">{{ row.name.display.label }}
                                     </option>
                                   {% endif %}
                                 {% endfor %}
@@ -396,7 +394,7 @@
                                 aria-label="Select node" disabled>
                                 <option
                                   selected>{{ _('select node')|capitalize }}</option>
-                                {% for row in config_data %}
+                                {% for row in entities %}
                                   <option
                                     class="config-class-{{ row.config_class }} d-none"
                                     data-classId="{{ row.id }}"
@@ -411,7 +409,7 @@
                                   selected>{{ _('select role')|capitalize }}</option>
                                 <option
                                   value="0">{{ _('not specified') }}</option>
-                                {% for row in config_data %}
+                                {% for row in entities %}
                                   {% if row.config_class == 3 %}
                                     <option
                                       value="{{ row.id }}">{{ row.name['display']['label'] }}</option>
@@ -423,7 +421,7 @@
                                       data-direction="" data-role=""
                                       data-tab="{{ tab.target }}"
                                       data-entry="
-                                        {{ tab.target }}{{ entry.id }}"
+                                        {{ tab.target }}{{ entry.id_ }}"
                                       class="btn btn-primary"
                                       onclick="saveLinkValues(this)"
                                       style="min-width: 125px" disabled>

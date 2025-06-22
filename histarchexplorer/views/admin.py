@@ -12,11 +12,7 @@ from werkzeug import Response
 from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.admin import get_config_properties
-from histarchexplorer.database.config import (
-    get_config_data)
-from histarchexplorer.database.map import (check_if_map_id_exist
-
-                                           )
+from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.services.admin import Admin, EntryNotFound
 from histarchexplorer.utils import helpers
 from histarchexplorer.utils.view_util import construct_admin_tabs
@@ -28,33 +24,6 @@ from histarchexplorer.utils.view_util import construct_admin_tabs
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     check_manager_user()
-
-    # Todo: merge this with the classes from the about site!
-    entities = []
-    print(get_config_data(g.language))
-    for item in get_config_data(g.language):
-        entity = {'id': item.id, 'config_class': item.config_class,
-                  'website': item.website, 'email': item.email,
-                  'orcid_id': item.orcid_id, 'image': item.image}
-
-        for column in ['name', 'description', 'imprint', 'address',
-                       'legal_notice']:
-            entity[column] = {}
-            if getattr(item, column):
-                for key, value in getattr(item, column).items():
-                    entity[column][key] = value
-                entity[column]['display'] = helpers.get_translation(
-                    entity[column])
-
-        entities.append(entity)
-    print(entities)
-    config_properties = get_config_properties()
-    print(config_properties)
-    colnames = [desc[0] for desc in g.cursor.description]
-    config_list = [dict(zip(colnames, row)) for row in config_properties]
-
-    for row in config_list:
-        row['name'] = helpers.get_translation(row['name'])
 
     g.cursor.execute("""
                      SELECT l.id        AS link_id,
@@ -114,13 +83,12 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     return render_template(
         "admin.html",
-        config_data=entities,
-        entities=entities,
+        entities=g.config_entities,
         tabs=construct_admin_tabs(),
         activetab=tab,
         activeentry=entry,
         links_data=links_list,
-        config_properties=config_list,
+        config_properties=g.config_properties,
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
         class_items=class_items,

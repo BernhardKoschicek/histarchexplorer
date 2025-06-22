@@ -6,3 +6,4 @@ def get_config_classes() -> dict[str, int]:
     for config_class in get_config_classes_sql():
         data[config_class.name] = config_class.id
     return data
+
