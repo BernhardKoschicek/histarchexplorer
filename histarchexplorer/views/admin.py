@@ -11,7 +11,6 @@ from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
-from histarchexplorer.database.admin import get_config_properties
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.services.admin import Admin, EntryNotFound
 from histarchexplorer.utils import helpers
@@ -242,7 +241,6 @@ def add_map() -> Response:
         map_id = Admin.add_new_map(data)
         flash(
             f"Map {data['name']} with ID {map_id} added successfully!",
-            ''
             'success')
     except Exception as e:
         flash(f"Error adding map {data['name']}: {e}", 'danger')
@@ -301,7 +299,7 @@ def reset() -> Response:
         '-h', current_app.config['DATABASE_HOST'],
         '-p', str(current_app.config['DATABASE_PORT']),
         '-d', current_app.config['DATABASE_NAME'],
-        '-f', os.path.join(current_app.root_path, 'sql', 'test.sql')],
+        '-f', os.path.join(current_app.root_path, 'sql', 'reset.sql')],
         env=env,
         check=True)
 
