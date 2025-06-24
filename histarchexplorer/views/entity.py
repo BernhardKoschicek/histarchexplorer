@@ -5,6 +5,7 @@ from flask import abort, g, render_template
 
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
+from histarchexplorer.database.entity import get_entity_by_id
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
 
@@ -497,6 +498,14 @@ def get_entity(id_: int, tab_name=None) -> str:
             id_,
             get_parser_for_landing(id_))
         main_entity= get_main_entity(id_, entities)
+
+        print('=== DEBUG PERSON ENTITY ===')
+        print('ID:', main_entity.id)
+        print('Name:', main_entity.name)
+        print('Class:', main_entity.system_class)
+        print('Formated date:', main_entity.formated_date)
+        print('Types (Chronology):', [(t.label, t.root) for t in main_entity.types if t.root == 'Chronology'])
+
         related_entities = get_related_entities(main_entity, entities)
 
         data = {
@@ -548,8 +557,8 @@ def get_entity(id_: int, tab_name=None) -> str:
 
 
 def get_parser_for_landing(id_: int) -> Parser:
-    simple_entity = Entity.get_entity(id_, Parser(show=['None']))
-    match simple_entity.system_class:
+    simple_entity = get_entity_by_id(id_)
+    match simple_entity.openatlas_class_name.capitalize():
         case 'Place' | 'Feature' | 'Stratigraphic unit':
             properties = ['P46', 'P67']
         case 'Human remains' | 'Artifact':
@@ -573,7 +582,8 @@ def get_parser_for_landing(id_: int) -> Parser:
     return Parser(
         properties=properties,
         limit=0,
-        format='lpx')
+        format='lpx',
+        centroid='true')
 
 
 
@@ -643,31 +653,3 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
 
     return sorted_divisions
 
-
-def get_parser_for_getentity(id_: int) -> Parser:
-    simple_entity = Entity.get_entity(id_, Parser(show=['None']))
-    match simple_entity.system_class:
-        case 'Place' | 'Feature' | 'Stratigraphic unit':
-            properties = ['P46', 'P67']
-        case 'Human remains' | 'Artifact':
-            properties = ['P46', 'P67', 'P52']
-        case 'Source' | 'Source translation':
-            properties = ['P67', 'P73', 'P128']
-        case 'Event' | 'Acquisition' | 'Activity' | 'Creation' | 'Move' | \
-             'Production' | 'Modification':
-            properties = [
-                'P67', 'P11', 'P14', 'P22', 'P23', 'P25', 'P7',
-                'P26', 'P27', 'P24', 'P31', 'P25', 'P108', 'P9',
-                'P134']
-        case 'Bibliography' | 'Edition' | 'External reference':
-            properties = ['P67']
-        case 'Group' | 'Person':
-            properties = [
-                'OA7', 'OA8', 'OA9', 'P107', 'P74', 'P52', 'P11',
-                'P14', 'P22', 'P23', 'P25']
-        case _:
-            properties = []
-    return Parser(
-        properties=properties,
-        limit=0,
-        format='lpx')

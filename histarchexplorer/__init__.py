@@ -6,13 +6,15 @@ from flask_babel import Babel
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
+
 from histarchexplorer.database.settings import get_main_image_table
+from histarchexplorer.services.about import Project
+from histarchexplorer.services.config_classes import get_config_classes
 from histarchexplorer.services.search import SearchService
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
-app.search_service = SearchService(app)
 babel = Babel(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
@@ -86,16 +88,14 @@ def before_request() -> None:
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     session['language'] = get_locale()
+    g.language = session.get(
+        'language',
+        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
     g.main_images = get_main_image_table()
-    app.jinja_env.filters['capitalize_first'] = capitalize_first
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
-
-
-def capitalize_first(value: str) -> str:
-    if not value:
-        return ''
-    return value[0].upper() + value[1:]
+    g.config_classes = get_config_classes()
+    g.search_service = SearchService(app)
 
 
 @app.context_processor

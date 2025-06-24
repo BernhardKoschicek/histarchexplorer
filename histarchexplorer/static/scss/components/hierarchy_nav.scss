@@ -115,6 +115,10 @@ button.btn-whitish[disabled] {
   }
 }
 
+.hierarchy-card-label[data-system-class="person"] {
+  align-items: flex-start;
+}
+
 @media (min-width: 1921px) {
   .hierarchy-card-label {
     font-size: 1.4rem;
@@ -126,5 +130,24 @@ button.btn-whitish[disabled] {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
   display: grid;
-  height: calc(100vh - 106px);
+  min-height: calc(100vh - 106px);
 }
+
+.attribute-area {
+  //border: 1px solid black;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: rem(20);
+  max-width: 80%;
+  margin: auto;
+  display: grid;
+  margin-bottom: rem(20);
+
+  @media (min-width: 1921px) or (max-width: 769px) {
+    max-width: 90%;
+    margin: auto;
+    display: grid;
+    align-content: center;
+    align-items: center;
+  }}
+

@@ -12368,15 +12368,15 @@ textarea.form-control-lg {
   display: block;
   margin: 5px;
   position: absolute;
-  width: calc((100% - 45px) / 3);
+  width: calc((100% - 20px) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1400px) {
   .item {
-    width: calc((100% - 40px) / 2);
+    width: calc((100% - 20px) / 2);
   }
 }
 @media (max-width: 766px) {
@@ -12390,9 +12390,9 @@ textarea.form-control-lg {
   width: 66.6666666667%;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1400px) {
   .item-middle {
-    width: calc(100% - 20px);
+    width: 75%;
   }
 }
 @media (max-width: 766px) {
@@ -12400,9 +12400,26 @@ textarea.form-control-lg {
     width: calc(100% - 10px);
   }
 }
+.item-5-6 {
+  width: calc((100% - 20px) / 3 / 2 * 5 + 10px);
+}
+
+@media (max-width: 1400px) {
+  .item-5-6 {
+    width: calc((100% - 20px) / 4 * 3);
+  }
+}
+@media (max-width: 766px) {
+  .item-5-6 {
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+  }
+}
 .item-half {
   display: block;
   margin: 2.5px;
+  margin-top: 5px;
   position: absolute;
   width: calc(((100% - 30px) / 3 - 10px) / 2);
   max-height: fit-content;
@@ -12411,21 +12428,23 @@ textarea.form-control-lg {
   border-radius: 7.5px;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1400px) {
   .item-half {
-    width: calc(((100% - 20px) / 2 - 10px) / 2);
+    width: calc((100% - 25px) / 2 / 2);
   }
 }
 @media (max-width: 766px) {
   .item-half {
-    width: calc(100% - 10px);
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
   }
 }
 .item-wide {
   width: calc(100% - 30px);
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1400px) {
   .item-wide {
     width: calc(100% - 20px);
   }
@@ -12433,6 +12452,29 @@ textarea.form-control-lg {
 @media (max-width: 766px) {
   .item-wide {
     width: calc(100% - 10px);
+  }
+}
+@media (min-width: 767px) and (max-width: 992px) {
+  .item,
+  .item-half,
+  .item-middle,
+  .item-fit {
+    width: calc((100% - 20px) / 2);
+  }
+  .item-wide {
+    width: calc(100% - 10px);
+  }
+  .item-5-6 {
+    width: calc(100% - 10px);
+  }
+}
+@media (max-width: 766px) {
+  .item,
+  .item-half,
+  .item-middle,
+  .item-fit {
+    border-radius: 0;
+    padding-bottom: 0.625rem;
   }
 }
 .item-fit {
@@ -12516,9 +12558,15 @@ textarea.form-control-lg {
 
 .location {
   width: 100%;
-  height: calc(100vh - 106px);
+  height: calc(66.6vh - 106px);
 }
 
+@media (max-width: 766px) {
+  .location {
+    width: 100%;
+    height: calc(100vh - 106px);
+  }
+}
 #muuri-map {
   height: 100%;
   width: 100%;
@@ -12556,6 +12604,11 @@ textarea.form-control-lg {
   overflow: auto;
   margin-top: 1.5rem;
 }
+@media (max-height: 766px) {
+  #expand-button {
+    margin-top: 0px;
+  }
+}
 #expand-button i {
   font-size: 1.2rem;
 }
@@ -12567,8 +12620,9 @@ textarea.form-control-lg {
 }
 
 .entity-card__icon img {
-  max-width: 60%;
+  max-width: 80%;
   height: auto;
+  border-radius: 10px;
 }
 
 .super-entity {
@@ -12598,6 +12652,7 @@ textarea.form-control-lg {
 
 .entity-country {
   text-align: center;
+  heigth: auto;
 }
 
 @media (max-width: 992px) {
@@ -12777,6 +12832,10 @@ button.btn-whitish[disabled] {
     font-size: 2.5rem;
   }
 }
+.hierarchy-card-label[data-system-class=person] {
+  align-items: flex-start;
+}
+
 @media (min-width: 1921px) {
   .hierarchy-card-label {
     font-size: 1.4rem;
@@ -12786,7 +12845,26 @@ button.btn-whitish[disabled] {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
   display: grid;
-  height: calc(100vh - 106px);
+  min-height: calc(100vh - 106px);
+}
+
+.attribute-area {
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 1.25rem;
+  max-width: 80%;
+  margin: auto;
+  display: grid;
+  margin-bottom: 1.25rem;
+}
+@media (min-width: 1921px) or (max-width: 769px) {
+  .attribute-area {
+    max-width: 90%;
+    margin: auto;
+    display: grid;
+    align-content: center;
+    align-items: center;
+  }
 }
 
 #offcanvasSidebar .nav-pills .nav-item {
