@@ -12,12 +12,10 @@ from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.config import (
     get_config_data, update_jsonb_column)
-from histarchexplorer.database.config_classes import get_config_classes
 from histarchexplorer.database.config_properties import get_config_properties
 from histarchexplorer.database.map import get_base_map, get_base_map_by_id
-from histarchexplorer.database.settings import (get_hidden_entities,
-                                                get_map_settings,
-                                                get_shown_entities)
+from histarchexplorer.database.settings import (
+    get_hidden_entities, get_map_settings, get_shown_entities)
 from histarchexplorer.utils import helpers
 
 
@@ -59,96 +57,66 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     for row in config_list:
         row['name'] = helpers.get_translation(row['name'])
 
-    mainproject = []
-    projects = []
-    persons = []
-    institutions = []
-    roles = []
-
-    for row in get_config_classes():
-        if row.name in ['main-project']:
-            mainproject.append(row.id)
-        if row.name in ['project']:
-            projects.append(row.id)
-        if row.name in ['person']:
-            persons.append(row.id)
-        if row.name in ['institution']:
-            institutions.append(row.id)
-        if row.name in ['role']:
-            roles.append(row.id)
-
     tabs = [
         {
             'label': _('main-project'),
             'target': 'nav-main-project',
-            'filter': mainproject,
-            'id': 5
-
-        },
-        {
+            'id': g.config_classes['main-project']
+        }, {
             'label': _('projects'),
             'target': 'nav-projects',
-            'filter': projects,
-            'id': 1
-
-        },
-        {
+            'id': g.config_classes['project']
+        }, {
             'label': _('persons'),
             'target': 'nav-persons',
-            'filter': persons,
-            'id': 2
-        },
-        {
+            'id': g.config_classes['person']
+        }, {
             'label': _('institutions'),
             'target': 'nav-institutions',
-            'filter': institutions,
-            'id': 4
-        },
-        {
+            'id': g.config_classes['institution']
+        }, {
             'label': _('attributes'),
             'target': 'nav-attributes',
-            'filter': roles,
-            'id': 3
-        }
-    ]
-    #print(tabs)
+            'id': g.config_classes['role']}]
 
     g.cursor.execute("""
-               SELECT l.id     AS link_id, 
-               l.sortorder AS sortorder,
-       s.id     AS start_id,
-       s.name   AS start_name,
-       cp.name  AS config_property,
-       cp.id    AS property_id,
-       'direct' AS direction,
-       e.name   AS end_name,
-       e.id     AS end_id,
-       r.name   AS role,
-       r.id     AS role_id
-FROM tng.links l
-         JOIN tng.config s ON l.domain_id = s.id
-         JOIN tng.config e ON l.range_id = e.id
-         JOIN tng.config_properties cp ON l.property = cp.id
-         LEFT JOIN tng.config r ON l.attribute = r.id
-UNION ALL
-SELECT l.id        AS link_id, 
-        l.sortorder AS sortorder,
-       s.id        AS start_id,
-       s.name      AS start_name,
-       cp.name_inv AS config_property,
-       cp.id       AS property_id,
-       'inverse'   AS direction,
-       e.name      AS end_name,
-       e.id        AS end_id,
-       r.name      AS role,
-       r.id        AS role_id
-FROM tng.links l
-         JOIN tng.config s ON l.range_id = s.id
-         JOIN tng.config e ON l.domain_id = e.id
-         JOIN tng.config_properties cp ON l.property = cp.id
-         LEFT JOIN tng.config r ON l.attribute = r.id
-         ORDER BY sortorder
-    """)
+                     SELECT l.id        AS link_id,
+                            l.sortorder AS sortorder,
+                            s.id        AS start_id,
+                            s.name      AS start_name,
+                            cp.name     AS config_property,
+                            cp.id       AS property_id,
+                            'direct'    AS direction,
+                            e.name      AS end_name,
+                            e.id        AS end_id,
+                            r.name      AS role,
+                            r.id        AS role_id
+                     FROM tng.links l
+                              JOIN tng.config s ON l.domain_id = s.id
+                              JOIN tng.config e ON l.range_id = e.id
+                              JOIN tng.config_properties cp ON l.property =
+                                                               cp.id
+                              LEFT JOIN tng.config r ON l.attribute = r.id
+                     UNION ALL
+                     SELECT l.id        AS link_id,
+                            l.sortorder AS sortorder,
+                            s.id        AS start_id,
+                            s.name      AS start_name,
+                            cp.name_inv AS config_property,
+                            cp.id       AS property_id,
+                            'inverse'   AS direction,
+                            e.name      AS end_name,
+                            e.id        AS end_id,
+                            r.name      AS role,
+                            r.id        AS role_id
+                     FROM tng.links l
+                              JOIN tng.config s ON l.range_id = s.id
+                              JOIN tng.config e ON l.domain_id = e.id
+                              JOIN tng.config_properties cp ON l.property =
+                                                               cp.id
+                              LEFT JOIN tng.config r ON l.attribute = r.id
+                     ORDER BY sortorder
+                     """)
 
     links_data = g.cursor.fetchall()
 
@@ -238,17 +206,18 @@ def add_entry() -> Response:
             return redirect(url_for('admin') + current_tab)
 
         g.cursor.execute('''
-                   INSERT INTO tng.config (name, email, website, orcid_id, 
-                   image, config_class)
-                   VALUES (
-                    '{"de": "Stefan Eichert", "en": "Stefan Eichert"}'::jsonb,
-                    NULLIF(%s, ''),
-                    NULLIF(%s, ''),
-                    NULLIF(%s, ''),
-                    NULLIF(%s, ''),
-                    %s
-                ) RETURNING id
-               ''', (mail, website, orcid, image, tab_config_class))
+                         INSERT INTO tng.config (name, email, website,
+                                                 orcid_id,
+                                                 image, config_class)
+                         VALUES ('{"de": "Stefan Eichert", "en": "Stefan 
+                         Eichert"}'::jsonb,
+                                 NULLIF(%s, ''),
+                                 NULLIF(%s, ''),
+                                 NULLIF(%s, ''),
+                                 NULLIF(%s, ''),
+                                 %s)
+                         RETURNING id
+                         ''', (mail, website, orcid, image, tab_config_class))
 
         new_entry_id = g.cursor.fetchone()[0]
         config_id = new_entry_id
@@ -291,7 +260,7 @@ def delete_entry(tab: str, id_: int) -> Response:
 
 @app.route('/admin/delete_link/<link_id>/<tab>/<entry>')
 @login_required
-def delete_link(link_id: int,  tab: str, entry: str) -> Response:
+def delete_link(link_id: int, tab: str, entry: str) -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -314,8 +283,11 @@ def add_link(
     if current_user.group not in ['admin', 'manager']:
         abort(403)
     g.cursor.execute(
-        f'INSERT INTO tng.links (domain_id, range_id, property, attribute, sortorder) '
-        f'VALUES ({domain}, {range_}, {prop}, NULLIF({role}, 0), COALESCE((SELECT (sortorder + 1) FROM tng.links WHERE sortorder IS NOT NULL ORDER BY sortorder DESC LIMIT 1),1))')
+        f'INSERT INTO tng.links (domain_id, range_id, property, attribute, '
+        f'sortorder) '
+        f'VALUES ({domain}, {range_}, {prop}, NULLIF({role}, 0), COALESCE(('
+        f'SELECT (sortorder + 1) FROM tng.links WHERE sortorder IS NOT NULL '
+        f'ORDER BY sortorder DESC LIMIT 1),1))')
     flash('Link added successfully', 'success')
     return redirect(url_for('admin') + tab + '/' + entry)
 
@@ -345,13 +317,13 @@ def edit_entry() -> Response:
     image = request.form.get('image') or ''
 
     editsql = """
-        UPDATE  tng.config SET 
-            email = NULLIF(%(email)s, ''),
-            website = NULLIF(%(website)s, ''),
-            orcid_id = NULLIF(%(orcid_id)s, ''),
-            image = NULLIF(%(image)s, '')            
-        WHERE  id = %(id)s;
-    """
+              UPDATE tng.config
+              SET email    = NULLIF(%(email)s, ''),
+                  website  = NULLIF(%(website)s, ''),
+                  orcid_id = NULLIF(%(orcid_id)s, ''),
+                  image    = NULLIF(%(image)s, '')
+              WHERE id = %(id)s; \
+              """
     try:
         g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s',
                          {'id': int(config_id)})
@@ -390,14 +362,15 @@ def edit_map() -> Response:
     map_id = request.form.get('map_id')
 
     editsql = """
-        UPDATE tng.maps SET
-            name = NULLIF(%(name)s, ''),
-            display_name = NULLIF(%(display_name)s, ''),
-            sortorder = CASE WHEN %(sortorder)s = '' THEN NULL ELSE CAST(%(
-            sortorder)s AS integer) END,
-            tilestring = NULLIF(%(tilestring)s, '')
-        WHERE id = %(map_id)s
-    """
+              UPDATE tng.maps
+              SET name         = NULLIF(%(name)s, ''),
+                  display_name = NULLIF(%(display_name)s, ''),
+                  sortorder    = CASE
+                                     WHEN %(sortorder)s = '' THEN NULL
+                                     ELSE CAST(%(sortorder)s AS integer) END,
+                  tilestring   = NULLIF(%(tilestring)s, '')
+              WHERE id = %(map_id)s \
+              """
 
     try:
         g.cursor.execute('SELECT id FROM tng.maps WHERE id = %(map_id)s',
@@ -433,9 +406,11 @@ def add_map() -> Response:
 
     try:
         g.cursor.execute('''
-            INSERT INTO tng.maps (name, display_name, sortorder, tilestring)
-            VALUES (%s, %s, %s, %s) RETURNING id
-        ''', (name, displayname, inputorder, description))
+                         INSERT INTO tng.maps (name, display_name,
+                                               sortorder, tilestring)
+                         VALUES (%s, %s, %s, %s)
+                         RETURNING id
+                         ''', (name, displayname, inputorder, description))
 
         new_map_id = g.cursor.fetchone()[0]
 
@@ -492,6 +467,7 @@ def select_entities() -> Response:
 
     return redirect(url_for('admin'))
 
+
 @app.route('/admin/deselect_entities', methods=['GET', 'POST'])
 def deselect_entities() -> Response:
     if request.method == 'POST':
@@ -517,7 +493,6 @@ def reset() -> Response:
 
     return redirect(url_for('admin'))
 
-
 # @app.route('/sortlinks', methods=['POST'])
 # def sort_links() -> Response:
 #     @login_required
@@ -531,6 +506,7 @@ def reset() -> Response:
 #
 #     for row in criteria:
 #         g.cursor.execute(
-#             f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(id)s',
+#             f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(
+#             id)s',
 #             {'id': row['id'], 'order': row['order'], 'table': table})
 #     return jsonify({'status': 'ok'})
