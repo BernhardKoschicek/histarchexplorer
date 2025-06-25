@@ -21,6 +21,11 @@ def index() -> str:
         map_data=map_data,
         view_classes=view_classes)
 
+@app.route('/prototype')
+def prototype() -> str:
+    return render_template('prototyppage.html')
+
+
 
 @app.route('/language=<language>')
 def set_language(language: Optional[str] = None) -> Response:
