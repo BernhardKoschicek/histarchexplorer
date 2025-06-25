@@ -33,7 +33,7 @@ class RelationshipLabel:
 
 @dataclass()
 class ConfigEntity:
-    id_: int
+    id: int
     name: dict[str, str | dict[str, str]]
     description: dict[str, str | dict[str, str]]
     website: str
@@ -55,7 +55,7 @@ class ConfigEntity:
 
         for entry in get_config_entities():
             entities.append(ConfigEntity(
-                id_=entry.id,
+                id=entry.id,
                 name=add_display(entry.name),
                 description=add_display(entry.description),
                 website=entry.website,

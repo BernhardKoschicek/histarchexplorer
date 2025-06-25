@@ -37,7 +37,7 @@
                 <p>{{ person.name.display.label }}</p>
               </div>
               <ul class="list-unstyled">
-                {% for attribute in person.attributes[project.id_] %}
+                {% for attribute in person.attributes[project.id] %}
                   <li>{{ attribute | capitalize }}</li>
                 {% endfor %}
                 {% if person.email %}
@@ -72,7 +72,7 @@
         {% for institution in institutions %}
           <div class="col-md-3 text-center">
             <h6 class="pt-3 fst-italic">
-              {{ institution.attributes[project.id_] | join('</br>') | safe }}
+              {{ institution.attributes[project.id] | join('</br>') | safe }}
             </h6>
             {% if institution.image %}
               <a href="{{ institution.website if institution.website }}"
