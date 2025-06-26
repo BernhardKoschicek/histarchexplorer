@@ -29,13 +29,13 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                             l.sortorder AS sortorder,
                             s.id        AS start_id,
                             s.name      AS start_name,
-                            cp.name     AS relationship,
+                            cp.name     AS config_property,
                             cp.id       AS property_id,
                             'direct'    AS direction,
                             e.name      AS end_name,
                             e.id        AS end_id,
-                            r.name      AS attribute,
-                            r.id        AS attribute_id
+                            r.name      AS role,
+                            r.id        AS role_id
                      FROM tng.links l
                               JOIN tng.entities s ON l.domain_id = s.id
                               JOIN tng.entities e ON l.range_id = e.id
@@ -47,13 +47,13 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                             l.sortorder AS sortorder,
                             s.id        AS start_id,
                             s.name      AS start_name,
-                            cp.name_inv AS relationship,
+                            cp.name_inv AS config_property,
                             cp.id       AS property_id,
                             'inverse'   AS direction,
                             e.name      AS end_name,
                             e.id        AS end_id,
-                            r.name      AS attribute,
-                            r.id        AS attribute_id
+                            r.name      AS role,
+                            r.id        AS role_id
                      FROM tng.links l
                               JOIN tng.entities s ON l.range_id = s.id
                               JOIN tng.entities e ON l.domain_id = e.id
@@ -74,9 +74,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     for row in links_list:
         row['start_name'] = helpers.get_translation(row['start_name'])
         row['end_name'] = helpers.get_translation(row['end_name'])
-        row['relationship'] = helpers.get_translation(
-            row['relationship'])
-        row['attribute'] = helpers.get_translation(row['attribute'])
+        row['config_property'] = helpers.get_translation(
+            row['config_property'])
+        row['role'] = helpers.get_translation(row['role'])
 
     class_items = {
         k: v for k, v in get_entities_count_by_case_study().items()

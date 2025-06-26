@@ -350,7 +350,7 @@
                                     <input type="text"
                                            class="form-control me-2"
                                            disabled
-                                           value="{{ link.relationship.label }}">
+                                           value="{{ link.config_property['label'] }}">
                                     <input type="text"
                                            class="form-control me-2"
                                            disabled
@@ -358,10 +358,10 @@
                                     <input type="text"
                                            class="form-control me-2"
                                            disabled
-                                           value="{{ link.attribute['label'] }}">
+                                           value="{{ link.role['label'] }}">
                                     <button class="btn btn-danger"
                                             id='delete{{ link.id }}'
-                                            onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name.label }}', '{{ link.relationship.label }}', '{{ link.end_name.label }}', '{{ tab.target }}', '{{ tab.target + entry.id|string }}', )"
+                                            onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name.label }}', '{{ link.config_property.label }}', '{{ link.end_name.label }}', '{{ tab.target }}', '{{ tab.target + entry.id|string }}', )"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteModal"
                                             style="min-width: 125px">{{ _('Delete') }}
