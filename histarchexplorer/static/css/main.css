@@ -12510,6 +12510,17 @@ textarea.form-control-lg {
   position: relative;
 }
 
+.image {
+  position: relative;
+}
+.image .hover-max {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+.image:hover .hover-max {
+  opacity: 1;
+}
+
 .tile-label {
   font-size: 1.3em;
   font-weight: bold;

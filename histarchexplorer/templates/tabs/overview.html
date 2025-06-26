@@ -237,46 +237,59 @@
 
 
   <!-- First image -->
-  {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
-    <div class="item-half">
-      <div class="item-content item-content-full">
-        <div class="muuri-images">
-          <div class="image">
-            {% if main_image.iiif_base_path %}
-              <img src="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
-                   alt="{{ main_image.title }}">
-            {% else %}
-              <img src="{{ main_image.url }}"
-                   alt="{{ main_image.title }}">
-            {% endif %}
-          </div>
+{% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
+  <div class="item-half">
+    <div class="item-content item-content-full">
+      <div class="muuri-images">
+        <div class="image position-relative">
+          {% if main_image.iiif_base_path %}
+            <a href="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
+               target="_blank"
+               class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
+               style="z-index: 10;">
+              <i class="bi bi-arrows-fullscreen"></i>
+            </a>
+            <img src="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
+                 alt="{{ main_image.title }}">
+          {% else %}
+            <img src="{{ main_image.url }}"
+                 alt="{{ main_image.title }}">
+          {% endif %}
         </div>
       </div>
     </div>
-  {% endif %}
+  </div>
+{% endif %}
 
 
-
-  <!-- All other images -->
-  {% if initial_images %}
-    {% for depiction in initial_images %}
-      <div class="{% if loop.index0 < 3 %}item-half{% else %}item{% endif %}">
-        <div class="item-content item-content-full">
-          <div class="image">
-            <img
-                src="{% if depiction.iiif_base_path %}
-                      {{ depiction.iiif_base_path }}/full/max/0/default.jpg
-                    {% else %}
-                      {{ depiction.url }}
-                    {% endif %}"
-                alt="{{ depiction.title }}"
-            />
+<!-- All other images -->
+{% if initial_images %}
+  {% for depiction in initial_images %}
+    <div class="{% if loop.index0 < 3 %}item-half{% else %}item{% endif %}">
+      <div class="item-content item-content-full">
+        <div class="image position-relative">
+          {% if depiction.iiif_base_path %}
+            <a href="{{ depiction.iiif_base_path }}/full/max/0/default.jpg"
+               target="_blank"
+               class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
+               style="z-index: 10;">
+              <i class="bi bi-arrows-fullscreen"></i>
             </a>
-          </div>
+          {% endif %}
+          <img
+            src="{% if depiction.iiif_base_path %}
+                   {{ depiction.iiif_base_path }}/full/max/0/default.jpg
+                 {% else %}
+                   {{ depiction.url }}
+                 {% endif %}"
+            alt="{{ depiction.title }}"
+          />
         </div>
       </div>
-    {% endfor %}
-  {% endif %}
+    </div>
+  {% endfor %}
+{% endif %}
+
 
 
   <!-- Bibliography and External References -->
