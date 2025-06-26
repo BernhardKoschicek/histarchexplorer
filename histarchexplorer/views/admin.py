@@ -13,7 +13,6 @@ from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.services.admin import Admin, EntryNotFound
-from histarchexplorer.utils import helpers
 from histarchexplorer.utils.view_util import construct_admin_tabs
 
 
@@ -23,73 +22,16 @@ from histarchexplorer.utils.view_util import construct_admin_tabs
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     check_manager_user()
-    print(g.config_properties)
-    g.cursor.execute("""
-                     SELECT l.id        AS link_id,
-                            l.sortorder AS sortorder,
-                            s.id        AS start_id,
-                            s.name      AS start_name,
-                            cp.name     AS config_property,
-                            cp.id       AS property_id,
-                            'direct'    AS direction,
-                            e.name      AS end_name,
-                            e.id        AS end_id,
-                            r.name      AS role,
-                            r.id        AS role_id
-                     FROM tng.links l
-                              JOIN tng.entities s ON l.domain_id = s.id
-                              JOIN tng.entities e ON l.range_id = e.id
-                              JOIN tng.properties cp ON l.property =
-                                                               cp.id
-                              LEFT JOIN tng.entities r ON l.attribute = r.id
-                     UNION ALL
-                     SELECT l.id        AS link_id,
-                            l.sortorder AS sortorder,
-                            s.id        AS start_id,
-                            s.name      AS start_name,
-                            cp.name_inv AS config_property,
-                            cp.id       AS property_id,
-                            'inverse'   AS direction,
-                            e.name      AS end_name,
-                            e.id        AS end_id,
-                            r.name      AS role,
-                            r.id        AS role_id
-                     FROM tng.links l
-                              JOIN tng.entities s ON l.range_id = s.id
-                              JOIN tng.entities e ON l.domain_id = e.id
-                              JOIN tng.properties cp ON l.property =
-                                                               cp.id
-                              LEFT JOIN tng.entities r ON l.attribute = r.id
-                     ORDER BY sortorder
-                     """)
-
-    links_data = g.cursor.fetchall()
-
-    colnames = [desc[0] for desc in g.cursor.description]
-
-    links_list = [dict(zip(colnames, row)) for row in links_data]
-
-    print(links_list)
-
-    for row in links_list:
-        row['start_name'] = helpers.get_translation(row['start_name'])
-        row['end_name'] = helpers.get_translation(row['end_name'])
-        row['config_property'] = helpers.get_translation(
-            row['config_property'])
-        row['role'] = helpers.get_translation(row['role'])
-
     class_items = {
         k: v for k, v in get_entities_count_by_case_study().items()
         if k not in app.config['CLASSES_TO_SKIP']}
-
-    print(g.config_entities)
     return render_template(
         "admin.html",
         entities=g.config_entities,
         tabs=construct_admin_tabs(),
         activetab=tab,
         activeentry=entry,
-        links_data=links_list,
+        links_data=g.config_links,
         properties=g.config_properties,
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
@@ -157,19 +99,17 @@ def add_entry() -> Response:
 
     current_tab = 'nav-' + form_data['category']
     redirect_base = url_for('admin') + current_tab
-
-    try:
-        new_id = Admin.add_entry(form_data)
-        flash(_('Entry added successfully!'), 'success')
-        return redirect(f"{redirect_base}/{current_tab}{new_id}")
-
-    except Admin.TooManyMainProjects:
-        flash(
-            f'Error adding entry {form_data["name"]}: '
-            'Only one main project allowed',
-            'danger')
-    except Exception as e:
-        flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
+    #try:
+    new_id = Admin.add_entry(form_data)
+    flash(_('Entry added successfully!'), 'success')
+    return redirect(f"{redirect_base}/{current_tab}{new_id}")
+    #except Admin.TooManyMainProjects:
+    #    flash(
+    #        f'Error adding entry {form_data["name"]}: '
+    #        'Only one main project allowed',
+    #        'danger')
+    #except Exception as e:
+    #    flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
 
     return redirect(redirect_base)
 

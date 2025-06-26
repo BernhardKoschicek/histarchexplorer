@@ -350,18 +350,18 @@
                                     <input type="text"
                                            class="form-control me-2"
                                            disabled
-                                           value="{{ link.config_property['label'] }}">
+                                           value="{{ link.config_property.display.label }}">
                                     <input type="text"
                                            class="form-control me-2"
                                            disabled
-                                           value="{{ link.end_name['label'] }}">
+                                           value="{{ link.end_name.display.label }}">
                                     <input type="text"
                                            class="form-control me-2"
                                            disabled
-                                           value="{{ link.role['label'] }}">
+                                           value="{{ link.role.display.label }}">
                                     <button class="btn btn-danger"
                                             id='delete{{ link.id }}'
-                                            onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name.label }}', '{{ link.config_property.label }}', '{{ link.end_name.label }}', '{{ tab.target }}', '{{ tab.target + entry.id|string }}', )"
+                                            onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name.display.label }}', '{{ link.config_property.display.label }}', '{{ link.end_name.display.label }}', '{{ tab.target }}', '{{ tab.target + entry.id|string }}', )"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteModal"
                                             style="min-width: 125px">{{ _('Delete') }}

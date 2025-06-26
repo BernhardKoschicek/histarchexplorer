@@ -1,7 +1,7 @@
 from typing import Any
 
 from histarchexplorer.database.admin import (
-    add_link, add_new_map, check_sortorder, create_config_entry, delete_entry,
+    add_link, add_new_map, check_sortorder, add_entry, delete_entry,
     delete_link,
     delete_map,
     get_config_class_by_id, set_hidden_entities,
@@ -43,7 +43,7 @@ class Admin:
 
     @staticmethod
     def add_entry(data: dict) -> int:
-        return create_config_entry(data)
+        return add_entry(data)
 
     @staticmethod
     def edit_entry(data: dict) -> None:
@@ -62,7 +62,7 @@ class Admin:
         return check_sortorder()
 
     @staticmethod
-    def get_config_config_types_by_id(id_: int) -> int | None:
+    def get_config_config_classes_by_id(id_: int) -> int | None:
         return get_config_class_by_id(id_)
 
     @staticmethod

@@ -13,6 +13,45 @@ from histarchexplorer.database.config import check_if_config_entry_exist
 #        FROM tng.properties''')
 #    return g.cursor.fetchall()
 
+def get_config_links() -> Any:
+    g.cursor.execute(
+        """
+        SELECT l.id        AS link_id,
+               l.sortorder AS sortorder,
+               s.id        AS start_id,
+               s.name      AS start_name,
+               cp.name     AS config_property,
+               cp.id       AS property_id,
+               'direct'    AS direction,
+               e.name      AS end_name,
+               e.id        AS end_id,
+               r.name      AS role,
+               r.id        AS role_id
+        FROM tng.links l
+                 JOIN tng.entities s ON l.domain_id = s.id
+                 JOIN tng.entities e ON l.range_id = e.id
+                 JOIN tng.properties cp ON l.property = cp.id
+                 LEFT JOIN tng.entities r ON l.attribute = r.id
+        UNION ALL
+        SELECT l.id        AS link_id,
+               l.sortorder AS sortorder,
+               s.id        AS start_id,
+               s.name      AS start_name,
+               cp.name_inv AS config_property,
+               cp.id       AS property_id,
+               'inverse'   AS direction,
+               e.name      AS end_name,
+               e.id        AS end_id,
+               r.name      AS role,
+               r.id        AS role_id
+        FROM tng.links l
+                 JOIN tng.entities s ON l.range_id = s.id
+                 JOIN tng.entities e ON l.domain_id = e.id
+                 JOIN tng.properties cp ON l.property = cp.id
+                 LEFT JOIN tng.entities r ON l.attribute = r.id
+        ORDER BY sortorder
+        """)
+    return g.cursor.fetchall()
 
 def get_config_properties() -> Any:
     g.cursor.execute(
@@ -107,29 +146,32 @@ def delete_entry(id_: int) -> None:
         {'id': id_})
 
 
-def create_config_entry(data: dict) -> int:
-    config_class = g.config_types_map.get(data['category'])
+def add_entry(data: dict) -> int:
+    # todo: fix add new entry. It is a database problem
+    print(data)
+    config_class = g.config_classes_map.get(data['category'])
     if config_class is None:
         raise ValueError(f"Unknown category {data['category']}")
     if config_class == 5 and check_if_main_project_exist():
         raise 404
-
+    print(config_class)
     g.cursor.execute(
         """
-        INSERT INTO tng.config
-        (email, website, orcid_id, image, config_type)
+        INSERT INTO tng.entities
+        (email, website, orcid_id, image, class_id)
         VALUES (NULLIF(%(email)s, ''),
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
                 NULLIF(%(image)s, ''),
-                %(config_type)s)
+                %(class_id)s)
         RETURNING id
         """, {
             'email': data.get('email'),
             'website': data.get('website'),
             'orcid_id': data.get('orcid_id'),
             'image': data.get('image'),
-            'config_class': config_class})
+            'class_id': config_class})
+
     id_ = g.cursor.fetchone()[0]
     _upsert_jsonb_fields(id_, data)
 
@@ -143,7 +185,7 @@ def update_config_entry(data: dict) -> None:
 
     g.cursor.execute(
         """
-        UPDATE tng.config
+        UPDATE tng.entities
         SET email    = NULLIF(%(email)s, ''),
             website  = NULLIF(%(website)s, ''),
             orcid_id = NULLIF(%(orcid_id)s, ''),
@@ -162,7 +204,7 @@ def _upsert_jsonb_fields(config_id: int, data: dict) -> None:
         if val:
             g.cursor.execute(
                 f"""
-                UPDATE tng.config
+                UPDATE tng.entities
                    SET {col} = jsonb_set(
                                  COALESCE({col}, '{{}}'),
                                  %(path)s,
@@ -176,7 +218,7 @@ def _upsert_jsonb_fields(config_id: int, data: dict) -> None:
         else:
             g.cursor.execute(
                 f"""
-                UPDATE tng.config
+                UPDATE tng.entities
                    SET {col} = COALESCE({col}, '{{}}') - %(key)s
                  WHERE id = %(config_id)s
                 """, {

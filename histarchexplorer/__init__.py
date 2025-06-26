@@ -7,9 +7,8 @@ from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.services.config import get_config_classes
-from histarchexplorer.services.config_entities import ConfigEntity, \
-    Properties
+from histarchexplorer.services.config import ConfigEntity, Link, Properties, \
+    get_config_classes
 from histarchexplorer.services.search import SearchService
 from histarchexplorer.services.settings import Settings
 
@@ -100,6 +99,7 @@ def before_request() -> None:
     g.type_divisions = get_type_divisions()
     g.config_classes = get_config_classes()
     g.config_properties = Properties.get_all()
+    g.config_links = Link.get_all()
     g.settings = Settings.initialize_settings()
     # Todo: this is basically the same as
     #   config_classes but with 's' and attributes instead of attribute
