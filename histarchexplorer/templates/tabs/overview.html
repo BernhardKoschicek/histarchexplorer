@@ -249,7 +249,7 @@
                style="z-index: 10;">
               <i class="bi bi-arrows-fullscreen"></i>
             </a>
-            <img src="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
+            <img src="{{ main_image.iiif_base_path }}/full/400,/0/default.jpg"
                  alt="{{ main_image.title }}">
           {% else %}
             <img src="{{ main_image.url }}"
@@ -278,7 +278,7 @@
           {% endif %}
           <img
             src="{% if depiction.iiif_base_path %}
-                   {{ depiction.iiif_base_path }}/full/max/0/default.jpg
+                   {{ depiction.iiif_base_path }}/full/400,/0/default.jpg
                  {% else %}
                    {{ depiction.url }}
                  {% endif %}"
