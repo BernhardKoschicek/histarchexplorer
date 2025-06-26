@@ -16,38 +16,28 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE IF EXISTS ONLY tng.relationship_labels DROP CONSTRAINT IF EXISTS relationship_labels_range_id_fkey;
-ALTER TABLE IF EXISTS ONLY tng.relationship_labels DROP CONSTRAINT IF EXISTS relationship_labels_domain_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_range_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS config_config_classes_fk;
 DROP TRIGGER IF EXISTS delete_links_trigger ON tng.entities;
-DROP TRIGGER IF EXISTS delete_links_trigger ON tng.config;
 ALTER TABLE IF EXISTS ONLY tng.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY tng.maps DROP CONSTRAINT IF EXISTS maps_pkey;
 ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_pkey;
-ALTER TABLE IF EXISTS ONLY tng.relationship_labels DROP CONSTRAINT IF EXISTS config_properties_pkey;
+ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS config_properties_pkey;
 ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS config_pkey;
-ALTER TABLE IF EXISTS ONLY tng.types DROP CONSTRAINT IF EXISTS config_classes_pkey;
+ALTER TABLE IF EXISTS ONLY tng.classes DROP CONSTRAINT IF EXISTS config_classes_pkey;
 ALTER TABLE IF EXISTS tng.settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.maps ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.links ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS tng.config_properties ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS tng.config_classes ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS tng.config ALTER COLUMN id DROP DEFAULT;
-DROP TABLE IF EXISTS tng.types;
 DROP SEQUENCE IF EXISTS tng.settings_id_seq;
 DROP TABLE IF EXISTS tng.settings;
-DROP TABLE IF EXISTS tng.relationship_labels;
+DROP TABLE IF EXISTS tng.properties;
 DROP SEQUENCE IF EXISTS tng.maps_id_seq;
 DROP TABLE IF EXISTS tng.maps;
 DROP SEQUENCE IF EXISTS tng.links_id_seq;
 DROP TABLE IF EXISTS tng.links;
 DROP TABLE IF EXISTS tng.entities;
-DROP SEQUENCE IF EXISTS tng.config_properties_id_seq;
-DROP TABLE IF EXISTS tng.config_properties;
-DROP SEQUENCE IF EXISTS tng.config_id_seq;
-DROP SEQUENCE IF EXISTS tng.config_classes_id_seq;
-DROP TABLE IF EXISTS tng.config_classes;
-DROP TABLE IF EXISTS tng.config;
+DROP TABLE IF EXISTS tng.classes;
 DROP FUNCTION IF EXISTS tng.getdates(first timestamp without time zone, last timestamp without time zone, comment text);
 DROP FUNCTION IF EXISTS tng.delete_links_on_config_delete();
 DROP SCHEMA IF EXISTS tng;
@@ -109,131 +99,27 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: config; Type: TABLE; Schema: tng; Owner: openatlas
+-- Name: classes; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
-CREATE TABLE tng.config (
+CREATE TABLE tng.classes (
     id integer NOT NULL,
-    name jsonb,
-    description jsonb,
-    address jsonb,
-    config_class integer,
-    email text,
-    orcid_id text,
-    image text,
-    website text,
-    legal_notice jsonb,
-    imprint jsonb
+    name text
 );
 
 
-ALTER TABLE tng.config OWNER TO openatlas;
-
---
--- Name: config_classes; Type: TABLE; Schema: tng; Owner: openatlas
---
-
-CREATE TABLE tng.config_classes (
-    id integer NOT NULL,
-    name text,
-    description text
-);
-
-
-ALTER TABLE tng.config_classes OWNER TO openatlas;
-
---
--- Name: config_classes_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
---
-
-CREATE SEQUENCE tng.config_classes_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE tng.config_classes_id_seq OWNER TO openatlas;
-
---
--- Name: config_classes_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: openatlas
---
-
-ALTER SEQUENCE tng.config_classes_id_seq OWNED BY tng.config_classes.id;
-
-
---
--- Name: config_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
---
-
-CREATE SEQUENCE tng.config_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE tng.config_id_seq OWNER TO openatlas;
-
---
--- Name: config_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: openatlas
---
-
-ALTER SEQUENCE tng.config_id_seq OWNED BY tng.config.id;
-
-
---
--- Name: config_properties; Type: TABLE; Schema: tng; Owner: openatlas
---
-
-CREATE TABLE tng.config_properties (
-    id integer NOT NULL,
-    name jsonb,
-    name_inv jsonb,
-    description jsonb,
-    domain integer,
-    range integer
-);
-
-
-ALTER TABLE tng.config_properties OWNER TO openatlas;
-
---
--- Name: config_properties_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
---
-
-CREATE SEQUENCE tng.config_properties_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE tng.config_properties_id_seq OWNER TO openatlas;
-
---
--- Name: config_properties_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: openatlas
---
-
-ALTER SEQUENCE tng.config_properties_id_seq OWNED BY tng.config_properties.id;
-
+ALTER TABLE tng.classes OWNER TO openatlas;
 
 --
 -- Name: entities; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
 CREATE TABLE tng.entities (
-    id integer DEFAULT nextval('tng.config_id_seq'::regclass) NOT NULL,
+    id integer NOT NULL,
     name jsonb,
     description jsonb,
     address jsonb,
-    type integer,
+    class_id integer,
     email text,
     orcid_id text,
     image text,
@@ -321,11 +207,11 @@ ALTER SEQUENCE tng.maps_id_seq OWNED BY tng.maps.id;
 
 
 --
--- Name: relationship_labels; Type: TABLE; Schema: tng; Owner: openatlas
+-- Name: properties; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
-CREATE TABLE tng.relationship_labels (
-    id integer DEFAULT nextval('tng.config_properties_id_seq'::regclass) NOT NULL,
+CREATE TABLE tng.properties (
+    id integer NOT NULL,
     name jsonb,
     name_inv jsonb,
     domain_type_id integer,
@@ -333,7 +219,7 @@ CREATE TABLE tng.relationship_labels (
 );
 
 
-ALTER TABLE tng.relationship_labels OWNER TO openatlas;
+ALTER TABLE tng.properties OWNER TO openatlas;
 
 --
 -- Name: settings; Type: TABLE; Schema: tng; Owner: openatlas
@@ -379,39 +265,6 @@ ALTER SEQUENCE tng.settings_id_seq OWNED BY tng.settings.id;
 
 
 --
--- Name: types; Type: TABLE; Schema: tng; Owner: openatlas
---
-
-CREATE TABLE tng.types (
-    id integer DEFAULT nextval('tng.config_classes_id_seq'::regclass) NOT NULL,
-    name text
-);
-
-
-ALTER TABLE tng.types OWNER TO openatlas;
-
---
--- Name: config id; Type: DEFAULT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.config ALTER COLUMN id SET DEFAULT nextval('tng.config_id_seq'::regclass);
-
-
---
--- Name: config_classes id; Type: DEFAULT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.config_classes ALTER COLUMN id SET DEFAULT nextval('tng.config_classes_id_seq'::regclass);
-
-
---
--- Name: config_properties id; Type: DEFAULT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.config_properties ALTER COLUMN id SET DEFAULT nextval('tng.config_properties_id_seq'::regclass);
-
-
---
 -- Name: links id; Type: DEFAULT; Schema: tng; Owner: openatlas
 --
 
@@ -433,10 +286,10 @@ ALTER TABLE ONLY tng.settings ALTER COLUMN id SET DEFAULT nextval('tng.settings_
 
 
 --
--- Name: types config_classes_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: classes config_classes_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.types
+ALTER TABLE ONLY tng.classes
     ADD CONSTRAINT config_classes_pkey PRIMARY KEY (id);
 
 
@@ -449,10 +302,10 @@ ALTER TABLE ONLY tng.entities
 
 
 --
--- Name: relationship_labels config_properties_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: properties config_properties_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.relationship_labels
+ALTER TABLE ONLY tng.properties
     ADD CONSTRAINT config_properties_pkey PRIMARY KEY (id);
 
 
@@ -481,13 +334,6 @@ ALTER TABLE ONLY tng.settings
 
 
 --
--- Name: config delete_links_trigger; Type: TRIGGER; Schema: tng; Owner: openatlas
---
-
-CREATE TRIGGER delete_links_trigger BEFORE DELETE ON tng.config FOR EACH ROW EXECUTE FUNCTION tng.delete_links_on_config_delete();
-
-
---
 -- Name: entities delete_links_trigger; Type: TRIGGER; Schema: tng; Owner: openatlas
 --
 
@@ -499,23 +345,23 @@ CREATE TRIGGER delete_links_trigger BEFORE DELETE ON tng.entities FOR EACH ROW E
 --
 
 ALTER TABLE ONLY tng.entities
-    ADD CONSTRAINT config_config_classes_fk FOREIGN KEY (type) REFERENCES tng.types(id);
+    ADD CONSTRAINT config_config_classes_fk FOREIGN KEY (class_id) REFERENCES tng.classes(id);
 
 
 --
--- Name: relationship_labels relationship_labels_domain_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: properties relationship_labels_domain_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.relationship_labels
-    ADD CONSTRAINT relationship_labels_domain_id_fkey FOREIGN KEY (domain_type_id) REFERENCES tng.types(id) NOT VALID;
+ALTER TABLE ONLY tng.properties
+    ADD CONSTRAINT relationship_labels_domain_id_fkey FOREIGN KEY (domain_type_id) REFERENCES tng.classes(id) NOT VALID;
 
 
 --
--- Name: relationship_labels relationship_labels_range_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: properties relationship_labels_range_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.relationship_labels
-    ADD CONSTRAINT relationship_labels_range_id_fkey FOREIGN KEY (range_type_id) REFERENCES tng.types(id) NOT VALID;
+ALTER TABLE ONLY tng.properties
+    ADD CONSTRAINT relationship_labels_range_id_fkey FOREIGN KEY (range_type_id) REFERENCES tng.classes(id) NOT VALID;
 
 
 --

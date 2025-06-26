@@ -10,7 +10,7 @@ from histarchexplorer.database.config import check_if_config_entry_exist
 #    g.cursor.execute(
 #        '''
 #        SELECT id, name, name_inv, domain_type_id, range_type_id
-#        FROM tng.relationship_labels''')
+#        FROM tng.properties''')
 #    return g.cursor.fetchall()
 
 
@@ -18,15 +18,15 @@ def get_config_properties() -> Any:
     g.cursor.execute(
         '''
         SELECT id, name, domain_type_id, range_type_id, 'direct' AS direction
-        FROM tng.relationship_labels
+        FROM tng.properties
         UNION ALL
         SELECT id, name_inv, range_type_id, domain_type_id, 'inverse' AS direction
-        FROM tng.relationship_labels''')
+        FROM tng.properties''')
     return g.cursor.fetchall()
 
 
 
-def get_config_type_class_by_id(id_: int) -> int | None:
+def get_config_class_by_id(id_: int) -> int | None:
     g.cursor.execute(
         'SELECT type FROM tng.entities WHERE id = %s',
         (id_,))
@@ -97,22 +97,21 @@ def update_map(data: dict[str, str]) -> None:
 
 
 def check_if_main_project_exist() -> bool:
-    g.cursor.execute("SELECT 1 FROM tng.entitiesWHERE config_class = 5 LIMIT 1")
+    g.cursor.execute("SELECT 1 FROM tng.entities WHERE config_class = 5 LIMIT 1")
     return g.cursor.fetchone() is not None
 
 
 def delete_entry(id_: int) -> None:
     g.cursor.execute(
-        'DELETE FROM tng.entitiesWHERE id = %(id)s',
+        'DELETE FROM tng.entities WHERE id = %(id)s',
         {'id': id_})
 
 
 def create_config_entry(data: dict) -> int:
-    config_type = g.config_types_map.get(data['category'])
-    if config_type is None:
+    config_class = g.config_types_map.get(data['category'])
+    if config_class is None:
         raise ValueError(f"Unknown category {data['category']}")
-
-    if config_type == 5 and check_if_main_project_exist():
+    if config_class == 5 and check_if_main_project_exist():
         raise 404
 
     g.cursor.execute(
@@ -130,7 +129,7 @@ def create_config_entry(data: dict) -> int:
             'website': data.get('website'),
             'orcid_id': data.get('orcid_id'),
             'image': data.get('image'),
-            'config_type': config_type})
+            'config_class': config_class})
     id_ = g.cursor.fetchone()[0]
     _upsert_jsonb_fields(id_, data)
 

@@ -39,12 +39,12 @@ class ConfigEntity:
     website: str
     legal_notice: dict[str, str | dict[str, str]]
     imprint: dict[str, str | dict[str, str]]
-    type: int
+    class_id: int
     address: dict[str, str | dict[str, str]]
     email: str
     image: str
     orcid_id: str
-    type_name: str
+    class_name: str
     attributes: dict[int, list[str]] | None
     main_project: bool
     affiliations: list[dict[str, Any]] | None
@@ -61,29 +61,29 @@ class ConfigEntity:
                 website=entry.website,
                 legal_notice=add_display(entry.legal_notice),
                 imprint=add_display(entry.imprint),
-                type=entry.type,
+                class_id=entry.class_id,
                 address=add_display(entry.address),
                 email=entry.email,
                 image=entry.image,
                 orcid_id=entry.orcid_id,
-                type_name=entry.type_name,
-                main_project=(entry.type_name == 'main-project'),
+                class_name=entry.class_name,
+                main_project=(entry.class_name == 'main-project'),
                 attributes=get_project_roles(
                     entry.id,
-                    entry.type),
+                    entry.class_id),
                 affiliations=get_person_affiliations(entry.id)
-                if entry.type_name == 'person' else None
+                if entry.class_name == 'person' else None
             ))
 
         return entities
     @classmethod
-    def group_by_type_name(
+    def group_by_class_name(
             cls,
             entities: list['ConfigEntity']) \
             -> dict[str, list['ConfigEntity']]:
         grouped = {}
         for entity in entities:
-            grouped.setdefault(entity.type_name, []).append(entity)
+            grouped.setdefault(entity.class_name, []).append(entity)
         return grouped
 
 

@@ -7,7 +7,7 @@ from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.services.config import get_config_types
+from histarchexplorer.services.config import get_config_classes
 from histarchexplorer.services.config_entities import ConfigEntity, \
     RelationshipLabel
 from histarchexplorer.services.search import SearchService
@@ -98,12 +98,12 @@ def before_request() -> None:
     g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
-    g.config_types = get_config_types()
-    g.config_relationship_labels = RelationshipLabel.get_all()
+    g.config_classes = get_config_classes()
+    g.config_properties = RelationshipLabel.get_all()
     g.settings = Settings.initialize_settings()
     # Todo: this is basically the same as
     #   config_classes but with 's' and attributes instead of attribute
-    g.config_types_map = {
+    g.config_classes_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
         'persons': 2,
         'institutions': 4,

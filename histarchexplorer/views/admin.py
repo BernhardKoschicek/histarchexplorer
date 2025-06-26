@@ -23,7 +23,7 @@ from histarchexplorer.utils.view_util import construct_admin_tabs
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     check_manager_user()
-    print(g.config_relationship_labels)
+    print(g.config_properties)
     g.cursor.execute("""
                      SELECT l.id        AS link_id,
                             l.sortorder AS sortorder,
@@ -39,7 +39,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                      FROM tng.links l
                               JOIN tng.entities s ON l.domain_id = s.id
                               JOIN tng.entities e ON l.range_id = e.id
-                              JOIN tng.relationship_labels cp ON l.property =
+                              JOIN tng.properties cp ON l.property =
                                                                cp.id
                               LEFT JOIN tng.entities r ON l.attribute = r.id
                      UNION ALL
@@ -57,7 +57,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                      FROM tng.links l
                               JOIN tng.entities s ON l.range_id = s.id
                               JOIN tng.entities e ON l.domain_id = e.id
-                              JOIN tng.relationship_labels cp ON l.property =
+                              JOIN tng.properties cp ON l.property =
                                                                cp.id
                               LEFT JOIN tng.entities r ON l.attribute = r.id
                      ORDER BY sortorder
@@ -90,7 +90,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         activetab=tab,
         activeentry=entry,
         links_data=links_list,
-        relationship_labels=g.config_relationship_labels,
+        properties=g.config_properties,
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
         class_items=class_items,
@@ -103,7 +103,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 @login_required
 def delete_entry(id_: int, tab: str) -> Response:
     check_manager_user()
-    if Admin.get_config_config_types_by_id(id_) == 5:
+    if Admin.get_config_config_classes_by_id(id_) == 5:
         flash(_('Main Project cannot be deleted'), 'danger')
         return redirect(url_for('admin', tab=tab))
     Admin.delete_entry(id_)

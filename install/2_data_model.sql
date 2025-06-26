@@ -17,10 +17,23 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Data for Name: config; Type: TABLE DATA; Schema: tng; Owner: openatlas
+-- Data for Name: classes; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-INSERT INTO tng.config VALUES
+INSERT INTO tng.classes VALUES
+	(1, 'project'),
+	(2, 'person'),
+	(4, 'institution'),
+	(5, 'main-project'),
+	(6, 'language_code'),
+	(3, 'attribute');
+
+
+--
+-- Data for Name: entities; Type: TABLE DATA; Schema: tng; Owner: openatlas
+--
+
+INSERT INTO tng.entities VALUES
 	(2, '{"de": "Stefan Eichert", "en": "Stefan Eichert"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
 	(3, '{"de": "Lisa Aldrian", "en": "Lisa Aldrian"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
 	(4, '{"de": "David Ruß", "en": "David Ruß"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -48,31 +61,6 @@ INSERT INTO tng.config VALUES
 
 
 --
--- Data for Name: config_classes; Type: TABLE DATA; Schema: tng; Owner: openatlas
---
-
-INSERT INTO tng.config_classes VALUES
-	(1, 'project', NULL),
-	(2, 'person', NULL),
-	(3, 'role', NULL),
-	(4, 'institution', NULL),
-	(5, 'main-project', NULL),
-	(6, 'language_code', NULL);
-
-
---
--- Data for Name: config_properties; Type: TABLE DATA; Schema: tng; Owner: openatlas
---
-
-INSERT INTO tng.config_properties VALUES
-	(1, '{"de": "hat Mitglied", "en": "has member"}', '{"de": "ist Mitglied von", "en": "is member of"}', NULL, 1, 2),
-	(2, '{"de": "hat Zugehörigkeit", "en": "has affiliation"}', '{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}', NULL, 2, 4),
-	(3, '{"de": "hat Kernmitglied", "en": "has core member"}', '{"de": "ist Kernmitglied von", "en": "is core member of"}', NULL, 5, 2),
-	(4, '{"de": "hat Kerninstitution", "en": "has core institution"}', '{"de": "ist Kerninstitution von", "en": "is core institution of"}', NULL, 5, 4),
-	(5, '{"de": "hat Institution", "en": "has institution"}', '{"de": "ist Institution von", "en": "is institution of"}', NULL, 1, 4);
-
-
---
 -- Data for Name: links; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
@@ -94,8 +82,6 @@ INSERT INTO tng.links VALUES
 	(15, 2, 19, 2, 5, 15),
 	(16, 2, 19, 2, 10, 16),
 	(17, 2, 19, 2, 8, 17),
-	(18, 16, 2, 1, 5, 18),
-	(19, 16, 2, 1, 8, 19),
 	(20, 1, 2, 3, 5, 20),
 	(21, 4, 20, 2, 13, 21),
 	(22, 16, 20, 5, 14, 22),
@@ -113,32 +99,23 @@ INSERT INTO tng.maps VALUES
 
 
 --
+-- Data for Name: properties; Type: TABLE DATA; Schema: tng; Owner: openatlas
+--
+
+INSERT INTO tng.properties VALUES
+	(1, '{"de": "hat Mitglied", "en": "has member"}', '{"de": "ist Mitglied von", "en": "is member of"}', 1, 2),
+	(2, '{"de": "hat Zugehörigkeit", "en": "has affiliation"}', '{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}', 2, 4),
+	(3, '{"de": "hat Kernmitglied", "en": "has core member"}', '{"de": "ist Kernmitglied von", "en": "is core member of"}', 5, 2),
+	(4, '{"de": "hat Kerninstitution", "en": "has core institution"}', '{"de": "ist Kerninstitution von", "en": "is core institution of"}', 5, 4),
+	(5, '{"de": "hat Institution", "en": "has institution"}', '{"de": "ist Institution von", "en": "is institution of"}', 1, 4);
+
+
+--
 -- Data for Name: settings; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
 INSERT INTO tng.settings VALUES
-	(1, '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'map', false, '{person,group,artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}', NULL, '{group,stratigraphic_unit,source,external_reference}', NULL, NULL, NULL);
-
-
---
--- Name: config_classes_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
---
-
-SELECT pg_catalog.setval('tng.config_classes_id_seq', 6, true);
-
-
---
--- Name: config_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
---
-
-SELECT pg_catalog.setval('tng.config_id_seq', 24, true);
-
-
---
--- Name: config_properties_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
---
-
-SELECT pg_catalog.setval('tng.config_properties_id_seq', 5, true);
+	(1, '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'map', true, '{person,group,artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}', NULL, '{group,stratigraphic_unit,source,external_reference}', NULL, NULL, NULL);
 
 
 --

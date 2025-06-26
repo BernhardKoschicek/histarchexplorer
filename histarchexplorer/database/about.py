@@ -10,21 +10,21 @@ def get_config_entities() -> tuple[str]:
             c.website,
             c.legal_notice,
             c.imprint,
-            c.type,
+            c.class_id,
             c.address, 
             c.email,
             c.image,      
             c.orcid_id,
-            cc.name as type_name 
+            cc.name as class_name 
         FROM 
             tng.entities as c
-		JOIN  tng.types as cc ON c.type = cc.id;""")
+		JOIN  tng.classes as cc ON c.class_id = cc.id;""")
     return g.cursor.fetchall()
 
 
 def get_project_attributes_sql(
         id_: int,
-        config_type_id: int) -> tuple[str]:
+        config_class_id: int) -> tuple[str]:
     g.cursor.execute(
         """
         SELECT l.domain_id,
@@ -32,14 +32,14 @@ def get_project_attributes_sql(
         FROM tng.links l
                  JOIN tng.entities c ON l.range_id = c.id
                  LEFT JOIN tng.entities attribute ON l.attribute = attribute.id
-            AND attribute.type = %(attribute_id)s
+            AND attribute.class_id = %(attribute_id)s
         WHERE l.range_id = %(id)s
-          AND c.type = %(config_type_id)s
+          AND c.class_id = %(config_class_id)s
         ORDER BY l.sortorder, l.id;
         """, {
             'id': id_,
-            'config_type_id': config_type_id,
-            'attribute_id': g.config_types['attribute']})
+            'config_class_id': config_class_id,
+            'attribute_id': g.config_classes['attribute']})
     return g.cursor.fetchall()
 
 
@@ -52,7 +52,7 @@ def get_affiliations(id_: int) -> tuple[str]:
         FROM tng.links l
                  LEFT JOIN tng.entities attribute
                            ON l.attribute = attribute.id
-                               AND attribute.type = %(attribute_id)s
+                               AND attribute.class_id = %(attribute_id)s
                  LEFT JOIN tng.links la
                            ON la.range_id = l.range_id
                                AND la.property = %(affiliation_id)s
@@ -62,5 +62,5 @@ def get_affiliations(id_: int) -> tuple[str]:
         """, {
             'id': id_,
             'affiliation_id': 2,
-            'attribute_id': g.config_types['attribute']})
+            'attribute_id': g.config_classes['attribute']})
     return g.cursor.fetchall()
