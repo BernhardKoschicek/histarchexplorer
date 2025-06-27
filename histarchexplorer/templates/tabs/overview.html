@@ -4,9 +4,12 @@
 <link rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script
-    src="https://cdn.jsdelivr.net/gh/haltu/muuri@0.9.5/dist/muuri.min.js">
-</script>
+
+<script src="/static/node_modules/muuri/dist/muuri.min.js"></script>
+
+<script src="../../static/js/overview.js"></script>
+
+<script type="module" src="/static/node_modules/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
@@ -43,6 +46,7 @@
 <script>
     const related_entities = JSON.parse(JSON.parse({{ data|tojson }}).related_entities || 'null');
 </script>
+
 
 <link rel="stylesheet" href="/static/css/main.css">
 <!-- <div id="overview-content"></div> -->
@@ -138,7 +142,7 @@
         </button>
       </div>
     {% endif %}
-  <!--
+    <!--
     <div class="entity-country">
       {% if entity.types %}
         {% for type in entity.types %}
@@ -150,6 +154,7 @@
     </div>
     </button>
     -->
+
 
     <div class="attribute-area">
       <!-- Attributes -->
@@ -239,58 +244,76 @@
 
 
   <!-- First image -->
-{% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
-  <div class="item-half">
-    <div class="item-content item-content-full">
-      <div class="muuri-images">
-        <div class="image position-relative">
-          {% if main_image.iiif_base_path %}
-            <a href="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
-               target="_blank"
-               class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
-               style="z-index: 10;">
-              <i class="bi bi-arrows-fullscreen"></i>
-            </a>
-            <img src="{{ main_image.iiif_base_path }}/full/400,/0/default.jpg"
-                 alt="{{ main_image.title }}">
-          {% else %}
-            <img src="{{ main_image.url }}"
-                 alt="{{ main_image.title }}">
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-{% endif %}
-
-
-<!-- All other images -->
-{% if initial_images %}
-  {% for depiction in initial_images %}
-    <div class="{% if loop.index0 < 3 %}item-half{% else %}item{% endif %}">
+  {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
+    <div class="item-half">
       <div class="item-content item-content-full">
-        <div class="image position-relative">
-          {% if depiction.iiif_base_path %}
-            <a href="{{ depiction.iiif_base_path }}/full/max/0/default.jpg"
-               target="_blank"
-               class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
-               style="z-index: 10;">
-              <i class="bi bi-arrows-fullscreen"></i>
-            </a>
-          {% endif %}
-          <img
-            src="{% if depiction.iiif_base_path %}
-                   {{ depiction.iiif_base_path }}/full/400,/0/default.jpg
-                 {% else %}
-                   {{ depiction.url }}
-                 {% endif %}"
-            alt="{{ depiction.title }}"
-          />
+        <div class="muuri-images">
+          <div class="image position-relative">
+            {% if main_image.render_type == '3d_model' %}
+              <model-viewer src="{{ main_image.url }}"
+                            alt="{{ main_image.title }}"
+                            camera-controls
+                            style="width: 100%; height: 300px;"
+                            ar ar-modes="webxr scene-viewer quick-look"
+                            shadow-intensity="1"
+                            autoplay></model-viewer>
+            {% else %}
+              {% if main_image.iiif_base_path %}
+                <a href="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
+                   target="_blank"
+                   class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
+                   style="z-index: 10;">
+                  <i class="bi bi-arrows-fullscreen"></i>
+                </a>
+                <img src="{{ main_image.iiif_base_path }}/full/400,/0/default.jpg"
+                     alt="{{ main_image.title }}">
+              {% else %}
+                <img src="{{ main_image.url }}"
+                     alt="{{ main_image.title }}">
+              {% endif %}
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
-  {% endfor %}
-{% endif %}
+  {% endif %}
+
+
+  <!-- All other images -->
+  {% if initial_images %}
+    {% for depiction in initial_images %}
+      <div class="{% if loop.index0 < 3 %}item-half{% else %}item{% endif %}">
+        <div class="item-content item-content-full">
+          <div class="image position-relative">
+            {% if depiction.render_type == '3d_model' %}
+              <model-viewer src="{{ depiction.url }}"
+                            alt="{{ depiction.title }}"
+                            camera-controls
+                            style="width: 100%; height: 300px;"
+                            ar ar-modes="webxr scene-viewer quick-look"
+                            shadow-intensity="1"
+                            autoplay></model-viewer>
+            {% else %}
+              {% if depiction.iiif_base_path %}
+                <a href="{{ depiction.iiif_base_path }}/full/max/0/default.jpg"
+                   target="_blank"
+                   class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
+                   style="z-index: 10;">
+                  <i class="bi bi-arrows-fullscreen"></i>
+                </a>
+                <img src="{{ depiction.iiif_base_path }}/full/400,/0/default.jpg"
+                     alt="{{ depiction.title }}">
+              {% else %}
+                <img src="{{ depiction.url }}"
+                     alt="{{ depiction.title }}">
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+
 
 
 
@@ -353,7 +376,7 @@
 </div>
 
 
-<script src="../../static/js/overview.js"></script>
+
 
 
 

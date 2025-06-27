@@ -446,10 +446,21 @@ def get_entity(id_: int, tab_name=None) -> str:
         return {'type': 'FeatureCollection', 'features': []}
 
     def serialize_image(image):
+        print(f"DEBUG: mime_type for image id {getattr(image, 'id_', 'unknown')} is {image.mimetype}")
+        if image.mimetype in ["model/gltf-binary", "model/glb", "model/gltf+json"]:
+            render_type = "3d_model"
+        elif image.mimetype and image.mimetype.startswith("image/"):
+            render_type = "image"
+        elif image.mimetype == "application/pdf":
+            render_type = "pdf"
+        else:
+            render_type = "unknown"
         return {
             "url": image.url,
             "title": image.title,
-            "iiif_base_path": image.iiif_base_path
+            "iiif_base_path": image.iiif_base_path,
+            "mime_type": image.mimetype,
+            "render_type": render_type
         }
 
     features = []
