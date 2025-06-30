@@ -1,8 +1,72 @@
 {% extends "layout.html" %}
 
 {% block content %}
-  <div style="padding-top: 100px; background: yellow;">
-    <h1 style="color: red;">🌟 IT WORKS 🌟</h1>
-    <p>This content is now visible and no longer hidden behind the navbar.</p>
-  </div>
+  <div style="padding-top: 100px;"></div> <!-- To avoid navbar overlap -->
+
+  <style>
+    body, html {
+      height: 100%;
+      overflow-y: auto;
+    }
+    #quercus-tree {
+      max-height: 80vh;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+  <!-- Container for Quercus tree -->
+  <div id="quercus-tree" style="min-height: 300px;"></div>
+
+  <!-- Quercus CSS and JS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
+  <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
+
+  <script>
+    function buildTree(flatData) {
+      const nodesById = {};
+      Object.values(flatData).forEach(node => {
+        nodesById[node.id] = {
+          id: node.id,
+          name: node.name,
+          children: []
+        };
+      });
+
+      Object.values(flatData).forEach(node => {
+        if (!node.root || node.root.length === 0) return; // top-level
+
+        node.root.forEach(parentId => {
+          if (nodesById[parentId]) {
+            nodesById[parentId].children.push(nodesById[node.id]);
+          }
+        });
+      });
+
+      return Object.values(nodesById).filter(node => !flatData[node.id].root || flatData[node.id].root.length === 0);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetch("https://thanados.openatlas.eu/api/0.4/type_tree/")
+        .then(res => res.json())
+        .then(data => {
+          const nestedData = buildTree(data.typeTree);
+
+          new Treeview({
+            containerId: "quercus-tree",
+            data: nestedData,
+            initiallyExpanded: false,
+            searchEnabled: true,
+            multiSelectEnabled: true,
+            cascadeSelectChildren: false,
+            showSelectAllButton: true,
+            showExpandCollapseAllButtons: true,
+          });
+        })
+        .catch(err => {
+          console.error("Failed to fetch or build tree data:", err);
+          document.getElementById("quercus-tree").innerText = "Failed to load vocabulary.";
+        });
+    });
+  </script>
 {% endblock %}
