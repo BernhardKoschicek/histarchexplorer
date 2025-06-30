@@ -130,3 +130,6 @@ def search_live():
     print(f"✅ LIVE Found {len(results)} result(s) total")
     return jsonify(results)
 
+@app.route('/vocabulary')
+def vocabulary():
+    return render_template('vocabulary.html')

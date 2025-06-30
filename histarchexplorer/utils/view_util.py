@@ -1,6 +1,5 @@
 from typing import Any
 
-
 from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
@@ -16,5 +15,6 @@ def inject_menu() -> dict[str, Any]:
     navbar = [
         {'entities': _('browse/select/find all entities')},
         {'search': _('detailed search')},
-        {'about': _('about the project')}]
+        {'about': _('about the project')},
+        {'vocabulary': _('vocabulary')}]
     return {'navbar': navbar}
