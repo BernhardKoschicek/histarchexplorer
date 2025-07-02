@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
-  <script src="/static/node_modules/sortablejs/Sortable.min.js"></script>
+
+  <script src="{{ url_for('static', filename='node_modules/sortablejs/Sortable.min.js') }}"></script>
+
 
   <div class="container py-5 en">
     <h3>
@@ -29,16 +31,16 @@
 
     <div class="card mt-5 mb-5">
       <div class="card-body">
-        <h5 class="card-title">{{ _('About Section content') |upper }}</h5>
+        <h5 class="card-title">{{ _('about section content') |upper }}</h5>
         <nav>
           <div class="nav nav-pills mt-3 mb-2" id="nav-tab" role="tablist">
             {% for tab in tabs %}
               <button
-                class="nav-link{% if loop.first and not activetab %} active{% endif %} {% if activetab == tab.target %} active {% endif %}"
+                class="nav-link{% if (loop.first and not activetab) or activetab == tab.target %} active{% endif %}"
                 id="{{ tab.id }}" data-bs-toggle="tab"
                 data-bs-target="#{{ tab.target }}" type="button" role="tab"
                 aria-controls="{{ tab.target }}"
-                aria-selected="{{ 'true' if loop.first else 'false' }}">
+                aria-selected="{% if (loop.first and not activetab) or activetab == tab.target %}true{% else %}false{% endif %}">
                 {{ tab.label | upper }}
               </button>
             {% endfor %}
@@ -640,9 +642,6 @@
                         name="legalnotice"></textarea>
             </div>
 
-          </div>
-          <div class="mt-3 text-end">
-            <button type="submit" class="btn btn-primary">Add Entry</button>
           </div>
         </div>
       </div>

@@ -13,7 +13,6 @@ from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.services.admin import Admin, EntryNotFound
-from histarchexplorer.utils.view_util import construct_admin_tabs
 
 
 @app.route('/admin/')
@@ -21,6 +20,27 @@ from histarchexplorer.utils.view_util import construct_admin_tabs
 @app.route('/admin/<tab>/<entry>')
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
+    tabs = [
+        {
+            'label': _('main-project'),
+            'target': 'nav-main-project',
+            'id': g.config_classes['main-project']
+        }, {
+            'label': _('projects'),
+            'target': 'nav-projects',
+            'id': g.config_classes['project']
+        }, {
+            'label': _('persons'),
+            'target': 'nav-persons',
+            'id': g.config_classes['person']
+        }, {
+            'label': _('institutions'),
+            'target': 'nav-institutions',
+            'id': g.config_classes['institution']
+        }, {
+            'label': _('attributes'),
+            'target': 'nav-attributes',
+            'id': g.config_classes['attribute']}]
     check_manager_user()
     class_items = {
         k: v for k, v in get_entities_count_by_case_study().items()
@@ -28,7 +48,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     return render_template(
         "admin.html",
         entities=g.config_entities,
-        tabs=construct_admin_tabs(),
+        tabs=tabs,
         activetab=tab,
         activeentry=entry,
         links_data=g.config_links,
