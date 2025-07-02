@@ -3,18 +3,18 @@ from typing import Any
 from flask import g
 
 
-def get_shown_entities() -> Any:
+def get_shown_classes() -> Any:
     g.cursor.execute(
-        'SELECT shown_entities '
+        'SELECT shown_classes '
         'FROM tng.settings '
         'LIMIT 1')
     result = g.cursor.fetchone()
     return result[0] or []
 
 
-def get_hidden_entities() -> Any:
+def get_hidden_classes() -> Any:
     g.cursor.execute(
-        'SELECT hidden_entities '
+        'SELECT hidden_classes '
         'FROM tng.settings '
         'LIMIT 1')
     result = g.cursor.fetchone()

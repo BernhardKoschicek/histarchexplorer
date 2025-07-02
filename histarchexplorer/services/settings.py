@@ -10,9 +10,9 @@ class Settings:
     index_map: int
     img_map: str
     greyscale: bool
-    shown_entities: list[str]
+    shown_classes: list[str]
     shown_types: list[str]
-    hidden_entities: list[str]
+    hidden_classes: list[str]
     hidden_types: list[str]
     shown_ids: list[str]
     hidden_ids: list[str]

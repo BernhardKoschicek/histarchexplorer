@@ -4,9 +4,9 @@ from histarchexplorer.database.admin import (
     add_link, add_new_map, check_sortorder, add_entry, delete_entry,
     delete_link,
     delete_map,
-    get_config_class_by_id, set_hidden_entities,
+    get_config_class_by_id, set_hidden_classes,
     set_index_background,
-    set_shown_entities, update_config_entry, update_map)
+    set_shown_classes, update_config_entry, update_map)
 from histarchexplorer.database.map import get_maps
 
 
@@ -18,12 +18,12 @@ class Admin:
         pass
 
     @staticmethod
-    def set_hidden_entities(form: list[str]) -> None:
-        return set_hidden_entities(form)
+    def set_hidden_classes(form: list[str]) -> None:
+        return set_hidden_classes(form)
 
     @staticmethod
-    def set_shown_entities(form: list[str]) -> None:
-        return set_shown_entities(form)
+    def set_shown_classes(form: list[str]) -> None:
+        return set_shown_classes(form)
 
     @staticmethod
     def set_index_background(settings: dict[str, str]) -> None:

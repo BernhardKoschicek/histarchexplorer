@@ -6,13 +6,6 @@ from flask import g
 from histarchexplorer.database.config import check_if_config_entry_exist
 
 
-#def get_config_properties() -> Any:
-#    g.cursor.execute(
-#        '''
-#        SELECT id, name, name_inv, domain_type_id, range_type_id
-#        FROM tng.properties''')
-#    return g.cursor.fetchall()
-
 def get_config_links() -> Any:
     g.cursor.execute(
         """
@@ -53,16 +46,20 @@ def get_config_links() -> Any:
         """)
     return g.cursor.fetchall()
 
+
 def get_config_properties() -> Any:
     g.cursor.execute(
         '''
         SELECT id, name, domain_type_id, range_type_id, 'direct' AS direction
         FROM tng.properties
         UNION ALL
-        SELECT id, name_inv, range_type_id, domain_type_id, 'inverse' AS direction
+        SELECT id,
+               name_inv,
+               range_type_id,
+               domain_type_id,
+               'inverse' AS direction
         FROM tng.properties''')
     return g.cursor.fetchall()
-
 
 
 def get_config_class_by_id(id_: int) -> int | None:
@@ -73,15 +70,15 @@ def get_config_class_by_id(id_: int) -> int | None:
     return row[0] if row else None
 
 
-def set_hidden_entities(entities: list[str]) -> None:
+def set_hidden_classes(entities: list[str]) -> None:
     g.cursor.execute(
-        'UPDATE tng.settings SET hidden_entities = %s',
+        'UPDATE tng.settings SET hidden_classes = %s',
         (entities,))
 
 
-def set_shown_entities(entities: list[str]) -> None:
+def set_shown_classes(entities: list[str]) -> None:
     g.cursor.execute(
-        'UPDATE tng.settings SET shown_entities = %s',
+        'UPDATE tng.settings SET shown_classes = %s',
         (entities,))
 
 
@@ -136,7 +133,8 @@ def update_map(data: dict[str, str]) -> None:
 
 
 def check_if_main_project_exist() -> bool:
-    g.cursor.execute("SELECT 1 FROM tng.entities WHERE config_class = 5 LIMIT 1")
+    g.cursor.execute(
+        "SELECT 1 FROM tng.entities WHERE config_class = 5 LIMIT 1")
     return g.cursor.fetchone() is not None
 
 
@@ -155,7 +153,7 @@ def add_entry(data: dict) -> int:
     g.cursor.execute(
         """
         INSERT INTO tng.entities
-        (email, website, orcid_id, image, class_id)
+            (email, website, orcid_id, image, class_id)
         VALUES (NULLIF(%(email)s, ''),
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
@@ -255,5 +253,3 @@ def delete_link(id_: int) -> None:
         WHERE id = %(link_id)s
         """, {
             'link_id': id_})
-
-

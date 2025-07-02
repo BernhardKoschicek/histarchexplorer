@@ -286,9 +286,9 @@ CREATE TABLE tng.settings (
     index_map integer,
     img_map text,
     greyscale boolean,
-    shown_entities text[],
+    shown_classes text[],
     shown_types text[],
-    hidden_entities text[],
+    hidden_classes text[],
     hidden_types text[],
     shown_ids text[],
     hidden_ids text[]

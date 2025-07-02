@@ -262,9 +262,9 @@ CREATE TABLE tng.settings (
     index_map integer,
     img_map text,
     greyscale boolean,
-    shown_entities text[],
+    shown_classes text[],
     shown_types text[],
-    hidden_entities text[],
+    hidden_classes text[],
     hidden_types text[],
     shown_ids text[],
     hidden_ids text[]
@@ -395,6 +395,7 @@ COPY tng.links (id, domain_id, range_id, property, attribute, sortorder) FROM st
 
 COPY tng.maps (id, name, display_name, tilestring, sortorder) FROM stdin;
 1	OpenStreetMap	Open Street Map	L.tileLayer(\n            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});	1
+2	uio	uo		2
 \.
 
 
@@ -415,7 +416,7 @@ COPY tng.properties (id, name, name_inv, domain_type_id, range_type_id) FROM std
 -- Data for Name: settings; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-COPY tng.settings (id, index_img, index_map, img_map, greyscale, shown_entities, shown_types, hidden_entities, hidden_types, shown_ids, hidden_ids) FROM stdin;
+COPY tng.settings (id, index_img, index_map, img_map, greyscale, shown_classes, shown_types, hidden_classes, hidden_types, shown_ids, hidden_ids) FROM stdin;
 1	/static/images/index_map_bg/Blank_map_of_Europe_central_network.png	1	map	t	{person,group,artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}	\N	{group,stratigraphic_unit,source,external_reference}	\N	\N	\N
 \.
 

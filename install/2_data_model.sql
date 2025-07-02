@@ -99,7 +99,8 @@ INSERT INTO tng.links OVERRIDING SYSTEM VALUE VALUES
 
 INSERT INTO tng.maps VALUES
 	(1, 'OpenStreetMap', 'Open Street Map', 'L.tileLayer(
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1);
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1),
+	(2, 'uio', 'uo', '', 2);
 
 
 --
@@ -133,7 +134,7 @@ SELECT pg_catalog.setval('tng.classes_id_seq', 1, false);
 -- Name: entities_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
 --
 
-SELECT pg_catalog.setval('tng.entities_id_seq', 30, true);
+SELECT pg_catalog.setval('tng.entities_id_seq', 29, true);
 
 
 --

@@ -56,8 +56,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
         class_items=class_items,
-        shown_entities=g.settings.shown_entities,
-        hidden_entities=g.settings.hidden_entities,
+        shown_classes=g.settings.shown_classes,
+        hidden_classes=g.settings.hidden_classes,
         view_classes=app.config['VIEW_CLASSES'])
 
 
@@ -236,7 +236,7 @@ def choose_index_background() -> Response:
 @app.route('/admin/select_entities', methods=['POST'])
 def select_entities() -> Response:
     if request.method == 'POST':
-        Admin.set_shown_entities(request.form.getlist('selected_entities'))
+        Admin.set_shown_classes(request.form.getlist('selected_entities'))
         flash(_('set shown entities'), 'info')
     return redirect(url_for('admin'))
 
@@ -244,7 +244,7 @@ def select_entities() -> Response:
 @app.route('/admin/deselect_entities', methods=['POST'])
 def deselect_entities() -> Response:
     if request.method == 'POST':
-        Admin.set_hidden_entities(request.form.getlist('selected_entities'))
+        Admin.set_hidden_classes(request.form.getlist('selected_entities'))
         flash(_('set hidden entities'), 'info')
     return redirect(url_for('admin'))
 
