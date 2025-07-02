@@ -1,12 +1,19 @@
-<div id {{ tab_name }}-header>
-    <h1>{{ tab_name[0]|upper }}{{ tab_name[1:] }}</h1>
-    <div class="input-group mb-3">
-        <div class="input-group mb-3" style="max-width: 400px;">
-            <input type="text" id="filterInput{{ tab_name }}" class="form-control" placeholder="Search/Filter">
-            <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
-        </div>
+<div id="{{ tab_name }}-header" class="d-flex align-items-center justify-content-between flex-wrap gap-3 m-3">
+
+    <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}</h3>
+
+    <div class="input-group" style="max-width: 400px;">
+        <input type="text" id="filterInput{{ tab_name }}" class="form-control" placeholder="Search / Filter">
+        <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
     </div>
+
+    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
+            onclick="{{ tab_name }}Modal.show()" title="Advanced Search/Filter">
+        <i class="bi bi-funnel"></i>
+    </button>
+
 </div>
+
 <div id="table-{{ tab_name }}" class="tabulator-container"></div>
 
 <div class="modal fade" id="modal-{{ tab_name }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
