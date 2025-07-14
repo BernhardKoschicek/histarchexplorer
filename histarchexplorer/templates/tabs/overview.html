@@ -242,7 +242,6 @@
   {% endif %}
 
 
-
   <!-- First image -->
   {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
     <div class="item-half">
@@ -250,13 +249,16 @@
         <div class="muuri-images">
           <div class="image position-relative">
             {% if main_image.render_type == '3d_model' %}
-              <model-viewer src="{{ main_image.url }}"
-                            alt="{{ main_image.title }}"
-                            camera-controls
-                            style="width: 100%; height: 300px;"
-                            ar ar-modes="webxr scene-viewer quick-look"
-                            shadow-intensity="1"
-                            autoplay></model-viewer>
+              <div class="model-wrapper">
+                <div class="spinner"></div>
+                <model-viewer src="{{ main_image.url }}"
+                              alt="{{ main_image.title }}"
+                              camera-controls
+                              style="width: 100%; height: 300px;"
+                              ar ar-modes="webxr scene-viewer quick-look"
+                              shadow-intensity="1"
+                              autoplay></model-viewer>
+              </div>
             {% else %}
               {% if main_image.iiif_base_path %}
                 <a href="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
@@ -286,13 +288,16 @@
         <div class="item-content item-content-full">
           <div class="image position-relative">
             {% if depiction.render_type == '3d_model' %}
-              <model-viewer src="{{ depiction.url }}"
-                            alt="{{ depiction.title }}"
-                            camera-controls
-                            style="width: 100%; height: 300px;"
-                            ar ar-modes="webxr scene-viewer quick-look"
-                            shadow-intensity="1"
-                            autoplay></model-viewer>
+              <div class="model-wrapper">
+                <div class="spinner"></div>
+                <model-viewer src="{{ depiction.url }}"
+                              alt="{{ depiction.title }}"
+                              camera-controls
+                              style="width: 100%; height: 300px;"
+                              ar ar-modes="webxr scene-viewer quick-look"
+                              shadow-intensity="1"
+                              autoplay></model-viewer>
+              </div>
             {% else %}
               {% if depiction.iiif_base_path %}
                 <a href="{{ depiction.iiif_base_path }}/full/max/0/default.jpg"
