@@ -29,5 +29,6 @@ postgresql database and run
         cat 1_structure.sql 2_data_model.sql | psql -d <DATABASE_NAME> -f -
 
 Or run the script if you have the correct database credentials in "instance/production.py"
-    
-        python3 /install/install_script.py
+
+        export PYTHONPATH=".:$PYTHONPATH"
+        python3 install/install_script.py
