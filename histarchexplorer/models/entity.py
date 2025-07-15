@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any, Optional
 
-from flask import session
+from flask import session, url_for, g
 
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
@@ -78,10 +78,42 @@ class Entity:
     def __repr__(self) -> str:  # pragma: no cover
         return str(self.__dict__)
 
-    def get_depiction(self, depictions) -> list[Depiction]:
-        if depictions:
-            return [Depiction(depiction, self.id) for depiction in depictions]
-        return []
+    def get_depiction(self, depictions: Optional[list[dict[str, str]]]) -> list[Depiction]:
+        if not depictions:
+            return []
+        result = []
+        for data in depictions:
+            id_ = int(data['@id'].rsplit('/', 1)[-1])
+            mimetype = data.get("mimetype")
+            render_type = (
+                "3d_model" if mimetype in {"model/gltf-binary", "model/glb", "model/gltf+json"}
+                else "webp" if mimetype in {"image/webp", "image/webp"}
+                else "image" if mimetype and mimetype.startswith("image/")
+                else "pdf" if mimetype == "application/pdf"
+                else "unknown"
+            )
+            main_image = g.main_images.get(self.id) == id_
+            iiif_manifest = ""
+            if data.get("IIIFManifest"):
+                iiif_manifest = f'{data["IIIFManifest"]}?url={url_for("index", _external=True)}'
+
+            depiction = Depiction(
+                id_=id_,
+                link=data.get("@id"),
+                title=data.get("title"),
+                license=data.get("license"),
+                license_holder=data.get("licenseHolder"),
+                creator=data.get("creator"),
+                url=data.get("url"),
+                mimetype=mimetype,
+                iiif_manifest=iiif_manifest,
+                iiif_base_path=data.get("IIIFBasePath"),
+                entity_id=self.id,
+                main_image=main_image,
+                render_type=render_type,
+            )
+            result.append(depiction)
+        return result
 
     def get_parent(self) -> Optional[Relation]:
         if not self.relations:

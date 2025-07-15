@@ -421,23 +421,6 @@ def get_entity(id_: int, tab_name=None) -> str:
             return features
         return {'type': 'FeatureCollection', 'features': []}
 
-    def serialize_image(image):
-        print(f"DEBUG: mime_type for image id {getattr(image, 'id_', 'unknown')} is {image.mimetype}")
-        if image.mimetype in ["model/gltf-binary", "model/glb", "model/gltf+json"]:
-            render_type = "3d_model"
-        elif image.mimetype and image.mimetype.startswith("image/"):
-            render_type = "image"
-        elif image.mimetype == "application/pdf":
-            render_type = "pdf"
-        else:
-            render_type = "unknown"
-        return {
-            "url": image.url,
-            "title": image.title,
-            "iiif_base_path": image.iiif_base_path,
-            "mime_type": image.mimetype,
-            "render_type": render_type
-        }
 
     features = []
     main_image = None
@@ -519,16 +502,16 @@ def get_entity(id_: int, tab_name=None) -> str:
 
         for image in main_entity.depictions:
             if image.main_image:
-                main_image = serialize_image(image)
+                main_image = image
             else:
-                images.append(serialize_image(image))
+                images.append(image)
 
         if not main_image and images:
             main_image = images.pop(0)
 
         initial_images = images[:2]
         more_images = len(images) > 2
-        total_images = len(images)
+        total_images = len(images+[main_image])
 
     elif tab_name not in valid_routes:
         if tab_name not in ['feature']:

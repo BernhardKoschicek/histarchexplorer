@@ -13,16 +13,6 @@ window.onload = function () {
     }, 500);
 };
 
-// Wait for DOM and model-viewer
-window.addEventListener('DOMContentLoaded', () => {
-    if (customElements.get('model-viewer')) {
-        initMuuri();
-    } else {
-        customElements.whenDefined('model-viewer').then(() => {
-            initMuuri();
-        });
-    }
-});
 
 function observeModelSizeChanges() {
   const ro = new ResizeObserver(() => {

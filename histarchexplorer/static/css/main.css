@@ -12846,6 +12846,7 @@ button.btn-whitish[disabled] {
   padding: 0.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 @media (max-width: 769px) {
