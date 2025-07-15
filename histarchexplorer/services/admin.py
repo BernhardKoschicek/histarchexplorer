@@ -4,13 +4,15 @@ from typing import Any, Optional
 from flask import g
 
 from histarchexplorer.config.admin_fields import FIELD_CONFIGS
-from histarchexplorer.database.admin import (
-    add_link, add_new_map, check_sortorder, add_entry, delete_entry,
-    delete_link,
-    delete_map,
-    get_config_class_by_id, set_hidden_classes,
-    set_index_background,
-    set_shown_classes, update_config_entry, update_map)
+from histarchexplorer.database.admin import (add_entry, add_link, add_new_map,
+                                             check_sortorder, delete_entry,
+                                             delete_link, delete_map,
+                                             get_config_class_by_id,
+                                             get_openatlas_entity,
+                                             set_hidden_classes,
+                                             set_index_background,
+                                             set_shown_classes,
+                                             update_config_entry, update_map)
 from histarchexplorer.database.map import get_maps
 
 
@@ -100,7 +102,7 @@ class Admin:
             filtered = []
             for entity in filter(
                     lambda e: e.class_id == tab_id, g.config_entities):
-                entity_dict = {'id': entity.id}
+                entity_dict = {'id': entity.id, 'class_id': entity.class_id}
                 for field_config in fields_for_tab:
                     field_key = field_config['key']
                     is_translatable = field_config.get('translatable', False)
@@ -146,23 +148,29 @@ class Admin:
         for link in g.config_links:
             link_dict = link.__dict__.copy()
             for field in ['config_property', 'end_name', 'role', 'start_name']:
-                link_dict[f"{field}_display_label"] = \
-                    getattr(link, field)['display']['label']
+                field_obj = getattr(link, field, None)
+                if isinstance(field_obj, dict) and 'display' in field_obj:
+                    link_dict[f"{field}_display_label"] = field_obj['display']['label']
+                else:
+                    link_dict[f"{field}_display_label"] = str(field_obj)
             result[link.start_id].append(link_dict)
         return dict(result)
 
     @staticmethod
-    def process_properties_by_tab(tabs: list[dict]) -> dict[
-        str, list[dict[str, Any]]]:
+    def process_properties_by_tab(tabs: list[dict]) -> dict[str, list[dict[str, Any]]]:
         result = {}
         for t_data in tabs:
             tab_id = t_data['id']
             tab_target = t_data['target']
-            props = [
-                {**prop.__dict__,
-                 'name_display_label': prop.name['display']['label']}
-                for prop in g.config_properties if prop.domain == tab_id
-            ]
+            props = []
+            for prop in g.config_properties:
+                if prop.domain == tab_id:
+                    prop_dict = prop.__dict__.copy()
+                    if isinstance(prop.name, dict) and 'display' in prop.name:
+                        prop_dict['name_display_label'] = prop.name['display']['label']
+                    else:
+                        prop_dict['name_display_label'] = str(prop.name)
+                    props.append(prop_dict)
             result[tab_target] = props
         return result
 
@@ -182,3 +190,29 @@ class Admin:
              'name_display_label': entity.name['display']['label']}
             for entity in g.config_entities
         ]
+
+    @staticmethod
+    def check_case_study_type_id(entity_id: int) -> dict[str, Any]:
+        details = Admin.get_openatlas_entity(entity_id)
+        if details:
+            is_valid = details.openatlas_class_name == 'type'
+            return {
+                'is_valid': is_valid,
+                'name': details.name,
+                'class_name': details.openatlas_class_name
+            }
+        return {
+            'is_valid': False,
+            'name': None,
+            'class_name': None
+        }
+
+    # Todo: replace with an API call to check if it is a type
+    @staticmethod
+    def get_openatlas_entity(entity_id: int) -> Any:
+        return get_openatlas_entity(entity_id)
+
+    @staticmethod
+    def update_case_study_id_setting(id_: int):
+        # Todo make update for tng.settings
+        pass

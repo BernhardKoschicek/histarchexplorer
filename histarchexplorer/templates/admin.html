@@ -24,6 +24,36 @@
 
     <div class="card mt-5 mb-5">
       <div class="card-body">
+        <h5 class="card-title">{{ _('general settings') | upper }}</h5>
+        <div class="d-flex justify-content-start align-items-start">
+          <form id="caseStudyForm" method="POST" class="needs-validation" novalidate
+                {# CHANGED: Use a hardcoded base URL for the action template #}
+                data-action-template="/admin/update_case_study_id/">
+            <div class="mb-3">
+              <label for="caseStudyHierarchyID" class="form-label">{{ _('case study hierarchy ID') }}</label>
+              {# Changed type to text and added pattern for digits only, removed min #}
+              <input type="text" class="form-control" id="caseStudyHierarchyID" name="case_study_id"
+                     pattern="^\d+$" {# Allows only digits #}
+                     value="{{ initial_case_study_type_id or '' }}" {# Pre-populate if available #}
+                     required>
+              <div class="invalid-feedback" id="caseStudyIDFeedback">
+                {{ _('Please enter a positive integer for the Case Study Hierarchy ID.') }}
+              </div>
+              {# Display the entity name if available #}
+              <span id="caseStudyTypeName" class="form-text text-muted mt-2">
+                {% if initial_case_study_type_name %}
+                  ({{ initial_case_study_type_name }})
+                {% endif %}
+              </span>
+            </div>
+            <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-5 mb-5">
+      <div class="card-body">
         <h5 class="card-title">{{ _('maps') |upper }}</h5>
         {% include 'admin/maps.html' %}
       </div>

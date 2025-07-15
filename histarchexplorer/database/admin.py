@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, NamedTuple
 
 from flask import g
 
@@ -228,6 +228,14 @@ def check_sortorder() -> int:
         FROM tng.links
         WHERE sortorder IS NOT NULL''')
     return g.cursor.fetchone()[0]
+
+
+def get_openatlas_entity(id_) -> NamedTuple:
+    g.cursor.execute(
+        '''
+        SELECT name, openatlas_class_name FROM model.entity
+        WHERE id = %(id)s''', {'id': id_})
+    return g.cursor.fetchone()
 
 
 def add_link(data: dict[str, Any]) -> None:

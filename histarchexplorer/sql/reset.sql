@@ -291,7 +291,8 @@ CREATE TABLE tng.settings (
     hidden_classes text[],
     hidden_types text[],
     shown_ids text[],
-    hidden_ids text[]
+    hidden_ids text[],
+    case_study_type_id integer
 );
 
 
@@ -416,8 +417,7 @@ INSERT INTO tng.links (id, domain_id, range_id, property, attribute, sortorder) 
 
 INSERT INTO tng.maps (id, name, display_name, tilestring, sortorder) VALUES
 	(1, 'OpenStreetMap', 'Open Street Map', 'L.tileLayer(
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1),
-	(2, 'uio', 'uo', '', 2);
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1);
 
 
 --
@@ -436,8 +436,8 @@ INSERT INTO tng.properties (id, name, name_inv, domain_type_id, range_type_id) O
 -- Data for Name: settings; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-INSERT INTO tng.settings (id, index_img, index_map, img_map, greyscale, shown_classes, shown_types, hidden_classes, hidden_types, shown_ids, hidden_ids) VALUES
-	(1, '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'map', true, '{artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}', NULL, '{group,stratigraphic_unit,source,external_reference}', NULL, NULL, NULL);
+INSERT INTO tng.settings (id, index_img, index_map, img_map, greyscale, shown_classes, shown_types, hidden_classes, hidden_types, shown_ids, hidden_ids, case_study_type_id) VALUES
+	(1, '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'map', true, '{artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}', NULL, '{group,stratigraphic_unit,source,external_reference}', NULL, NULL, NULL, 8240);
 
 
 --

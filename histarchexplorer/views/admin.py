@@ -3,7 +3,7 @@ import subprocess
 from typing import Optional
 
 from flask import (
-    abort, current_app, flash, g, redirect, render_template,
+    abort, current_app, flash, g, jsonify, redirect, render_template,
     request, url_for)
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
@@ -38,6 +38,22 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         tab = tabs[0]['target']
     for tab_ in tabs:
         tab_['is_active'] = (tab_['target'] == tab)
+
+    initial_case_study_type_id = None
+    initial_case_study_type_name = None
+    # Assuming g.settings holds the case_study_type_id
+    if hasattr(g, 'settings') and hasattr(g.settings, 'case_study_type_id') and g.settings.case_study_type_id:
+        try:
+            initial_case_study_type_id = int(g.settings.case_study_type_id)
+            # Fetch details for the initial ID to display its name
+            details = Admin.get_openatlas_entity(initial_case_study_type_id)
+            if details:
+                initial_case_study_type_name = details['name']
+        except (ValueError, TypeError):
+            current_app.logger.warning(f"Invalid case_study_type_id in settings: {g.settings.case_study_type_id}")
+            initial_case_study_type_id = None
+            initial_case_study_type_name = None
+
     return render_template(
         "admin.html",
         tabs=tabs,
@@ -55,6 +71,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             if k not in app.config['CLASSES_TO_SKIP']},
         shown_classes=g.settings.shown_classes,
         hidden_classes=g.settings.hidden_classes,
+        initial_case_study_type_id=initial_case_study_type_id,
+        initial_case_study_type_name=initial_case_study_type_name,
         view_classes=app.config['VIEW_CLASSES'])
 
 
@@ -218,7 +236,9 @@ def delete_map(map_id: int) -> Response:
 
 
 @app.route('/admin/choose_index_background', methods=['POST'])
+@login_required
 def choose_index_background() -> Response:
+    check_manager_user()
     settings = {
         'index_map': request.form.get('mapselection'),
         'index_img': request.form.get('default_img'),
@@ -229,7 +249,9 @@ def choose_index_background() -> Response:
 
 
 @app.route('/admin/select_entities', methods=['POST'])
+@login_required
 def select_entities() -> Response:
+    check_manager_user()
     if request.method == 'POST':
         Admin.set_shown_classes(request.form.getlist('selected_entities'))
         flash(_('set shown entities'), 'info')
@@ -237,12 +259,38 @@ def select_entities() -> Response:
 
 
 @app.route('/admin/deselect_entities', methods=['POST'])
+@login_required
 def deselect_entities() -> Response:
+    check_manager_user()
     if request.method == 'POST':
         Admin.set_hidden_classes(request.form.getlist('selected_entities'))
         flash(_('set hidden entities'), 'info')
     return redirect(url_for('admin'))
 
+
+@app.route('/admin/update_case_study_id/<int:id_>', methods=['POST'])
+@login_required
+def update_case_study_id(id_: int) -> Response:
+    check_manager_user()
+    if request.method == 'POST':
+        validation_result = Admin.check_case_study_type_id(id_)
+        if validation_result['is_valid']:
+            # "Magic happens" - actually update the setting
+            if Admin.update_case_study_id_setting(id_):
+                flash(_('updated case study id successfully'), 'info')
+            else:
+                flash(_('Failed to update case study id in settings'), 'error')
+        else:
+            flash(_('Invalid Case Study ID. Must be a positive integer and its entity type must be "type".'), 'error')
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/check_case_study_id_ajax/<int:entity_id>', methods=['GET'])
+@login_required
+def check_case_study_id_ajax(entity_id: int) -> Response:
+    check_manager_user()
+    result = Admin.check_case_study_type_id(entity_id)
+    return jsonify(result)
 
 # Todo: This reset button is only here for development purpose.
 @app.route('/reset')

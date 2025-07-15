@@ -101,29 +101,183 @@ function addEntry(category) {
 (() => {
     'use strict';
 
+    // General form validation for all forms with 'needs-validation'
     const forms = document.querySelectorAll('.needs-validation');
 
-    // Loop over each form and add submit event listener to prevent submission if invalid
     forms.forEach(form => {
         form.addEventListener('submit', event => {
             // Only validate if the 'Save' button is visible, meaning the form is in edit mode
+            // This applies to project forms, not necessarily the new caseStudyForm
             const saveButton = form.querySelector('button[type="submit"]');
-            if (saveButton && !saveButton.classList.contains('d-none')) {
+            if (saveButton && !saveButton.classList.contains('d-none') && form.id !== 'caseStudyForm') {
                 if (!form.checkValidity()) {
                     event.preventDefault();
                     event.stopPropagation();
                 }
                 form.classList.add('was-validated');
-            } else {
-                // If not in edit mode, prevent submission (e.g., if someone tries to force it)
+            } else if (form.id !== 'caseStudyForm') { // For other forms not in edit mode
                 event.preventDefault();
                 event.stopPropagation();
             }
+            // caseStudyForm handles its own validation below
         });
     });
+
+    // NEW SECTION: Case Study Hierarchy ID Form Handling
+    const caseStudyForm = document.getElementById('caseStudyForm');
+    const caseStudyInputField = document.getElementById('caseStudyHierarchyID');
+    const caseStudyIDFeedback = document.getElementById('caseStudyIDFeedback');
+    const caseStudyTypeNameSpan = document.getElementById('caseStudyTypeName');
+
+    // Function to update the name display beside the input
+    function updateCaseStudyTypeName(name) {
+        if (caseStudyTypeNameSpan) {
+            caseStudyTypeNameSpan.textContent = name ? `(${name})` : '';
+        }
+    }
+
+    // Function to clear validation feedback
+    function clearCaseStudyIDValidation() {
+        if (caseStudyInputField) {
+            caseStudyInputField.classList.remove('is-invalid');
+            caseStudyInputField.classList.remove('is-valid');
+        }
+        if (caseStudyForm) {
+            caseStudyForm.classList.remove('was-validated');
+        }
+        if (caseStudyIDFeedback) {
+            caseStudyIDFeedback.textContent = 'Please enter a positive integer for the Case Study Hierarchy ID.'; // Reset to default message
+        }
+    }
+
+    // Event listener for input changes to provide immediate feedback
+    if (caseStudyInputField) {
+        caseStudyInputField.addEventListener('input', async () => {
+            const inputValue = caseStudyInputField.value.trim();
+            clearCaseStudyIDValidation(); // Clear previous validation state
+
+            if (inputValue === '') {
+                updateCaseStudyTypeName(''); // Clear name if input is empty
+                return;
+            }
+
+            const parsedValue = parseInt(inputValue, 10);
+
+            // Initial client-side integer and positive check
+            if (isNaN(parsedValue) || parsedValue <= 0) {
+                caseStudyInputField.classList.add('is-invalid');
+                if (caseStudyIDFeedback) {
+                    caseStudyIDFeedback.textContent = 'Please enter a positive integer.';
+                }
+                updateCaseStudyTypeName(''); // Clear name if invalid
+                return;
+            }
+
+            // If it looks like a number, make AJAX call
+            try {
+                const response = await fetch(`/admin/check_case_study_id_ajax/${parsedValue}`);
+                const data = await response.json();
+
+                if (data.is_valid) {
+                    caseStudyInputField.classList.add('is-valid');
+                    updateCaseStudyTypeName(data.name);
+                } else {
+                    caseStudyInputField.classList.add('is-invalid');
+                    if (caseStudyIDFeedback) {
+                        caseStudyIDFeedback.textContent = data.name ?
+                            `ID ${parsedValue} (${data.name}) is not of type "type".` :
+                            `ID ${parsedValue} not found or is not of type "type".`;
+                    }
+                    updateCaseStudyTypeName(''); // Clear name if not valid
+                }
+            } catch (error) {
+                console.error('Error checking Case Study ID:', error);
+                caseStudyInputField.classList.add('is-invalid');
+                if (caseStudyIDFeedback) {
+                    caseStudyIDFeedback.textContent = 'An error occurred while validating the ID. Please try again.';
+                }
+                updateCaseStudyTypeName(''); // Clear name on error
+            }
+        });
+    }
+
+
+    if (caseStudyForm) {
+        caseStudyForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const inputValue = caseStudyInputField.value.trim();
+            const actionTemplate = caseStudyForm.dataset.actionTemplate;
+
+            clearCaseStudyIDValidation(); // Clear previous validation state
+
+            const parsedValue = parseInt(inputValue, 10);
+
+            // Re-validate before final submission (in case input event didn't fire or was bypassed)
+            if (inputValue === '' || isNaN(parsedValue) || parsedValue <= 0) {
+                caseStudyInputField.classList.add('is-invalid');
+                if (caseStudyIDFeedback) {
+                    caseStudyIDFeedback.textContent = 'Please enter a positive integer.';
+                }
+                caseStudyForm.classList.add('was-validated');
+                event.stopPropagation();
+                return;
+            }
+
+            // Perform final server-side check before submitting the form
+            try {
+                const response = await fetch(`/admin/check_case_study_id_ajax/${parsedValue}`);
+                const data = await response.json();
+
+                if (data.is_valid) {
+                    // Valid, proceed with submission using fetch
+                    const finalActionUrl = actionTemplate.replace('_CASE_STUDY_ID_PLACEHOLDER_', parsedValue);
+                    const formData = new FormData(this); // Get form data
+
+                    const submitResponse = await fetch(finalActionUrl, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (submitResponse.ok) {
+                        // Redirect after successful submission
+                        window.location.href = '/admin'; // Or the specific redirect URL from your Flask app
+                    } else {
+                        console.error('Form submission failed:', submitResponse.statusText);
+                        caseStudyInputField.classList.add('is-invalid');
+                        if (caseStudyIDFeedback) {
+                            caseStudyIDFeedback.textContent = 'Failed to save ID. Server error.';
+                        }
+                        caseStudyForm.classList.add('was-validated');
+                    }
+
+                } else {
+                    // Not valid, display error and prevent submission
+                    caseStudyInputField.classList.add('is-invalid');
+                    if (caseStudyIDFeedback) {
+                        caseStudyIDFeedback.textContent = data.name ?
+                            `ID ${parsedValue} (${data.name}) is not of type "type".` :
+                            `ID ${parsedValue} not found or is not of type "type".`;
+                    }
+                    caseStudyForm.classList.add('was-validated');
+                    event.stopPropagation();
+                }
+            } catch (error) {
+                console.error('Error during final Case Study ID validation or submission:', error);
+                caseStudyInputField.classList.add('is-invalid');
+                if (caseStudyIDFeedback) {
+                    caseStudyIDFeedback.textContent = 'An error occurred during validation/submission. Please try again.';
+                }
+                caseStudyForm.classList.add('was-validated');
+                event.stopPropagation();
+            }
+        });
+    }
 })();
 
 document.getElementById('resetButton')?.addEventListener('click', function () {
+    // Replaced alert() with a custom modal or a more robust confirmation UI if needed.
+    // For now, using a simple confirm for demonstration, but consider replacing it.
     if (confirm('Are you sure you want to reset the settings?')) {
         window.location.href = '/reset';
     }
@@ -260,7 +414,8 @@ function saveLinkValues(button) {
 
     // Check if domain, range, property, and role are all set before proceeding
     if (!domain || !range || !button.dataset.property || !button.dataset.role) {
-        alert('Please select a connection type, target node, and role.'); // Or use a more sophisticated UI feedback
+        // Using a simple alert for now. Consider a custom modal for better UX.
+        alert('Please select a connection type, target node, and role.');
         return;
     }
 
