@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 from flask import g
 
+from histarchexplorer.config.admin_fields import FIELD_CONFIGS
 from histarchexplorer.database.admin import (
     add_link, add_new_map, check_sortorder, add_entry, delete_entry,
     delete_link,
@@ -78,36 +79,44 @@ class Admin:
         return get_maps()
 
     @staticmethod
-    def _has_translation(entity, field) -> bool:
-        value = getattr(entity, field, None)
-        return bool(value and value.get(g.language))
+    def _has_translation(entity, field_key) -> bool:
+        value_attr = getattr(entity, field_key, None)
+        if isinstance(value_attr, dict) and 'display' in value_attr:
+            return bool(value_attr['display'].get(g.language))
+        return bool(value_attr)
 
     @staticmethod
-    def process_entities_by_tab(tabs: list[dict], entry: Optional[str]) -> \
-    dict[
-        str, list[dict[str, Any]]]:
+    def process_entities_by_tab(tabs: list[dict], entry: Optional[str]) -> dict[str, list[dict[str, Any]]]:
         result = {}
         for t_data in tabs:
             tab_id = t_data['id']
             tab_target = t_data['target']
 
+            fields_for_tab = FIELD_CONFIGS.get(tab_target, [])
+
             filtered = []
-            for entity in filter(lambda e: e.class_id == tab_id,
-                                 g.config_entities):
+            for entity in filter(lambda e: e.class_id == tab_id, g.config_entities):
                 entity_dict = entity.__dict__.copy()
 
-                for field in ['name', 'description', 'imprint', 'legal_notice',
-                              'address']:
-                    entity_dict[
-                        f"{field}_has_current_translation"] = (
-                        Admin._has_translation(
-                        entity, field))
+                for field_config in fields_for_tab:
+                    field_key = field_config['key']
+                    if field_config.get('translatable', False):
+                        entity_dict[f"{field_key}_has_current_translation"] = \
+                            Admin._has_translation(entity, field_key)
+                    else:
+                        entity_dict[f"{field_key}_has_current_translation"] = bool(getattr(entity, field_key, None))
+
+                    field_value = getattr(entity, field_key, None)
+                    if field_config.get('translatable', False) and isinstance(field_value, dict) and 'display' in field_value:
+                         entity_dict[f"{field_key}_display_label"] = field_value['display'].get('label', '')
+                    else:
+                         entity_dict[f"{field_key}_display_label"] = field_value
 
                 is_active = (tab_target + str(entity.id) == entry)
                 entity_dict.update({
                     'is_active_entry': is_active,
-                    'is_collapsed_entry': not is_active
-                })
+                    'is_collapsed_entry': not is_active,
+                    'fields_config': fields_for_tab})
 
                 filtered.append(entity_dict)
             result[tab_target] = filtered

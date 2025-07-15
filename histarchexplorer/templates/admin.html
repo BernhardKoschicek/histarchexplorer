@@ -1,9 +1,8 @@
+{# admin.html #}
 {% extends "layout.html" %}
 {% block content %}
 
-  <script
-    src="{{ url_for('static', filename='node_modules/sortablejs/Sortable.min.js') }}"></script>
-
+  <script src="{{ url_for('static', filename='node_modules/sortablejs/Sortable.min.js') }}"></script>
 
   <div class="container py-5 en">
     <h3>
@@ -28,7 +27,6 @@
         {% include 'admin/maps.html' %}
       </div>
     </div>
-
 
     <div class="card mt-5 mb-5">
       <div class="card-body">
@@ -55,297 +53,119 @@
               id="{{ tab_item.target }}" role="tabpanel"
               aria-labelledby="{{ tab_item.id }}" tabindex="0">
               <div class="accordion" id="{{ tab_item.label }}accordion">
-                {% for entry in processed_entities_by_tab[tab_item.target] %}
+                {% for entity in processed_entities_by_tab[tab_item.target] %}
                   <div class="accordion-item">
                     <h2 class="accordion-header">
                       <button
-                        class="accordion-button {% if entry.is_collapsed_entry %}collapsed{% endif %}"
+                        class="accordion-button {% if entity.is_collapsed_entry %}collapsed{% endif %}"
                         type="button" data-bs-toggle="collapse"
-                        data-bs-target="#{{ tab_item.target }}{{ entry.id }}"
-                        aria-expanded="{{ entry.is_active_entry | string | lower }}"
-                        aria-controls="{{ tab_item.target }}{{ entry.id }}">
-                        {% if entry.name.display %}
-                          {{ entry.name.display.label or '' }}
-                        {% endif %}
+                        data-bs-target="#{{ tab_item.target }}{{ entity.id }}"
+                        aria-expanded="{{ entity.is_active_entry | string | lower }}"
+                        aria-controls="{{ tab_item.target }}{{ entity.id }}">
+                        {{ entity.name_display_label or '' }}
                       </button>
                     </h2>
-                    <div id="{{ tab_item.target }}{{ entry.id }}"
-                         class="accordion-collapse collapse {% if entry.is_active_entry %} show {% endif %}"
+                    <div id="{{ tab_item.target }}{{ entity.id }}"
+                         class="accordion-collapse collapse {% if entity.is_active_entry %} show {% endif %}"
                          data-bs-parent="#{{ tab_item.label }}accordion">
                       <div class="accordion-body">
                         <form method="POST"
                               action="{{ url_for('edit_entry') }}"
                               class="projectForm needs-validation"
-                              id="form{{ entry.id }}"
+                              id="form{{ entity.id }}"
                               novalidate>
                           <input type="hidden" name="config_id"
-                                 value="{{ entry.id }}">
+                                 value="{{ entity.id }}">
                           <input type="hidden" name="current_tab"
                                  value="{{ tab_item.target }}">
                           <input type="hidden" name="current_entry"
-                                 value="{{ tab_item.target }}{{ entry.id }}">
+                                 value="{{ tab_item.target }}{{ entity.id }}">
 
+                          {# Dynamic Fields Loop #}
                           <div class="row needs-validation">
-                            <div class="col-md-4">
-                              <label for="InputName{{ entry.id }}"
-                                     class="form-label">
-                                {{ _('name')|capitalize }}
-                                {% if not entry.name_has_current_translation %}
-                                  (
-                                  {{ (entry.name.display.language|upper  or _('no translation available')) | capitalize }}
-                                  )
-                                {% endif %}
-                              </label>
-                              <input type="text" class="form-control"
-                                     id="InputName{{ entry.id }}"
-                                     name="name"
-                                     value="{{ entry.name.display.label or '' }}"
-                                     aria-describedby="NameHelp{{ entry.id }}"
-                                     disabled
-                                {% if not entry.name_has_current_translation %}
-                                     placeholder="{{ entry.name.display.label or '' }}"
-                                {% endif %}
-                                     required>
-                              {% if not entry.name_has_current_translation %}
-                                <div
-                                  class="form-text">{{ _('This entry has no translation for') }}
-                                  "{{ available_languages[current_language] }}".
-                                </div>
-                              {% endif %}
-                              <div
-                                class="invalid-feedback">{{ _('Please provide a name') }}.
-                              </div>
-                            </div>
-
-                            <div class="col-md-8">
-                              <label for="InputDescription{{ entry.id }}"
-                                     class="form-label">
-                                {{ _('description')|capitalize }}
-                                {% if not entry.description_has_current_translation %}
-                                  (
-                                  {{ (entry.description.display.language|upper  or _('no translation available')) | capitalize }}
-                                  )
-                                {% endif %}
-                              </label>
-                              <textarea class="form-control"
-                                        id="InputDescription{{ entry.id }}"
-                                        name="description"
-                                        aria-describedby="descriptionHelp{{ entry.id }}"
-                                {% if not entry.description_has_current_translation %}
-                                        placeholder="{{ entry.description.display.label or '' }}"
-                                {% endif %}
-                                        disabled>{{ entry.description.display.label or '' }}</textarea>
-                              {% if not entry.description_has_current_translation %}
-                                <div
-                                  class="form-text">{{ _('This entry has no translation for') }}
-                                  "{{ available_languages[current_language] }}".
-                                </div>
-                              {% endif %}
-                            </div>
-                          </div>
-                          <div class="row needs-validation mt-4">
-                            {% if tab_item.target == 'nav-institutions' %}
-                              <div class="col-lg col-md-12">
-                                <label for="InputAddress{{ entry.id }}"
+                            {% for field in entity.fields_config %}
+                              <div class="{{ field.col_class or 'col-md-6' }} mt-2"> {# Add margin-top for spacing #}
+                                <label for="Input{{ field.key | capitalize }}{{ entity.id }}"
                                        class="form-label">
-                                  {{ _('address')|capitalize }}
-                                  {% if not entry.address_has_current_translation %}
-                                    (
-                                    {{ (entry.address.display.language|upper  or _('no translation available')) | capitalize }}
-                                    )
+                                  {{ _(field.label)|capitalize }}
+                                  {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
+                                    ({{ (entity[field.key].display.language|upper  or _('no translation available')) | capitalize }})
                                   {% endif %}
                                 </label>
-                                <textarea class="form-control"
-                                          id="InputAddress{{ entry.id }}"
-                                          name="address"
-                                          aria-describedby="addressHelp{{ entry.id }}"
-                                  {% if not entry.address_has_current_translation %}
-                                          placeholder="{{ entry.address.display.label or '' }}"
-                                  {% endif %}
-                                          disabled>{{ entry.address.display.label or '' }}</textarea>
-                                {% if not entry.address_has_current_translation %}
-                                  <div
-                                    class="form-text">{{ _('This entry has no translation for') }}
-                                    "{{ available_languages[current_language] }}".
-                                  </div>
-                                {% endif %}
-                                <div
-                                  class="invalid-feedback">{{ _('Please provide an address') }}.
-                                </div>
-                                <div class="col-lg col-md-12 mt-4">
-                                  <label for="InputImage" class="form-label">Image
-                                    URL</label>
-                                  <input type="text" class="form-control"
-                                         id="InputImage" name="image"
-                                         placeholder="Please provide a logo with 68px height"
-                                         value="{{ entry.image or '' }}"
+
+                                {% if field.type == 'textarea' %}
+                                  <textarea class="form-control"
+                                            id="Input{{ field.key | capitalize }}{{ entity.id }}"
+                                            name="{{ field.key }}"
+                                            aria-describedby="{{ field.key }}Help{{ entity.id }}"
+                                            {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}
+                                            {% if field.required %}required{% endif %}
+                                            disabled>{{ entity[field.key + '_display_label'] or '' }}</textarea>
+                                {% else %}
+                                  <input type="{{ field.type }}"
+                                         class="form-control"
+                                         id="Input{{ field.key | capitalize }}{{ entity.id }}"
+                                         name="{{ field.key }}"
+                                         value="{{ entity[field.key + '_display_label'] or '' }}"
+                                         aria-describedby="{{ field.key }}Help{{ entity.id }}"
+                                         {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                         {% if field.required %}required{% endif %}
                                          disabled>
-                                  {% if entry.image %}
-                                    <img class="mt-2" src="{{ entry.image }}"
-                                         alt="{{ entry.name.display.label or '' }}'s Logo">
-                                  {% endif %}
-                                </div>
-                              </div>
-                            {% endif %}
+                                {% endif %}
 
-                            {% if tab_item.target in ['nav-institutions', 'nav-persons'] %}
-                              <div class="col-lg col-md-12">
-                                <label for="InputMail{{ entry.id }}"
-                                       class="form-label">{{ _('e-mail')|capitalize }}</label>
-                                <input type="email" class="form-control"
-                                       id="InputMail{{ entry.id }}"
-                                       name="mail"
-                                       value="{{ entry.email or '' }}"
-                                       aria-describedby="mailHelp{{ entry.id }}"
-                                       disabled>
-                                <div
-                                  class="invalid-feedback">{{ _('Please provide a valid mail address: someone@somemail.com') }}.
-                                </div>
-                              </div>
-                              <div class="col-lg col-md-12">
-                                <label for="InputImage" class="form-label">Image
-                                  URL</label>
-                                <input type="text" class="form-control"
-                                       id="InputImage" name="image"
-                                       placeholder="Please provide a logo with 68px height"
-                                       value="{{ entry.image or '' }}"
-                                       disabled>
-                              </div>
-                            {% endif %}
+                                {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
+                                  <div class="form-text">{{ _('This entry has no translation for') }}
+                                    "{{ available_languages[current_language] }}".
+                                  </div>
+                                {% endif %}
+                                {% if field.required %}
+                                  <div class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.</div>
+                                {% endif %}
 
-                            {% if tab_item.target in ['nav-main-project', 'nav-projects', 'nav-institutions'] %}
-                              <div class="col-lg col-md-12">
-                                <label for="InputWebsite{{ entry.id }}"
-                                       class="form-label">{{ _('website')|capitalize }}</label>
-                                <input type="url" class="form-control"
-                                       id="InputWebsite{{ entry.id }}"
-                                       name="website"
-                                       value="{{ entry.website or '' }}"
-                                       aria-describedby="websiteHelp{{ entry.id }}"
-                                       disabled>
-                                <div
-                                  class="invalid-feedback">{{ _('Please provide a valid website url: https://someurl.com') }}</div>
-                              </div>
-                            {% endif %}
-
-                            {% if tab_item.target == 'nav-persons' %}
-                              <div class="col-lg col-md-12">
-                                <label for="InputOrcid{{ entry.id }}"
-                                       class="form-label">ORCID-ID</label>
-                                <input type="text" class="form-control"
-                                       id="InputOrcid{{ entry.id }}"
-                                       name="orcid"
-                                       value="{{ entry.orcid_id or '' }}"
-                                       aria-describedby="orcidHelp{{ entry.id }}"
-                                       disabled>
-                              </div>
-                              <div class="col-lg col-md-4">
-                                <label for="InputImage" class="form-label">Image
-                                  URL</label>
-                                <input type="text" class="form-control"
-                                       id="InputImage" name="image"
-                                       placeholder="Please provide a square image"
-                                       value="{{ entry.image or '' }}"
-                                       disabled>
-                                {% if entry.image %}
-                                  <img class="mt-2" src="{{ entry.image }}"
-                                       alt="{{ entry.name.display.label or '' }}'s Logo"
-                                       width="140" height="140">
+                                {# Special handling for image preview #}
+                                {% if field.display_image and entity[field.key] %}
+                                  <img class="mt-2" src="{{ entity[field.key] }}"
+                                       alt="{{ entity.name_display_label or '' }}'s Logo"
+                                       {% if field.key == 'image' and tab_item.target == 'nav-persons' %}width="140" height="140"{% endif %}>
                                 {% endif %}
                               </div>
-                            {% endif %}
+                            {% endfor %}
                           </div>
-
-                          {% if tab_item.target == 'nav-main-project' %}
-                            <div class="row needs-validation mt-4">
-                              <div class="col-md-6">
-                                <label for="Imprint{{ entry.id }}"
-                                       class="form-label">
-                                  {{ _('imprint')|capitalize }}
-                                  {% if not entry.imprint_has_current_translation %}
-                                    (
-                                    {{ (entry.imprint.display.language|upper  or _('no translation available')) | capitalize }}
-                                    )
-                                  {% endif %}
-                                </label>
-                                <textarea class="form-control"
-                                          id="Imprint{{ entry.id }}"
-                                          name="imprint"
-                                          aria-describedby="imprint{{ entry.id }}"
-                                  {% if not entry.imprint_has_current_translation %}
-                                          placeholder="{{ entry.imprint.display.label or '' }}"
-                                  {% endif %}
-                                          disabled>{{ entry.imprint.display.label or '' }}</textarea>
-                                {% if not entry.imprint_has_current_translation %}
-                                  <div
-                                    class="form-text">{{ _('This entry has no translation for') }}
-                                    "{{ available_languages[current_language] }}".
-                                  </div>
-                                {% endif %}
-                              </div>
-                              <div class="col-md-6">
-                                <label for="legalNotice{{ entry.id }}"
-                                       class="form-label">
-                                  {{ _('legal notice')|capitalize }}
-                                  {% if not entry.legal_notice_has_current_translation %}
-                                    (
-                                    {{ (entry.legal_notice.display.language or _('no translation available')) | capitalize }}
-                                    )
-                                  {% endif %}
-                                </label>
-                                <textarea class="form-control"
-                                          id="legalNotice{{ entry.id }}"
-                                          name="legalnotice"
-                                          aria-describedby="legalnotice{{ entry.id }}"
-                                  {% if not entry.legal_notice_has_current_translation %}
-                                          placeholder="{{ entry.legal_notice.display.label or '' }}"
-                                  {% endif %}
-                                          disabled>{{ entry.legal_notice.display.label or '' }}</textarea>
-                                {% if not entry.legal_notice_has_current_translation %}
-                                  <div
-                                    class="form-text">{{ _('This entry has no translation for') }}
-                                    "{{ available_languages[current_language] }}".
-                                  </div>
-                                {% endif %}
-                              </div>
-                            </div>
-                          {% endif %}
-
+                          {# End Dynamic Fields Loop #}
 
                           <div class="mt-3 text-end">
                             <button type="button" class="btn btn-primary"
-                                    id='edit{{ entry.id }}'
-                                    onclick="changeEdit({{ entry.id }}, true)">{{ _('Edit') }}
+                                    id='edit{{ entity.id }}'
+                                    onclick="changeEdit({{ entity.id }}, true)">{{ _('Edit') }}
                             </button>
                             <button type="button"
                                     class="btn btn-danger{% if tab_item.id == g.config_classes['main-project'] %} d-none-at-all{% endif %}"
-                                    id='delete{{ entry.id }}'
-                                    value="{{ entry.id }}"
-                                    onclick="deleteEntry({{ entry.id }}, '{{ entry.name.display.label or '' }}', '{{ tab_item.target }}')"
+                                    id='delete{{ entity.id }}'
+                                    value="{{ entity.id }}"
+                                    onclick="deleteEntry({{ entity.id }}, '{{ entity.name_display_label or '' }}', '{{ tab_item.target }}')"
                                     data-bs-toggle="modal"
                                     data-bs-target="#deleteModal">{{ _('Delete') }}
                             </button>
                             <button type="button"
                                     class="btn btn-secondary d-none"
-                                    id='cancel{{ entry.id }}'
-                                    onclick="changeEdit({{ entry.id }}, false)">{{ _('Cancel') }}
+                                    id='cancel{{ entity.id }}'
+                                    onclick="changeEdit({{ entity.id }}, false)">{{ _('Cancel') }}
                             </button>
 
                             <button type="submit"
                                     class="btn btn-primary d-none"
-                                    id='save{{ entry.id }}'
-                                    value="{{ entry.id }}">{{ _('Save') }}
+                                    id='save{{ entity.id }}'
+                                    value="{{ entity.id }}">{{ _('Save') }}
                             </button>
-
                           </div>
                         </form>
 
-
+                        {# Rest of the template remains largely the same #}
                         {% if tab_item.id != g.config_classes['attribute'] %}
                           <hr>
                           <div id="{{ tab_item.target }}-links"
                                class="link-divs">
-                            {% for link in processed_links_by_entity.get(entry.id, []) %}
+                            {% for link in processed_links_by_entity.get(entity.id, []) %}
                               <div class="d-flex mb-2"
                                    data-order="{{ link.sortorder }}"
                                    data-id="{{ link.link_id }}">
@@ -365,7 +185,7 @@
                                        value="{{ link.role_display_label }}">
                                 <button class="btn btn-danger"
                                         id='delete{{ link.link_id }}'
-                                        onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name_display_label }}', '{{ link.config_property_display_label }}', '{{ link.end_name_display_label }}', '{{ tab_item.target }}', '{{ tab_item.target + entry.id|string }}', )"
+                                        onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name_display_label }}', '{{ link.config_property_display_label }}', '{{ link.end_name_display_label }}', '{{ tab_item.target }}', '{{ tab_item.target + entity.id|string }}', )"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteModal"
                                         style="min-width: 125px">{{ _('Delete') }}
@@ -373,7 +193,6 @@
                               </div>
                             {% endfor %}
                           </div>
-
 
                           <div class="d-flex mb-2">
                             <select
@@ -384,7 +203,7 @@
                               {% for prop in processed_properties_by_tab[tab_item.target] %}
                                 <option data-range="{{ prop.range }}"
                                         data-direction="{{ prop.direction }}"
-                                        data-entry="{{ entry.id }}"
+                                        data-entry="{{ entity.id }}"
                                         value="{{ prop.id }}">{{ prop.name_display_label }}
                                 </option>
                               {% endfor %}
@@ -419,7 +238,7 @@
                                     data-direction="" data-role=""
                                     data-tab="{{ tab_item.target }}"
                                     data-entry="
-                                      {{ tab_item.target }}{{ entry.id }}"
+                                      {{ tab_item.target }}{{ entity.id }}"
                                     class="btn btn-primary"
                                     onclick="saveLinkValues(this)"
                                     style="min-width: 125px" disabled>
