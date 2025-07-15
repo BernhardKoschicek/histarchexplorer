@@ -1,0 +1,120 @@
+
+
+{% from "_form_fields.html" import input_field, textarea_field %}
+<div class="modal" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ _('Confirm Delete') }}.</h5>
+        {{ ui.close_button("modal") }}
+      </div>
+      <div class="modal-body">
+        <p>{{ _('Are you sure you want to delete') }}: "<span
+          id="deleteName"></span>"?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+        <a id="confirmedDelete" type="button" href="#"
+           class="btn btn-primary">{{ _('Confirm Delete') }}</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addMapModal" tabindex="-1"
+     aria-labelledby="addMapModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="addMapModalLabel">{{ _('Add Map') }}</h5>
+        {{ ui.close_button("modal") }}
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('add_map') }}"
+              class="needs-validation" novalidate>
+          <input type="hidden" name="map_id" value="{{ map_id }}">
+          <div class="row">
+            <div class="col-md-6">
+              {{ input_field('InputName', _('name')|capitalize, 'name', 'text', True, '', _('Please provide a name')) }}
+            </div>
+            <div class="col-md-6">
+              {{ input_field('InputDispName', _('Display Name'), 'displayname', 'text', True, '', _('Please provide a display name')) }}
+            </div>
+            <div class="col-md-2 d-none">
+              {{ input_field('InputOrder', _('order')|capitalize, 'inputorder', 'text', True, maps|length + 1, _('Please provide an order')) }}
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-12">
+              {{ textarea_field('InputDescription', 'Leaflet Tile Layer String', 'description') }}
+            </div>
+          </div>
+          <div class="mt-3 text-end">
+            <button type="submit"
+                    class="btn btn-primary">{{ _('Add Map') }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="addEntryModal" tabindex="-1"
+     aria-labelledby="addEntryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="addEntryModalLabel">{{ _('add entry')|capitalize }}</h5>
+        {{ ui.close_button("modal") }}
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('add_entry') }}"
+              class="needs-validation" novalidate>
+          <input type="hidden" name="category" id="currentTab">
+          <div class="row">
+            <div class="col-lg">
+              {{ input_field('InputNameModal', _('name')|capitalize, 'name', 'text', True, '', _('Please provide a name')) }}
+            </div>
+            <div class="col-lg">
+              {{ textarea_field('InputDescriptionModal', _('description')|capitalize, 'description') }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg institutions-show persons-show modal-input">
+              {{ textarea_field('InputAddressModal', _('address')|capitalize, 'address') }}
+              {{ input_field('InputImageModal', 'Image URL', 'image') }}
+            </div>
+            <div
+              class="col-lg institutions-show persons-show projects-show modal-input">
+              {{ input_field('InputMailModal', _('e-mail')|capitalize, 'mail', 'email', False, '', _('Please provide a valid mail address: someone@somemail.com')) }}
+            </div>
+            <div
+              class="col-lg institutions-show projects-show modal-input">
+              {{ input_field('InputWebsiteModal', 'Website', 'website', 'url', False, '', _('Please provide a valid website url: https://someurl.com')) }}
+            </div>
+            <div class="col-lg persons-show modal-input">
+              {{ input_field('InputOrcidModal', 'ORCID-ID', 'orcid') }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg main-project-show modal-input">
+              {{ textarea_field('InputImprintModal', _('imprint')|capitalize, 'imprint') }}
+            </div>
+            <div class="col-lg main-project-show modal-input">
+              {{ textarea_field('InputLegalNoticeModal', _('legal notice')|capitalize, 'legalnotice') }}
+            </div>
+          </div>
+
+          <div class="mt-3 text-end">
+            <button type="submit"
+                    class="btn btn-primary">{{ _('add entry')|capitalize }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
