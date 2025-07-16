@@ -73,13 +73,27 @@ function addMap() {
 }
 
 function addEntry(category) {
-    const hiddenField = document.getElementById('currentTab');
-    if (hiddenField) {
-        hiddenField.value = category.replace('nav-', '');
-        console.log(hiddenField.value);
+    const currentTabInput = document.getElementById('currentTab');
+    if (currentTabInput) {
+        currentTabInput.value = category.replace('nav-', '');
 
-        document.querySelectorAll('.modal-input').forEach(el => el.classList.add('d-none'));
-        document.querySelectorAll(`.${hiddenField.value}-show`).forEach(el => el.classList.remove('d-none'));
+        // Hide all modal category field containers first
+        document.querySelectorAll('.modal-category-fields').forEach(el => {
+            el.style.display = 'none';
+            // Disable all inputs within hidden categories to prevent sending irrelevant data
+            el.querySelectorAll('input, textarea, select').forEach(input => {
+                input.disabled = true;
+            });
+        });
+
+        // Show only the container for the selected category and enable its inputs
+        const selectedCategoryDiv = document.getElementById(`modal-fields-${category}`);
+        if (selectedCategoryDiv) {
+            selectedCategoryDiv.style.display = 'block';
+            selectedCategoryDiv.querySelectorAll('input, textarea, select').forEach(input => {
+                input.disabled = false;
+            });
+        }
 
         const modalElement = document.getElementById('addEntryModal');
         if (modalElement) {

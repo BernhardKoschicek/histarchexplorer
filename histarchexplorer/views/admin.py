@@ -11,6 +11,7 @@ from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
+from histarchexplorer.config.admin_fields import FIELD_CONFIGS
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.services.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
@@ -79,6 +80,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_id=initial_case_study_type_id,
         initial_case_study_type_name=initial_case_study_type_name,
         case_study_children=case_study_children,
+        FIELD_CONFIGS=FIELD_CONFIGS,
         view_classes=app.config['VIEW_CLASSES'])
 
 
@@ -113,6 +115,7 @@ def add_link() -> Response:
 @login_required
 def add_entry() -> Response:
     check_manager_user()
+    case_study_str = request.form.get('case_study')
     form_data = {
         'category': request.form.get('category', ''),
         'name': request.form.get('name', ''),
@@ -124,7 +127,8 @@ def add_entry() -> Response:
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
         'legal_notice': request.form.get('legalnotice', ''),
-        'case_study': int(request.form.get('case_study'))}
+        'case_study': int(case_study_str)
+        if case_study_str and case_study_str.isdigit() else 0}
     current_tab = 'nav-' + form_data['category']
     redirect_base = url_for('admin') + current_tab
     try:

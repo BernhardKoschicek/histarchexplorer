@@ -158,7 +158,7 @@ def add_entry(data: dict) -> int:
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
                 NULLIF(%(image)s, ''),
-                NULLIF(%(case_study)s, ''),
+                NULLIF(%(case_study)s, NULL),
                 %(class_id)s)
         RETURNING id
         """, {
