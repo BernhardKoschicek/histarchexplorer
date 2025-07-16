@@ -1,8 +1,11 @@
-from typing import Any
+import datetime
+from typing import Any, Optional
 
+from flask import render_template, request
 from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
+from histarchexplorer.models.entity import Entity
 
 _('entities')
 _('search')
@@ -48,3 +51,14 @@ def find_children_by_id(data, target_id):
     return result
 
 
+def get_cite_button(entity: Entity) -> Optional[tuple[str, str]]:
+    if not entity:
+        return None, None
+    current_date = datetime.date.today().strftime("%Y-%m-%d")
+    button_html = render_template('cite/button.html')
+    modal_html = render_template(
+        'cite/modal.html',
+        entity=entity,
+        current_url=request.url,
+        today_date=current_date)
+    return button_html, modal_html

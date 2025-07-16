@@ -5,7 +5,7 @@ from typing import Any, Optional
 
 from flask import session
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.depiction import Depiction
@@ -152,6 +152,7 @@ class Entity:
     #             ApiAccess.get_by_system_class(class_, parser)]
 
     @staticmethod
+    @cache.memoize()
     def get_linked_entities_by_properties_recursive(
             id_: int,
             parser: Parser) -> list[Entity]:

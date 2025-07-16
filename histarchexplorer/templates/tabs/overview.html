@@ -50,6 +50,9 @@
 <div class="col flex-column grid-muuri">
 
   <div class="item item-half hierarchy-item">
+    <div class="cite-wrapper">
+    {{ cite_button | safe }}
+  </div>
     {% if ancestor_entities %}
       {% for entity in ancestor_entities %}
         <div class="hierarchy-button">
@@ -328,7 +331,6 @@
       </div>
     </div>
   {% endif %}
-
 </div>
 </div>
 </div>
@@ -337,6 +339,7 @@
 </div>
 </div>
 
+{{ cite_modal | safe }}
 
 <script src="../../static/js/overview.js"></script>
 
