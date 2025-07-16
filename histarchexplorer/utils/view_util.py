@@ -51,7 +51,7 @@ def find_children_by_id(data, target_id):
     return result
 
 
-def get_cite_button(entity: Entity) -> Optional[tuple[str, str]]:
+def get_cite_button(entity: Entity) -> tuple[None, None] | tuple[str, str]:
     if not entity:
         return None, None
     current_date = datetime.date.today().strftime("%Y-%m-%d")
