@@ -4,6 +4,12 @@
   </button>
 </div>
 
+<div class="button-card me-3">
+  <button id="clearCacheButton" class="btn btn-warning">
+    {{ _('clear cache') | upper }}
+  </button>
+</div>
+
 <form method="post" action="{{ url_for('select_entities') }}">
   <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle me-3"

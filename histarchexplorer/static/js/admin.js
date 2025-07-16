@@ -277,6 +277,12 @@ document.getElementById('resetButton')?.addEventListener('click', function () {
     }
 });
 
+document.getElementById('clearCacheButton')?.addEventListener('click', function () {
+    if (confirm('Are you sure you want to clear the cache?')) {
+        window.location.href = '/clear-cache';
+    }
+});
+
 
 function deleteEntry(id, name, tab) {
     const deleteName = document.getElementById('deleteName');
