@@ -283,6 +283,12 @@ document.getElementById('clearCacheButton')?.addEventListener('click', function 
     }
 });
 
+document.getElementById('warmCacheButton')?.addEventListener('click', function () {
+    if (confirm('Are you sure you want to warm the cache? This can take some time.')) {
+        window.location.href = '/warm-cache';
+    }
+});
+
 
 function deleteEntry(id, name, tab) {
     const deleteName = document.getElementById('deleteName');
@@ -488,3 +494,11 @@ function saveSortOrder(items, table) {
         console.error('Error saving sort order:', error);
     });
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+    new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+})

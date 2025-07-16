@@ -9,7 +9,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.config.admin_fields import FIELD_CONFIGS
 from histarchexplorer.database.map import check_if_map_id_exist
@@ -323,6 +323,20 @@ def reset() -> Response:
 
     return redirect(url_for('admin'))
 
+
+
+@app.route('/clear-cache')
+def clear_cache():
+    cache.clear()
+    flash(_('cache cleared'), 'success')
+    return redirect(url_for('admin'))
+
+
+@app.route('/warm-cache')
+def warm_cache():
+    type_tree()
+    flash(_('cache warmed'), 'success')
+    return redirect(url_for('admin'))
 
 def check_manager_user() -> None:
     if current_user.group not in ['admin', 'manager']:

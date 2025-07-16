@@ -1,14 +1,23 @@
+
 <div class="button-card me-3">
-  <button id="resetButton" class="btn btn-danger">
+  <button id="resetButton" class="btn btn-danger" data-bs-toggle="tooltip" title="{{ _('Resets the entire database') }}">
     {{ _('reset') | upper }}
   </button>
 </div>
 
 <div class="button-card me-3">
-  <button id="clearCacheButton" class="btn btn-warning">
+  <button id="warmCacheButton" class="btn btn-info" data-bs-toggle="tooltip" title="{{ _('This warms the application cache') }}">
+    {{ _('warm cache') | upper }}
+  </button>
+</div>
+
+<div class="button-card me-3">
+  <button id="clearCacheButton" class="btn btn-warning" data-bs-toggle="tooltip" title="{{ _('Clear the cache to free up space') }}">
     {{ _('clear cache') | upper }}
   </button>
 </div>
+
+
 
 <form method="post" action="{{ url_for('select_entities') }}">
   <div class="dropdown">

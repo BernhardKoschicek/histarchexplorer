@@ -1,9 +1,8 @@
-import json
 from typing import Optional
 
 import requests
-from flask import g, jsonify, redirect, render_template, request, session, \
-    url_for
+from flask import g, jsonify, redirect, render_template, request, \
+    session
 from werkzeug import Response
 
 from histarchexplorer import app, cache
@@ -38,8 +37,3 @@ def type_tree():
         timeout=20).json()
     return jsonify(response)
 
-
-@app.route('/clear-cache')
-def clear_cache():
-    cache.clear()
-    return redirect(url_for('admin'))
