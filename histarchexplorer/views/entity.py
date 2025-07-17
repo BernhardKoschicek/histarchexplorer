@@ -425,6 +425,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     features = []
     main_image = None
     initial_images = []
+    remaining_images = []
     more_images = False
     total_images = 0
     # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
@@ -510,7 +511,8 @@ def get_entity(id_: int, tab_name=None) -> str:
             main_image = images.pop(0)
 
         initial_images = images[:2]
-        more_images = len(images) > 2
+        remaining_images = images[2:]
+        more_images = len(remaining_images) > 0
         total_images = len(images+[main_image])
 
     elif tab_name not in valid_routes:
@@ -526,6 +528,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         features=features,
         main_image=main_image,
         initial_images=initial_images,
+        remaining_images=remaining_images,
         more_images=more_images,
         total_images=total_images,
         related_entities=related_entities or {})

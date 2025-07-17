@@ -32,11 +32,11 @@
 
           {# 3D-Modell-Ansicht (GLB/GLTF) #}
           {% if image.render_type == '3d_model' %}
-            <div class="model-wrapper">
+            <div class="model-wrapper" style="height: 300px; position: relative;">
               <div class="spinner"></div>
               <model-viewer
                   src="{{ image.url }}" alt="{{ image.title }}"
-                  camera-controls style="width: 100%; height: 300px;"
+                  camera-controls style="width: 100%; height: 100%;"
                   ar ar-modes="webxr scene-viewer quick-look"
                   shadow-intensity="1" autoplay></model-viewer>
             </div>

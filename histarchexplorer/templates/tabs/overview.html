@@ -6,7 +6,7 @@
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script type="modeul" src="/static/node_modules/muuri/dist/muuri.min.js"></script>
+<script type="module" src="/static/node_modules/muuri/dist/muuri.min.js"></script>
 
 <script src="../../static/js/overview.js"></script>
 
@@ -42,6 +42,7 @@
     const main_image = {{ main_image | tojson | safe }};
     const images = {{ initial_images | tojson | safe }};
     const more_images = {{ more_images | tojson | safe }};
+    const remainingImages = {{ remaining_images|tojson }};
 </script>
 
 <script>
@@ -245,19 +246,38 @@
 
   <!-- First image -->
   {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
-      {{ ui.overview_image(main_image) }}
+    {{ ui.overview_image(main_image) }}
   {% endif %}
 
-
-  <!-- All other images -->
+  <!-- All initial images, split last one out -->
   {% if initial_images %}
-    {% for depiction in initial_images %}
-        {{ ui.overview_image(depiction) }}
+    {% set last_image = initial_images[-1] %}
+    {% set other_images = initial_images[:-1] %}
+
+    {% for depiction in other_images %}
+      {{ ui.overview_image(depiction) }}
     {% endfor %}
+
+    <div class="item-half">
+      <div class="item-content item-content-full">
+        <div class="muuri-images">
+          <div class="image position-relative">
+            <a href="{{ last_image.iiif_base_path }}/full/max/0/default.jpg"
+               target="_blank"
+               class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
+               style="z-index: 10;">
+              <i class="bi bi-arrows-fullscreen"></i>
+            </a>
+            <img src="{{ last_image.url }}" alt="{{ last_image.title }}">
+            <button id="show-more-images"
+                    class="hover-max position-absolute bottom-0 start-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded">
+              More images
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   {% endif %}
-
-
-
 
 
 
@@ -319,6 +339,41 @@
 </div>
 </div>
 </div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('show-more-images');
+        const gridContainer = document.querySelector('.grid-muuri');
+
+        console.log('Button:', btn);
+        console.log('Grid Container:', gridContainer);
+        console.log('Remaining images:', remainingImages);
+        console.log('Muuri grid:', window.grid);
+
+        if (btn && gridContainer && remainingImages.length > 0) {
+            btn.addEventListener('click', function () {
+                remainingImages.forEach(image => {
+                    const el = document.createElement('div');
+                    el.classList.add('item-half');
+                    el.innerHTML = `
+                    <img src="${image.url}" alt="${image.label || ''}" loading="lazy">
+                `;
+                    gridContainer.appendChild(el);
+                    window.grid.add(el);
+                });
+
+                btn.style.display = 'none';
+
+                setTimeout(() => {
+                    window.grid.refreshItems().layout();
+                }, 100);
+            });
+        }
+    });
+
+</script>
+
 
 
 
