@@ -89,9 +89,8 @@ class ConfigEntity:
     orcid_id: str
     class_name: str
     case_study: int
-    attributes: dict[int, list[str]] | None
     main_project: bool
-    affiliations: list[dict[str, Any]] | None
+    links: list[Link]
 
     @classmethod
     def get_all_localized(cls) -> list['ConfigEntity']:
@@ -113,10 +112,7 @@ class ConfigEntity:
                 class_name=entry.class_name,
                 case_study=entry.case_study_type_id,
                 main_project=(entry.class_name == 'main-project'),
-                attributes=get_project_roles(
-                    entry.id,
-                    entry.class_id),
-                affiliations=get_person_affiliations(entry.id)
+                links=[l_ for l_ in g.config_links if l_.start_id == entry.id]
             ))
 
         return entities

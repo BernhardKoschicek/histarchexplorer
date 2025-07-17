@@ -1,21 +1,36 @@
-
-<div class="modal fade" id="citationModal" tabindex="-1" aria-labelledby="citationModalLabel" aria-hidden="true">
+<div class="modal fade" id="citationModal" tabindex="-1"
+     aria-labelledby="citationModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="citationModalLabel">Cite this Page</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <p id="citationText">
           <span>"{{ entity.name }}". From: {{ case_study_names }}: {{ current_url }} [Accessed: {{ today_date }}]</span>
         </p>
       </div>
+      <div class="container-fluid">
+        <div class="row">
+          {% for case_study in case_studies %}
+            <div class="col-6">
+              <p>{{ case_study.name.display.label }}</p>
+              {% for link in case_study.links %}
+                <p>{{ link.config_property.display.label }}: {{ link.end_name.display.label }}</p>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" id="copyCitationBtn">
           <i class="bi bi-copy"></i> Copy Citation
         </button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal">Close
+        </button>
       </div>
     </div>
   </div>

@@ -1,4 +1,5 @@
 import datetime
+from pprint import pprint
 from typing import Any
 
 from flask import g, render_template, url_for
@@ -65,7 +66,6 @@ def get_cite_button(entity: Entity) -> tuple[None, None] | tuple[str, str]:
                         if e.class_id == g.config_classes['main-project']]
     case_study_names = '/'.join(
         [cs.name['display']['label'] for cs in case_studies])
-
     button_html = render_template('cite/button.html')
     modal_html = render_template(
         'cite/modal.html',
