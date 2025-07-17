@@ -138,7 +138,8 @@ CREATE TABLE tng.entities (
     image text,
     website text,
     legal_notice jsonb,
-    imprint jsonb
+    imprint jsonb,
+    case_study_type_id integer
 );
 
 
@@ -291,7 +292,8 @@ CREATE TABLE tng.settings (
     hidden_classes text[],
     hidden_types text[],
     shown_ids text[],
-    hidden_ids text[]
+    hidden_ids text[],
+    case_study_type_id integer
 );
 
 
@@ -350,31 +352,31 @@ INSERT INTO tng.classes (id, name) OVERRIDING SYSTEM VALUE VALUES
 -- Data for Name: entities; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-INSERT INTO tng.entities (id, name, description, address, class_id, email, orcid_id, image, website, legal_notice, imprint) OVERRIDING SYSTEM VALUE VALUES
-	(2, '{"de": "Stefan Eichert", "en": "Stefan Eichert"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-	(3, '{"de": "Lisa Aldrian", "en": "Lisa Aldrian"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-	(4, '{"de": "David Ruß", "en": "David Ruß"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-	(5, '{"de": "Projektleitung", "en": "Principal Investigator"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
-	(6, '{"de": "Hauptkoordinator", "en": "Main Coordinator"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
-	(7, '{"de": "Forscher", "en": "Researcher"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
-	(8, '{"de": "Softwareentwickler", "en": "Software Developer"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
-	(9, '{"de": "Design & Programmierung", "en": "Design & Programming"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
-	(10, '{"de": "Archäologe", "en": "Archaeologist"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
-	(11, '{"de": "Anthropologe", "en": "Anthropologist"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
-	(12, '{"de": "Datenaufnahme", "en": "Data Acquisition"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
-	(13, '{"de": "Historiker", "en": "Historian"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
-	(14, '{"de": "Sponsor", "en": "Sponsor"}', NULL, NULL, 3, 'https://example.example', NULL, NULL, NULL, NULL, NULL),
-	(15, '{"de": "Partner", "en": "Partner"}', NULL, NULL, 3, 'https://example.example', NULL, NULL, NULL, NULL, NULL),
-	(17, '{"de": "RELIC", "en": "RELIC"}', NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-	(18, '{"de": "REPLICO", "en": "REPLICO"}', NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-	(20, '{"de": "Universität Wien", "en": "University of Vienna"}', '{"de": "Die Wiener Uni", "en": "Viennese university"}', '{"de": "Universitätsring 1\r\n1010 Wien", "en": "Universitätsring 1\r\n1010 Vienna"}', 4, 'uni@univie.ac.at', NULL, 'https://www.univie.ac.at/fileadmin/templates/Startseite/assets/uni_logo_220@2x.jpg', 'https://www.univie.ac.at/', '{}', '{}'),
-	(1, '{"de": "HistArchExplorer ", "en": "HistArchExplorer "}', '{"de": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.  \r\n\r\nDuis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.  \r\n\r\nUt wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.  \r\n\r\nNam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.  \r\n\r\nDuis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.   \r\n\r\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam"}', '{}', 5, NULL, NULL, NULL, 'http://127.0.0.1:5000/', '{"de": "Ich auch nicht"}', '{"de": "Hab ich keins"}'),
-	(21, '{"de": "Austrian Centre for Digital Humanities", "en": "Austrian Centre for Digital Humanities & Cultural Heritage"}', '{"de": "Digitale Geisteswissenschaften"}', '{"de": "Bäckerstraße 13\r\n1010 Wien"}', 4, 'ACDH-CH-Office@oeaw.ac.at', NULL, 'https://www.oeaw.ac.at/fileadmin/oeaw/institutstemplate/acdh/img/acdh-ch-logo96.png', 'https://www.oeaw.ac.at/acdh/acdh-ch-home', '{}', '{}'),
-	(22, '{"de": "Nina Brundke", "en": "Nina Richards"}', '{"de": "Beste Anthropologin", "en": "Best anthropologist! "}', '{"en": "Burgring 7"}', 2, 'nina@richards.us', NULL, NULL, NULL, '{}', '{}'),
-	(23, '{"de": "Physiotherapeut"}', '{}', '{}', 3, NULL, NULL, NULL, NULL, '{}', '{}'),
-	(19, '{"de": "NHM", "en": "NHM_"}', '{"de": "Naturhistorisches Museum"}', '{"de": "Burgring 7"}', 4, NULL, NULL, 'https://nhm.at/jart/prj3/nhm-resp/resources/images/logo.svg', 'https://nhm.at/', '{}', '{}'),
-	(24, '{"de": "FH Wien"}', '{}', '{}', 4, NULL, NULL, NULL, NULL, '{}', '{}'),
-	(16, '{"de": "THANADOS", "en": "THANADOS"}', '{}', '{}', 1, NULL, NULL, NULL, 'https://thanados.net/', '{}', '{}');
+INSERT INTO tng.entities (id, name, description, address, class_id, email, orcid_id, image, website, legal_notice, imprint, case_study_type_id) OVERRIDING SYSTEM VALUE VALUES
+	(2, '{"de": "Stefan Eichert", "en": "Stefan Eichert"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(3, '{"de": "Lisa Aldrian", "en": "Lisa Aldrian"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(4, '{"de": "David Ruß", "en": "David Ruß"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5, '{"de": "Projektleitung", "en": "Principal Investigator"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(6, '{"de": "Hauptkoordinator", "en": "Main Coordinator"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(7, '{"de": "Forscher", "en": "Researcher"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(8, '{"de": "Softwareentwickler", "en": "Software Developer"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(9, '{"de": "Design & Programmierung", "en": "Design & Programming"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(10, '{"de": "Archäologe", "en": "Archaeologist"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(11, '{"de": "Anthropologe", "en": "Anthropologist"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(12, '{"de": "Datenaufnahme", "en": "Data Acquisition"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(13, '{"de": "Historiker", "en": "Historian"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(14, '{"de": "Sponsor", "en": "Sponsor"}', NULL, NULL, 3, 'https://example.example', NULL, NULL, NULL, NULL, NULL, NULL),
+	(15, '{"de": "Partner", "en": "Partner"}', NULL, NULL, 3, 'https://example.example', NULL, NULL, NULL, NULL, NULL, NULL),
+	(20, '{"de": "Universität Wien", "en": "University of Vienna"}', '{"de": "Die Wiener Uni", "en": "Viennese university"}', '{"de": "Universitätsring 1\r\n1010 Wien", "en": "Universitätsring 1\r\n1010 Vienna"}', 4, 'uni@univie.ac.at', NULL, 'https://www.univie.ac.at/fileadmin/templates/Startseite/assets/uni_logo_220@2x.jpg', 'https://www.univie.ac.at/', '{}', '{}', NULL),
+	(1, '{"de": "HistArchExplorer ", "en": "HistArchExplorer "}', '{"de": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.  \r\n\r\nDuis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.  \r\n\r\nUt wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.  \r\n\r\nNam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.  \r\n\r\nDuis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.   \r\n\r\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam"}', '{}', 5, NULL, NULL, NULL, 'http://127.0.0.1:5000/', '{"de": "Ich auch nicht"}', '{"de": "Hab ich keins"}', NULL),
+	(21, '{"de": "Austrian Centre for Digital Humanities", "en": "Austrian Centre for Digital Humanities & Cultural Heritage"}', '{"de": "Digitale Geisteswissenschaften"}', '{"de": "Bäckerstraße 13\r\n1010 Wien"}', 4, 'ACDH-CH-Office@oeaw.ac.at', NULL, 'https://www.oeaw.ac.at/fileadmin/oeaw/institutstemplate/acdh/img/acdh-ch-logo96.png', 'https://www.oeaw.ac.at/acdh/acdh-ch-home', '{}', '{}', NULL),
+	(22, '{"de": "Nina Brundke", "en": "Nina Richards"}', '{"de": "Beste Anthropologin", "en": "Best anthropologist! "}', '{"en": "Burgring 7"}', 2, 'nina@richards.us', NULL, NULL, NULL, '{}', '{}', NULL),
+	(23, '{"de": "Physiotherapeut"}', '{}', '{}', 3, NULL, NULL, NULL, NULL, '{}', '{}', NULL),
+	(19, '{"de": "NHM", "en": "NHM_"}', '{"de": "Naturhistorisches Museum"}', '{"de": "Burgring 7"}', 4, NULL, NULL, 'https://nhm.at/jart/prj3/nhm-resp/resources/images/logo.svg', 'https://nhm.at/', '{}', '{}', NULL),
+	(24, '{"de": "FH Wien"}', '{}', '{}', 4, NULL, NULL, NULL, NULL, '{}', '{}', NULL),
+	(17, '{"de": "RELIC", "en": "RELIC"}', '{}', '{}', 1, NULL, NULL, NULL, NULL, '{}', '{}', 221174),
+	(16, '{"de": "THANADOS", "en": "THANADOS"}', '{}', '{}', 1, NULL, NULL, NULL, 'https://thanados.net/', '{}', '{}', 181731),
+	(18, '{"de": "REPLICO", "en": "REPLICO"}', '{}', '{}', 1, NULL, NULL, NULL, NULL, '{}', '{}', 221174);
 
 
 --
@@ -416,8 +418,7 @@ INSERT INTO tng.links (id, domain_id, range_id, property, attribute, sortorder) 
 
 INSERT INTO tng.maps (id, name, display_name, tilestring, sortorder) VALUES
 	(1, 'OpenStreetMap', 'Open Street Map', 'L.tileLayer(
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1),
-	(2, 'uio', 'uo', '', 2);
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1);
 
 
 --
@@ -436,8 +437,8 @@ INSERT INTO tng.properties (id, name, name_inv, domain_type_id, range_type_id) O
 -- Data for Name: settings; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-INSERT INTO tng.settings (id, index_img, index_map, img_map, greyscale, shown_classes, shown_types, hidden_classes, hidden_types, shown_ids, hidden_ids) VALUES
-	(1, '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'map', true, '{artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}', NULL, '{group,stratigraphic_unit,source,external_reference}', NULL, NULL, NULL);
+INSERT INTO tng.settings (id, index_img, index_map, img_map, greyscale, shown_classes, shown_types, hidden_classes, hidden_types, shown_ids, hidden_ids, case_study_type_id) VALUES
+	(1, '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'map', true, '{artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}', NULL, '{group,stratigraphic_unit,source,external_reference}', NULL, NULL, NULL, 8240);
 
 
 --

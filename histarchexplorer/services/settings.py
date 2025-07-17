@@ -16,6 +16,7 @@ class Settings:
     hidden_types: list[str]
     shown_ids: list[str]
     hidden_ids: list[str]
+    case_study_type_id: int
 
     @classmethod
     def initialize_settings(cls) -> "Settings":

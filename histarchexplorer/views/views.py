@@ -1,8 +1,8 @@
-import json
 from typing import Optional
 
 import requests
-from flask import g, jsonify, redirect, render_template, request, session
+from flask import g, jsonify, redirect, render_template, request, \
+    session
 from werkzeug import Response
 
 from histarchexplorer import app, cache
@@ -36,3 +36,4 @@ def type_tree():
         f"{app.config['API_URL']}/type_by_view_class/",
         timeout=20).json()
     return jsonify(response)
+

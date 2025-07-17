@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from flask import abort, g, render_template
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.entity import get_entity_by_id
 from histarchexplorer.models.entity import Entity
@@ -386,8 +386,7 @@ def get_entities(tab_name: str = None) -> str:
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
-
-
+@cache.cached()
 def get_entity(id_: int, tab_name=None) -> str:
     data = {}
     main_entity = None
