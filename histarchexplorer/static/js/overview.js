@@ -23,8 +23,8 @@ window.grid.layout();
 //        window.grid.refreshItems().layout();
 //    }, 500);
 //};
-//
-//
+
+
 //function observeModelSizeChanges() {
 //    const ro = new ResizeObserver(() => {
 //        if (grid) grid.refreshItems().layout();
@@ -34,16 +34,17 @@ window.grid.layout();
 //        ro.observe(model);
 //    });
 //}
-//
-//let resizeTimeout;
-//
-//window.addEventListener('resize', () => {
-//    clearTimeout(resizeTimeout);
-//    resizeTimeout = setTimeout(() => {
-//        window.grid.refreshItems().layout();
-//    }, 300);
-//});
-//
+
+//necessary for maximizing resize!
+let resizeTimeout;
+
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        window.grid.refreshItems().layout();
+    }, 300);
+});
+
 
 
 //3d Model Spinner removal when 3dmodel loaded
