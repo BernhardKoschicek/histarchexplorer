@@ -1,5 +1,4 @@
 import datetime
-from pprint import pprint
 from typing import Any
 
 from flask import g, render_template, url_for
@@ -52,9 +51,9 @@ def find_children_by_id(data, target_id):
     return result
 
 
-def get_cite_button(entity: Entity) -> tuple[None, None] | tuple[str, str]:
+def get_cite_button(entity: Entity) -> dict[str, str]:
     if not entity:
-        return None, None
+        return {'button_html': '', 'modal_html': ''}
     current_date = datetime.date.today().strftime("%Y-%m-%d")
     projects = {e.case_study: e for e in g.config_entities if e.case_study}
     case_studies = []
@@ -64,14 +63,14 @@ def get_cite_button(entity: Entity) -> tuple[None, None] | tuple[str, str]:
     if not case_studies:
         case_studies = [e for e in g.config_entities
                         if e.class_id == g.config_classes['main-project']]
-    case_study_names = '/'.join(
+    project_name = '/'.join(
         [cs.name['display']['label'] for cs in case_studies])
     button_html = render_template('cite/button.html')
     modal_html = render_template(
         'cite/modal.html',
         entity=entity,
-        case_study_names=case_study_names,
-        case_studies=case_studies,
+        project_name=project_name,
+        projects=case_studies,
         current_url=url_for('entity', id_=entity.id, _external=True),
         today_date=current_date)
-    return button_html, modal_html
+    return {'button_html': button_html, 'modal_html': modal_html}

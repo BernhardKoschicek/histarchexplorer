@@ -519,7 +519,6 @@ def get_entity(id_: int, tab_name=None) -> str:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
-    cite_button, cite_modal = get_cite_button(main_entity)
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
@@ -531,8 +530,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         more_images=more_images,
         total_images=total_images,
         related_entities=related_entities or {},
-        cite_button=cite_button,
-        cite_modal=cite_modal)
+        cite_button=get_cite_button(main_entity))
 
     # related_entities=related_entities_json)
 

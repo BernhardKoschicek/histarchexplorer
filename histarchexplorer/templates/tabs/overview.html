@@ -51,7 +51,7 @@
 
   <div class="item item-half hierarchy-item">
     <div class="cite-wrapper">
-    {{ cite_button | safe }}
+    {{ cite_button.button_html | safe }}
   </div>
     {% if ancestor_entities %}
       {% for entity in ancestor_entities %}
@@ -339,7 +339,7 @@
 </div>
 </div>
 
-{{ cite_modal | safe }}
+{{ cite_button.modal_html | safe }}
 
 <script src="../../static/js/overview.js"></script>
 

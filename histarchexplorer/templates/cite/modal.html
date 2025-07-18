@@ -8,16 +8,16 @@
                 aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p id="citationText">
-          <span>"{{ entity.name }}". From: {{ case_study_names }}: {{ current_url }} [Accessed: {{ today_date }}]</span>
+        <p id="citationText" class="border border-secondary rounded-1 p-2 bg-light">
+          <span>"{{ entity.name }}". From: {{ project_name }}: {{ current_url }} [Accessed: {{ today_date }}]</span>
         </p>
       </div>
       <div class="container-fluid">
         <div class="row">
-          {% for case_study in case_studies %}
+          {% for project in projects %}
             <div class="col-6">
-              <p>{{ case_study.name.display.label }}</p>
-              {% for link in case_study.links %}
+              <p>{{ project.name.display.label }}</p>
+              {% for link in project.links %}
                 <p>{{ link.config_property.display.label }}: {{ link.end_name.display.label }}</p>
               {% endfor %}
             </div>
@@ -35,3 +35,5 @@
     </div>
   </div>
 </div>
+
+
