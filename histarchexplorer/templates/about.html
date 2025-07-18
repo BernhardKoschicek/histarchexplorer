@@ -38,8 +38,11 @@
               </div>
               <ul class="list-unstyled">
                 {% for link in person.links %}
-                  {% if link.end_id == project.id %}
-                  <li>{{ link.role.display.label | capitalize }}</li>
+                  {% if link.property_id == 2 %}
+                     <li>
+                      <i title="institution" class="bi bi-briefcase me-1 text-body-secondary"></i>
+                      {{ link.end_name.display.label }} {{ _('as') }} {{ link.role.display.label | capitalize }}
+                    </li>
                   {% endif %}
                 {% endfor %}
                 {% if person.email %}
@@ -49,14 +52,6 @@
                        class="text-body-secondary text-decoration-none">{{ person.email }}</a>
                   </li>
                 {% endif %}
-                  {% for link in person.links %}
-                    {% if link.property_id == 2 %}
-                    <li>
-                      <i title="institution" class="bi bi-briefcase me-1 text-body-secondary"></i>
-                      {{ link.end_name.display.label }}
-                    </li>
-                    {% endif %}
-                  {% endfor %}
               </ul>
             </div>
           {% endfor %}
