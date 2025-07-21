@@ -428,6 +428,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     remaining_images = []
     more_images = False
     total_images = 0
+    all_images = []
     # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
 
 
@@ -476,13 +477,13 @@ def get_entity(id_: int, tab_name=None) -> str:
                 if geom.get("type") == "Point"
             ]
 
-        print(main_entity.geometry)
-        print('=== DEBUG PERSON ENTITY ===')
-        print('ID:', main_entity.id)
-        print('Name:', main_entity.name)
-        print('Class:', main_entity.system_class)
-        print('Formated date:', main_entity.formated_date)
-        print('Types (Chronology):', [(t.label, t.root) for t in main_entity.types if t.root == 'Chronology'])
+        #print(main_entity.geometry)
+        #print('=== DEBUG PERSON ENTITY ===')
+        #print('ID:', main_entity.id)
+        #print('Name:', main_entity.name)
+        #print('Class:', main_entity.system_class)
+        #print('Formated date:', main_entity.formated_date)
+        #print('Types (Chronology):', [(t.label, t.root) for t in main_entity.types if t.root == 'Chronology'])
 
         related_entities = get_related_entities(main_entity, entities)
 
@@ -515,6 +516,23 @@ def get_entity(id_: int, tab_name=None) -> str:
         more_images = len(remaining_images) > 0
         total_images = len(images+[main_image])
 
+
+    #Media-tab
+
+    elif tab_name == 'media':
+        entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            get_parser_for_landing(id_)
+        )
+        main_entity = get_main_entity(id_, entities)
+
+        all_images = main_entity.depictions
+
+        data = {
+            'entity': json.dumps(main_entity.to_serializable(), ensure_ascii=False),
+            'categorized_types': json.dumps(categorized_types(main_entity), ensure_ascii=False)
+        }
+
     elif tab_name not in valid_routes:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
@@ -531,6 +549,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         remaining_images=remaining_images,
         more_images=more_images,
         total_images=total_images,
+        all_images=all_images,
         related_entities=related_entities or {})
 
     # related_entities=related_entities_json)
