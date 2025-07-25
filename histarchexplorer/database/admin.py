@@ -187,7 +187,7 @@ def update_config_entry(data: dict) -> None:
             website  = NULLIF(%(website)s, ''),
             orcid_id = NULLIF(%(orcid_id)s, ''),
             image    = NULLIF(%(image)s, ''),
-            case_study_type_id    = NULLIF(%(case_study)s, NULL)
+            case_study_type_id = %(case_study)s
         WHERE id = %(config_id)s
         """,
         data)

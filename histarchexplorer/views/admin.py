@@ -157,6 +157,8 @@ def delete_entry(id_: int, tab: str) -> Response:
 @login_required
 def edit_entry() -> Response:
     check_manager_user()
+    case_study_raw = request.form.get('case_study')
+    case_study = int(case_study_raw) if case_study_raw else None
     form_data = {
         'config_id': request.form.get('config_id', type=int),
         'name': request.form.get('name', ''),
@@ -168,7 +170,7 @@ def edit_entry() -> Response:
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
         'legal_notice': request.form.get('legalnotice', ''),
-        'case_study': int(request.form.get('case_study'))}
+        'case_study': case_study}
     try:
         Admin.edit_entry(form_data)
         flash(f'"{form_data["name"]}" updated successfully', 'success')
