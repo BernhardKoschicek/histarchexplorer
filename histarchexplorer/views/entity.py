@@ -466,7 +466,8 @@ def get_entity(id_: int, tab_name=None) -> str:
             print('No spatial features found. Aborting with 404.')
             abort(404)
         data['spatial'] = map_data
-
+    elif tab_name == 'catalogue':
+        print('nice')
     elif tab_name == 'overview':
         # data = get_entity()
         entities = Entity.get_linked_entities_by_properties_recursive(
