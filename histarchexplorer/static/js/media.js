@@ -7,8 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.mediaGrid = new Muuri('.grid-media', {
         layout: {
             fillGaps: true,
-        },
-        items: '.item-half'
+        }
     });
 
     window.mediaGrid.refreshItems().layout();
@@ -17,3 +16,4 @@ document.addEventListener('DOMContentLoaded', () => {
         window.mediaGrid.refreshItems().layout();
     }, 700);
 });
+

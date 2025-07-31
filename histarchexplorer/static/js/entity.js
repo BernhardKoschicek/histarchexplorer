@@ -172,13 +172,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (entityId === 0) newUrl = `/entities/${tabName}`;
                 history.pushState({tab: tabName}, '', newUrl);
             }
+
+
             setTimeout(() => {
                 const gridName = `${tabName}Grid`;
                 if (window[gridName]) {
                     window[gridName].refreshItems().layout();
                 }
+                console.log(gridName)
             }, 500);
-
 
         });
     });
