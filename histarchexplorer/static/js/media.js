@@ -1,13 +1,19 @@
+window.mediaGrid = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-  const container = document.querySelector('.grid-media');
-  if (!container) return;
+    const container = document.querySelector('.grid-media');
+    if (!container) return;
 
-  const mediaGrid = new Muuri('.grid-media', {
-    layout: {
-      fillGaps: true,
-    },
-    items: '.item-half'
-  });
+    window.mediaGrid = new Muuri('.grid-media', {
+        layout: {
+            fillGaps: true,
+        },
+        items: '.item-half'
+    });
 
-  mediaGrid.refreshItems().layout();
+    window.mediaGrid.refreshItems().layout();
+
+    setTimeout(() => {
+        window.mediaGrid.refreshItems().layout();
+    }, 700);
 });

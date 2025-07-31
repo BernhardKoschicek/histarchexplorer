@@ -1,6 +1,17 @@
 let loadedTabs = []
 let notYetClickedTabs = tabsToLoad
 
+function refreshGrids() {
+
+    setTimeout(() => {
+        if (window.overviewGrid) {
+            window.overviewGrid.refreshItems().layout();
+        }
+        if (window.mediaGrid) {
+            window.mediaGrid.refreshItems().layout();
+        }
+    }, 100);
+}
 
 document.getElementById('toggleSidebar').addEventListener('click', function () {
     const nav_sidebar = document.getElementById('nav-sidebar');
@@ -14,8 +25,8 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
         root.style.setProperty('--sidebar-width', '60px');
     }
     setTimeout(() => {
-    if (typeof(grid) !== 'undefined') grid.refreshItems().layout();
-}, 300);
+        if (typeof (grid) !== 'undefined') grid.refreshItems().layout();
+    }, 300);
 });
 
 let loadedCount = 0; // Track completed tab loads
@@ -25,7 +36,7 @@ async function loadHTML(id, tab, index, totalTabs) {
     console.log(tab)
 
     let urlbase = `/get_entity/${id}/${tab}`
-    if (id === 0) urlbase =  `/get_entities/${tab}`
+    if (id === 0) urlbase = `/get_entities/${tab}`
     console.log(urlbase)
 
     const response = await fetch(urlbase);
@@ -173,6 +184,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (entityId === 0) newUrl = `/entities/${tabName}`;
                 history.pushState({tab: tabName}, '', newUrl);
             }
+            setTimeout(() => {
+                const gridName = `${tabName}Grid`;
+                if (window[gridName]) {
+                    window[gridName].refreshItems().layout();
+                }
+            }, 500);
+
+
         });
     });
 

@@ -1,4 +1,4 @@
-const overviewGrid = new Muuri('.grid-muuri', {
+window.overviewGrid = new Muuri('.grid-muuri', {
     layout: {
         fillGaps: true,
     },
@@ -7,19 +7,19 @@ const overviewGrid = new Muuri('.grid-muuri', {
     }
 });
 
-overviewGrid.sort((a, b) => {
+window.overviewGrid.sort((a, b) => {
     const order = ['description', 'map', 'image', 'reference'];
     const aType = a.getElement().getAttribute('data-type');
     const bType = b.getElement().getAttribute('data-type');
     return order.indexOf(aType) - order.indexOf(bType);
 });
 
-overviewGrid.layout();
+window.overviewGrid.layout();
 
 window.addEventListener('resize', () => {
-    clearTimeout(overviewGrid.resizeTimeout);
-    overviewGrid.resizeTimeout = setTimeout(() => {
-        overviewGrid.refreshItems().layout();
+    clearTimeout(window.overviewGrid.resizeTimeout);
+    window.overviewGrid.resizeTimeout = setTimeout(() => {
+        window.overviewGrid.refreshItems().layout();
     }, 300);
 });
 
@@ -31,7 +31,7 @@ document.querySelectorAll('model-viewer').forEach(model => {
             const spinner = wrapper.querySelector('.spinner');
             if (spinner) spinner.style.display = 'none';
         }
-        overviewGrid.refreshItems().layout();
+        window.overviewGrid.refreshItems().layout();
     });
 });
 
@@ -48,14 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setTimeout(() => {
-        overviewGrid.refreshItems().layout();
+        window.overviewGrid.refreshItems().layout();
     }, 500);
 });
 
 
 function observeModelSizeChanges() {
     const ro = new ResizeObserver(() => {
-        overviewGrid.refreshItems().layout();
+        window.overviewGrid.refreshItems().layout();
     });
 
     document.querySelectorAll('model-viewer').forEach(model => {
