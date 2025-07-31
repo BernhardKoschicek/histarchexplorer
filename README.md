@@ -14,8 +14,8 @@ folder:
 python packages
 
         sudo apt install python3-bcrypt python3-flask python3-flask-babel 
-        python3-flask-login python3-mypy python3-numpy python3-psycopg2
-        python3-werkzeug python3-wtforms python3-flask-caching python3-requests
+        sudo apt install python3-flask-login python3-mypy python3-numpy python3-psycopg2
+        sudo apt install python3-werkzeug python3-wtforms python3-flask-caching python3-requests
 
 for development
 
@@ -28,6 +28,7 @@ postgresql database and run
         cd install
         cat 1_structure.sql 2_data_model.sql | psql -d <DATABASE_NAME> -f -
 
-Or run the script if you have the correct database credentials in "instance/production.py"
-    
-        python3 /install/install_script.py
+Or run the script in the histarchexplorer root folder, if you have the correct database credentials in "instance/production.py"
+
+        export PYTHONPATH=".:$PYTHONPATH"
+        python3 install/install_script.py

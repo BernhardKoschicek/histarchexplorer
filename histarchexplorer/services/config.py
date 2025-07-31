@@ -1,12 +1,9 @@
-from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any
 
 from flask import g
-from flask_babel import lazy_gettext as _
 
-from histarchexplorer.database.about import (
-    get_affiliations, get_config_entities, get_project_attributes_sql)
+from histarchexplorer.database.about import get_config_entities
 from histarchexplorer.database.admin import get_config_links, \
     get_config_properties
 from histarchexplorer.database.config_classes import get_config_classes_sql
@@ -87,9 +84,9 @@ class ConfigEntity:
     image: str
     orcid_id: str
     class_name: str
-    attributes: dict[int, list[str]] | None
+    case_study: int
     main_project: bool
-    affiliations: list[dict[str, Any]] | None
+    links: list[Link]
 
     @classmethod
     def get_all_localized(cls) -> list['ConfigEntity']:
@@ -109,12 +106,9 @@ class ConfigEntity:
                 image=entry.image,
                 orcid_id=entry.orcid_id,
                 class_name=entry.class_name,
+                case_study=entry.case_study_type_id,
                 main_project=(entry.class_name == 'main-project'),
-                attributes=get_project_roles(
-                    entry.id,
-                    entry.class_id),
-                affiliations=get_person_affiliations(entry.id)
-                if entry.class_name == 'person' else None
+                links=[l_ for l_ in g.config_links if l_.start_id == entry.id]
             ))
 
         return entities
@@ -130,29 +124,29 @@ class ConfigEntity:
         return grouped
 
 
-def get_project_roles(
-        id_: int,
-        config_class_id: int) -> dict[int, list]:
-    result = defaultdict(list)
-    for domain_id, attribute in get_project_attributes_sql(
-            id_,
-            config_class_id):
-        if attribute:
-            result[domain_id].append(localize(attribute))
-        else:
-            result[domain_id].append(_('no attribute'))
-    return dict(result)
+# def get_project_roles(
+#         id_: int,
+#         config_class_id: int) -> dict[int, list]:
+#     result = defaultdict(list)
+#     attributes= get_project_attributes_sql(id_, config_class_id)
+#     for domain_id, attribute in attributes:
+#         if attribute:
+#             result[domain_id].append(localize(attribute))
+#     for range_id, attribute in get_project_attributes_sql_inverse(id_, config_class_id):
+#         if attribute:
+#             result[range_id].append(localize(attribute))
+#     return dict(result)
 
 
-def get_person_affiliations(id_: int) -> list[dict[str, Any]]:
-    grouped = defaultdict(lambda: {"attributes": []})
-    for record in get_affiliations(id_):
-        rid = record.range_id
-        if "id" not in grouped[rid]:
-            grouped[rid]["institute_id"] = rid
-            grouped[rid]["affiliation"] = localize(record.affiliation)
-        grouped[rid]["attributes"].append(localize(record.attribute))
-    return list(grouped.values())
+# def get_person_affiliations(id_: int) -> list[dict[str, Any]]:
+#     grouped = defaultdict(lambda: {"attributes": []})
+#     for record in get_affiliations(id_):
+#         rid = record.range_id
+#         if "id" not in grouped[rid]:
+#             grouped[rid]["id"] = rid
+#             grouped[rid]["affiliation"] = localize(record.affiliation)
+#         grouped[rid]["attributes"].append(localize(record.attribute))
+#     return list(grouped.values())
 
 
 def localize(data: dict[str, str] | None) -> str | None:
@@ -176,9 +170,10 @@ def localize(data: dict[str, str] | None) -> str | None:
     return None
 
 
-def add_display(data: dict[str, Any]) -> dict[str, Any] | None:
+def add_display(data: dict[str, Any] | None) -> dict[str, Any]:
     if not data:
-        return {}
+        return {'display': {'language': None, 'label': None}}
+
     result = data.copy()
     label = localize(data)
 

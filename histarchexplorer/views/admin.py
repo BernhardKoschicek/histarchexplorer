@@ -3,16 +3,19 @@ import subprocess
 from typing import Optional
 
 from flask import (
-    abort, current_app, flash, g, redirect, render_template,
+    abort, current_app, flash, g, jsonify, redirect, render_template,
     request, url_for)
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
+from histarchexplorer.config.admin_fields import FIELD_CONFIGS
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.services.admin import Admin, EntryNotFound
+from histarchexplorer.utils.view_util import find_children_by_id
+from histarchexplorer.views.views import type_tree
 
 
 @app.route('/admin/')
@@ -20,47 +23,60 @@ from histarchexplorer.services.admin import Admin, EntryNotFound
 @app.route('/admin/<tab>/<entry>')
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
-    tabs = [
-        {
-            'label': _('main-project'),
-            'target': 'nav-main-project',
-            'id': g.config_classes['main-project']
-        }, {
-            'label': _('projects'),
-            'target': 'nav-projects',
-            'id': g.config_classes['project']
-        }, {
-            'label': _('persons'),
-            'target': 'nav-persons',
-            'id': g.config_classes['person']
-        }, {
-            'label': _('institutions'),
-            'target': 'nav-institutions',
-            'id': g.config_classes['institution']
-        }, {
-            'label': _('attributes'),
-            'target': 'nav-attributes',
-            'id': g.config_classes['attribute']}]
     check_manager_user()
-    class_items = {
-        k: v for k, v in get_entities_count_by_case_study().items()
-        if k not in app.config['CLASSES_TO_SKIP']}
+    tabs = [
+        {'label': _('main-project'), 'target': 'nav-main-project',
+         'id': g.config_classes['main-project']},
+        {'label': _('projects'), 'target': 'nav-projects',
+         'id': g.config_classes['project']},
+        {'label': _('persons'), 'target': 'nav-persons',
+         'id': g.config_classes['person']},
+        {'label': _('institutions'), 'target': 'nav-institutions',
+         'id': g.config_classes['institution']},
+        {'label': _('attributes'), 'target': 'nav-attributes',
+         'id': g.config_classes['attribute']}]
+
+    if not tab and tabs:
+        tab = tabs[0]['target']
+    for tab_ in tabs:
+        tab_['is_active'] = (tab_['target'] == tab)
+
+    initial_case_study_type_id = None
+    initial_case_study_type_name = None
+    if g.settings.case_study_type_id:
+        initial_case_study_type_id = int(g.settings.case_study_type_id)
+        details = Admin.get_openatlas_entity(initial_case_study_type_id)
+        if details:
+            initial_case_study_type_name = details.name
+
+
+    case_study_children = find_children_by_id(
+        type_tree().get_json(),
+        initial_case_study_type_id)
+
+
     return render_template(
         "admin.html",
-        entities=g.config_entities,
         tabs=tabs,
-        activetab=tab,
-        activeentry=entry,
-        links_data=g.config_links,
-        properties=g.config_properties,
+        processed_entities_by_tab=Admin.process_entities_by_tab(tabs, entry),
+        processed_links_by_entity=Admin.process_links_by_entity(),
+        processed_properties_by_tab=Admin.process_properties_by_tab(tabs),
+        processed_roles=Admin.process_roles(),
+        processed_target_nodes=Admin.process_target_nodes(),
+        current_language=g.language,
+        available_languages=app.config['LANGUAGES'],
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
-        class_items=class_items,
+        class_items={
+            k: v for k, v in get_entities_count_by_case_study().items()
+            if k not in app.config['CLASSES_TO_SKIP']},
         shown_classes=g.settings.shown_classes,
         hidden_classes=g.settings.hidden_classes,
+        initial_case_study_type_id=initial_case_study_type_id,
+        initial_case_study_type_name=initial_case_study_type_name,
+        case_study_children=case_study_children,
+        FIELD_CONFIGS=FIELD_CONFIGS,
         view_classes=app.config['VIEW_CLASSES'])
-
-
 
 
 @app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>', methods=['GET'])
@@ -68,7 +84,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 def delete_link(link_id: int, tab: str, entry: str) -> Response:
     check_manager_user()
     Admin.delete_link(link_id)
-    flash(_('Link deleted successfully!'), 'success')
+    flash(_('Link deleted successfully'), 'success')
     return redirect(url_for('admin', tab=tab, entry=entry))
 
 
@@ -94,6 +110,7 @@ def add_link() -> Response:
 @login_required
 def add_entry() -> Response:
     check_manager_user()
+    case_study_str = request.form.get('case_study')
     form_data = {
         'category': request.form.get('category', ''),
         'name': request.form.get('name', ''),
@@ -104,7 +121,9 @@ def add_entry() -> Response:
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', '')}
+        'legal_notice': request.form.get('legalnotice', ''),
+        'case_study': int(case_study_str)
+        if case_study_str and case_study_str.isdigit() else 0}
     current_tab = 'nav-' + form_data['category']
     redirect_base = url_for('admin') + current_tab
     try:
@@ -121,6 +140,7 @@ def add_entry() -> Response:
 
     return redirect(redirect_base)
 
+
 @app.route('/admin/delete_entry/<int:id_>/<tab>')
 @login_required
 def delete_entry(id_: int, tab: str) -> Response:
@@ -132,10 +152,13 @@ def delete_entry(id_: int, tab: str) -> Response:
     flash('Entry deleted successfully!', 'success')
     return redirect(url_for('admin') + tab)
 
+
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
 def edit_entry() -> Response:
     check_manager_user()
+    case_study_raw = request.form.get('case_study')
+    case_study = int(case_study_raw) if case_study_raw else None
     form_data = {
         'config_id': request.form.get('config_id', type=int),
         'name': request.form.get('name', ''),
@@ -146,7 +169,8 @@ def edit_entry() -> Response:
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', '')}
+        'legal_notice': request.form.get('legalnotice', ''),
+        'case_study': case_study}
     try:
         Admin.edit_entry(form_data)
         flash(f'"{form_data["name"]}" updated successfully', 'success')
@@ -168,10 +192,10 @@ def edit_entry() -> Response:
 def edit_map() -> Response:
     check_manager_user()
     form_data = {
-        'name': request.form.get('name', ''),
-        'display_name': request.form.get('displayname', ''),
-        'sortorder': request.form.get('inputorder', ''),
-        'tilestring': request.form.get('description', ''),
+        'name': request.form.get('name'),
+        'display_name': request.form.get('displayname'),
+        'sortorder': request.form.get('inputorder'),
+        'tilestring': request.form.get('description'),
         'map_id': request.form.get('map_id')}
 
     if not form_data['map_id']:
@@ -221,7 +245,9 @@ def delete_map(map_id: int) -> Response:
 
 
 @app.route('/admin/choose_index_background', methods=['POST'])
+@login_required
 def choose_index_background() -> Response:
+    check_manager_user()
     settings = {
         'index_map': request.form.get('mapselection'),
         'index_img': request.form.get('default_img'),
@@ -232,7 +258,9 @@ def choose_index_background() -> Response:
 
 
 @app.route('/admin/select_entities', methods=['POST'])
+@login_required
 def select_entities() -> Response:
+    check_manager_user()
     if request.method == 'POST':
         Admin.set_shown_classes(request.form.getlist('selected_entities'))
         flash(_('set shown entities'), 'info')
@@ -240,18 +268,49 @@ def select_entities() -> Response:
 
 
 @app.route('/admin/deselect_entities', methods=['POST'])
+@login_required
 def deselect_entities() -> Response:
+    check_manager_user()
+    print(request.form.getlist('selected_entities'))
     if request.method == 'POST':
         Admin.set_hidden_classes(request.form.getlist('selected_entities'))
         flash(_('set hidden entities'), 'info')
     return redirect(url_for('admin'))
 
 
-# Todo: This reset button is only here for development purpose.
-@app.route('/reset')
+@app.route('/admin/update_case_study_id/<int:id_>', methods=['POST'])
 @login_required
+def update_case_study_id(id_: int) -> Response:
+    check_manager_user()
+    if request.method == 'POST':
+        validation_result = Admin.check_case_study_type_id(id_)
+        if validation_result['is_valid']:
+            Admin.update_case_study_id_setting(id_)
+            flash(_('updated case study id successfully'), 'info')
+        else:
+            message = _(
+                'Invalid Case Study ID. Must be a positive integer '
+                'and its entity type must be "type".')
+            flash(message, 'error')
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/check_case_study_id_ajax/<int:entity_id>', methods=['GET'])
+@login_required
+def check_case_study_id_ajax(entity_id: int) -> Response:
+    check_manager_user()
+    result = Admin.check_case_study_type_id(entity_id)
+    return jsonify(result)
+
+
+# Todo: remove for production
+@app.route('/reset')
 def reset() -> Response:
-    # Avoid exposing password in command line
+    make_reset()
+    flash(_('reset database'), 'info')
+    return redirect(url_for('admin'))
+
+def make_reset():
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
     subprocess.run([
@@ -264,27 +323,19 @@ def reset() -> Response:
         env=env,
         check=True)
 
+@app.route('/clear-cache')
+def clear_cache():
+    cache.clear()
+    flash(_('cache cleared'), 'success')
     return redirect(url_for('admin'))
 
+
+@app.route('/warm-cache')
+def warm_cache():
+    type_tree()
+    flash(_('cache warmed'), 'success')
+    return redirect(url_for('admin'))
 
 def check_manager_user() -> None:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
-
-# @app.route('/sortlinks', methods=['POST'])
-# def sort_links() -> Response:
-#     @login_required
-#     def reset_():
-#         if current_user.group not in ['admin', 'manager']:
-#             abort(403)
-#
-#     data = request.get_json()
-#     criteria = data['criteria']
-#     table = data['table']
-#
-#     for row in criteria:
-#         g.cursor.execute(
-#             f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(
-#             id)s',
-#             {'id': row['id'], 'order': row['order'], 'table': table})
-#     return jsonify({'status': 'ok'})

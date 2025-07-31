@@ -20,10 +20,12 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
 let loadedCount = 0; // Track completed tab loads
 
 async function loadHTML(id, tab, index, totalTabs) {
-    console.log(id)
-    console.log(tab)
+    //console.log(id)
+    //console.log(tab)
 
     let urlbase = `/get_entity/${id}/${tab}`
+    if (id === 0) urlbase =  `/get_entities/${tab}`
+    //console.log(urlbase)
     if (id === 0) urlbase = `/get_entities/${tab}`
     console.log(urlbase)
 
@@ -34,7 +36,7 @@ async function loadHTML(id, tab, index, totalTabs) {
 
         document.querySelectorAll(`.to-remove-${tab}`).forEach(element => {
             element.remove();
-            console.log(`Removed element with class "to-remove-${tab}".`);
+            //console.log(`Removed element with class "to-remove-${tab}".`);
         });
 
         loadedCount++; // Increase count even for missing tabs
@@ -49,7 +51,7 @@ async function loadHTML(id, tab, index, totalTabs) {
 
     document.querySelectorAll(`.to-remove-${tab}`).forEach(element => {
         element.classList.toggle('d-none');
-        console.log(`Removed element with class "to-remove-${tab}".`);
+        //console.log(`Removed element with class "to-remove-${tab}".`);
     });
 
     const htmlText = await response.text();
@@ -88,8 +90,8 @@ async function loadHTML(id, tab, index, totalTabs) {
     }
 
     loadedTabs.push(tab);
-    console.log(`HTML, CSS, and scripts for "${tab}" loaded in correct order!`);
-    console.log(loadedTabs);
+    //console.log(`HTML, CSS, and scripts for "${tab}" loaded in correct order!`);
+    //console.log(loadedTabs);
 
 
     loadedCount++; // Increase count when a tab is fully loaded
@@ -101,7 +103,7 @@ function checkAndRemoveSpinner(totalTabs) {
     if (loadedCount >= totalTabs) {
         document.querySelectorAll(".to-remove-spinner").forEach(element => {
             element.remove();
-            console.log("Spinner removed.");
+            //console.log("Spinner removed.");
         });
     }
 }
@@ -262,10 +264,10 @@ document.querySelectorAll('#nav-sidebar .nav-link').forEach(button => {
         const isCurrentlyOpen = rightSidebar.classList.contains('right-expanded');
 
         if (!shouldBeOpen && isCurrentlyOpen) {
-            console.log(`Tab "${tabName}" should be closed but is open.`);
+            //console.log(`Tab "${tabName}" should be closed but is open.`);
             toggleRightSidebar(tabName, 'toggle');
         } else if (shouldBeOpen && !isCurrentlyOpen) {
-            console.log(`Tab "${tabName}" should be open but is closed.`);
+            //console.log(`Tab "${tabName}" should be open but is closed.`);
             toggleRightSidebar(tabName, 'toogle');
         }
     });

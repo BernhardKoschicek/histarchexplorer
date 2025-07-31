@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, NamedTuple
 
 from flask import g
 
@@ -153,11 +153,12 @@ def add_entry(data: dict) -> int:
     g.cursor.execute(
         """
         INSERT INTO tng.entities
-            (email, website, orcid_id, image, class_id)
+            (email, website, orcid_id, image, case_study_type_id, class_id)
         VALUES (NULLIF(%(email)s, ''),
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
                 NULLIF(%(image)s, ''),
+                NULLIF(%(case_study)s, NULL),
                 %(class_id)s)
         RETURNING id
         """, {
@@ -165,6 +166,7 @@ def add_entry(data: dict) -> int:
             'website': data.get('website'),
             'orcid_id': data.get('orcid_id'),
             'image': data.get('image'),
+            'case_study':  data.get('case_study'),
             'class_id': config_class})
 
     id_ = g.cursor.fetchone()[0]
@@ -184,7 +186,8 @@ def update_config_entry(data: dict) -> None:
         SET email    = NULLIF(%(email)s, ''),
             website  = NULLIF(%(website)s, ''),
             orcid_id = NULLIF(%(orcid_id)s, ''),
-            image    = NULLIF(%(image)s, '')
+            image    = NULLIF(%(image)s, ''),
+            case_study_type_id = %(case_study)s
         WHERE id = %(config_id)s
         """,
         data)
@@ -229,6 +232,18 @@ def check_sortorder() -> int:
         WHERE sortorder IS NOT NULL''')
     return g.cursor.fetchone()[0]
 
+
+def get_openatlas_entity(id_) -> NamedTuple:
+    g.cursor.execute(
+        '''
+        SELECT id, name, openatlas_class_name FROM model.entity
+        WHERE id = %(id)s''', {'id': id_})
+    return g.cursor.fetchone()
+
+def update_case_study_type_hierarchy(id_: int) -> None:
+    g.cursor.execute(
+        'UPDATE tng.settings SET case_study_type_id = %s',
+        (id_,))
 
 def add_link(data: dict[str, Any]) -> None:
     g.cursor.execute(

@@ -1,13 +1,17 @@
+
 import json
 from collections import defaultdict
+from datetime import datetime
+from typing import Any
 
-from flask import abort, g, render_template
+from flask import abort, g, render_template, request
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.entity import get_entity_by_id
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
+from histarchexplorer.utils.view_util import get_cite_button
 from histarchexplorer.views.views import type_tree
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
@@ -386,8 +390,6 @@ def get_entities(tab_name: str = None) -> str:
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
-
-
 def get_entity(id_: int, tab_name=None) -> str:
     data = {}
     main_entity = None
@@ -399,6 +401,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     # )
     # main_entity = get_main_entity(id_, entities)
 
+    @cache.memoize()
     def get_map_data():
         geom_there = check_p46_geoms(id_)
         if geom_there:
@@ -537,7 +540,6 @@ def get_entity(id_: int, tab_name=None) -> str:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
-
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
@@ -550,7 +552,8 @@ def get_entity(id_: int, tab_name=None) -> str:
         more_images=more_images,
         total_images=total_images,
         all_images=all_images,
-        related_entities=related_entities or {})
+        related_entities=related_entities or {},
+        cite_button=get_cite_button(main_entity))
 
     # related_entities=related_entities_json)
 
