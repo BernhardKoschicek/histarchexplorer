@@ -1,18 +1,6 @@
 let loadedTabs = []
 let notYetClickedTabs = tabsToLoad
 
-function refreshGrids() {
-
-    setTimeout(() => {
-        if (window.overviewGrid) {
-            window.overviewGrid.refreshItems().layout();
-        }
-        if (window.mediaGrid) {
-            window.mediaGrid.refreshItems().layout();
-        }
-    }, 100);
-}
-
 document.getElementById('toggleSidebar').addEventListener('click', function () {
     const nav_sidebar = document.getElementById('nav-sidebar');
     const root = document.documentElement;
