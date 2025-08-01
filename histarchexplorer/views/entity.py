@@ -394,6 +394,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     data = {}
     main_entity = None
     related_entities = {}
+    entity_tree = []
 
     # entities = Entity.get_linked_entities_by_properties_recursive(
     #     id_,
@@ -467,7 +468,16 @@ def get_entity(id_: int, tab_name=None) -> str:
             abort(404)
         data['spatial'] = map_data
     elif tab_name == 'catalogue':
-        print('nice')
+
+        catalogue_entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            get_parser_for_landing(id_)
+        )
+        print(len(catalogue_entities))
+        entity_tree = build_entity_tree(catalogue_entities)
+
+
+
     elif tab_name == 'overview':
         # data = get_entity()
         entities = Entity.get_linked_entities_by_properties_recursive(
@@ -554,10 +564,28 @@ def get_entity(id_: int, tab_name=None) -> str:
         total_images=total_images,
         all_images=all_images,
         related_entities=related_entities or {},
-        cite_button=get_cite_button(main_entity))
+        cite_button=get_cite_button(main_entity),
+        entity_tree=entity_tree )
 
     # related_entities=related_entities_json)
 
+def build_entity_tree(entities: list[Entity]) -> list[dict[str, Any]]:
+    entity_dict = {e.id: e for e in entities}
+
+    for entity in entities:
+        if entity.parent and entity.parent.relation_to_id in entity_dict:
+            parent_entity = entity_dict[entity.parent.relation_to_id]
+            if not hasattr(parent_entity, 'children'):
+                parent_entity.children = []
+            parent_entity.children.append(entity)
+
+    tree = []
+    for entity in entities:
+        if entity.parent and entity.parent.relation_to_id in entity_dict:
+            continue
+        if hasattr(entity, 'children'):
+            tree.extend(entity.children)
+    return tree
 
 def get_parser_for_landing(id_: int) -> Parser:
     simple_entity = get_entity_by_id(id_)
