@@ -12891,6 +12891,32 @@ button.btn-whitish[disabled] {
   }
 }
 
+.cite-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cite-button {
+  background: whitesmoke;
+  border: none;
+  padding: 0.25rem 0.25rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #444;
+  margin-right: 0.5rem;
+}
+.cite-button i {
+  font-size: 1rem;
+}
+.cite-button:hover {
+  background-color: rgb(254, 254, 254);
+}
+.cite-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 #offcanvasSidebar .nav-pills .nav-item {
   color: #6c757d;
   background-color: transparent;
