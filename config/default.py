@@ -91,3 +91,29 @@ SIDEBAR_OPTIONS = [
     {'order': 3, 'route': 'media', 'icon': 'bi bi-images'},
     {'order': 4, 'route': 'catalogue', 'icon': 'bi bi-journal-text'},
 ]
+
+
+TYPE_TREE_TOP_LEVEL = {
+    "Main Classes": [  # These are type IDs
+        73,  # Place
+        13362,  # Feature
+        13365,  # Stratigraphic unit
+        157754,  # Artifact
+        119334,  # Human remains
+    ]
+}
+TYPE_FILTERS = {
+    "standard": [
+        73,  # Place
+        13362,  # Feature
+        13365,  # Stratigraphic unit
+        157754,  # Artifact
+        11933    # Human remains
+    ],
+    "custom": [
+
+    ],
+    "value": [
+
+    ],
+}

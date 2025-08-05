@@ -2,7 +2,7 @@ from typing import Optional
 
 import requests
 from flask import g, jsonify, redirect, render_template, request, \
-    session
+    session, current_app
 from werkzeug import Response
 
 from histarchexplorer import app, cache
@@ -37,6 +37,7 @@ def type_tree():
         timeout=20).json()
     return jsonify(response)
 
-@app.route('/vocabulary')
+@app.route("/vocabulary")
 def vocabulary():
-    return render_template('vocabulary.html')
+    type_filters = current_app.config.get("TYPE_FILTERS", {})
+    return render_template("vocabulary.html", type_filters=type_filters)

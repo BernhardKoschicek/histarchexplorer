@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-  <div style="padding-top: 100px;"></div> <!-- To avoid navbar overlap -->
+  <div style="padding-top: 100px;"></div>
 
   <style>
       body, html {
@@ -9,10 +9,10 @@
           overflow-y: auto;
       }
 
-      /* Tab Buttons */
       .tab-buttons {
           margin-bottom: 10px;
       }
+
       .tab-buttons button {
           padding: 8px 16px;
           margin-right: 4px;
@@ -22,86 +22,104 @@
           border-radius: 4px;
           font-weight: bold;
       }
+
       .tab-buttons button.active {
           background: #007bff;
           color: white;
           border-color: #007bff;
       }
 
-      /* Tree containers */
       .tree-container {
           max-height: 70vh;
           overflow-y: auto;
           border: 1px solid #ccc;
           padding: 10px;
-          display: none; /* hidden by default */
+          display: none;
       }
+
       .tree-container.active {
           display: block;
       }
   </style>
 
-  <!-- Tab Buttons -->
   <div class="tab-buttons">
-      <button id="tab-main" class="active" onclick="showTab('main')">Main Classes</button>
-      <button id="tab-custom" onclick="showTab('custom')">Types</button>
-      <button id="tab-value" onclick="showTab('value')">Value Types</button>
+    <button id="tab-main" class="active" onclick="showTab('main')">Main Classes</button>
+    <button id="tab-custom" onclick="showTab('custom')">Types</button>
+    <button id="tab-value" onclick="showTab('value')">Value Types</button>
   </div>
 
-  <!-- Tree Containers -->
   <div id="tree-main" class="tree-container active"></div>
   <div id="tree-custom" class="tree-container"></div>
   <div id="tree-value" class="tree-container"></div>
 
-  <!-- Quercus CSS and JS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
   <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
+<script>
+    const typeFilters = {{ type_filters | tojson }};
+</script>
 
   <script>
       function buildTree(flatData) {
-    const nodesById = {};
+          const nodesById = {};
+          Object.values(flatData).forEach(node => {
+              nodesById[node.id] = {
+                  id: node.id,
+                  name: node.name,
+                  children: []
+              };
+          });
 
-    Object.values(flatData).forEach(node => {
-        nodesById[node.id] = {
-            id: node.id,
-            name: node.name,
-            children: []
-        };
-    });
+          Object.values(flatData).forEach(node => {
+              if (node.subs?.length) {
+                  node.subs.forEach(childId => {
+                      if (nodesById[childId]) {
+                          nodesById[node.id].children.push(nodesById[childId]);
+                      }
+                  });
+              }
+          });
 
-    Object.values(flatData).forEach(node => {
-        if (node.subs && node.subs.length > 0) {
-            node.subs.forEach(childId => {
-                if (nodesById[childId]) {
-                    nodesById[node.id].children.push(nodesById[childId]);
-                }
-            });
+          const hasParent = new Set();
+          Object.values(flatData).forEach(node => {
+              if (node.subs?.length) {
+                  node.subs.forEach(childId => hasParent.add(childId));
+              }
+          });
+
+          return Object.values(nodesById)
+              .filter(node => !hasParent.has(node.id))
+              .sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      function collectWithChildren(data, allowedIds) {
+    const result = {};
+    const visited = new Set();
+
+    function collect(id) {
+        if (visited.has(id) || !data[id]) return;
+        visited.add(id);
+        result[id] = data[id];
+        if (data[id].subs) {
+            data[id].subs.forEach(childId => collect(childId));
         }
-    });
+    }
 
-    const hasParent = new Set();
-    Object.values(flatData).forEach(node => {
-        if (node.subs && node.subs.length > 0) {
-            node.subs.forEach(childId => hasParent.add(childId));
-        }
-    });
-
-    // Hier alphabetisch sortieren
-    return Object.values(nodesById)
-      .filter(node => !hasParent.has(node.id))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    allowedIds.forEach(id => collect(id));
+    return result;
 }
 
+function filterByCategoryAndIds(data, category, allowedIds) {
+    const relevant = collectWithChildren(data, allowedIds);
+    const filtered = {};
+    for (const key in relevant) {
+        const item = relevant[key];
+        if (item.category === category) {
+            filtered[key] = item;
+        }
+    }
+    return filtered;
+}
 
-      function filterByCategory(data, category) {
-          const filtered = {};
-          for (const key in data) {
-              if (data[key].category === category) {
-                  filtered[key] = data[key];
-              }
-          }
-          return filtered;
-      }
 
       function showTab(tab) {
           document.querySelectorAll('.tree-container').forEach(div => div.classList.remove('active'));
@@ -115,48 +133,21 @@
           fetch("https://thanados.openatlas.eu/api/0.4/type_tree/")
               .then(res => res.json())
               .then(data => {
-                  // Filter die Daten für jede Kategorie
-                  const mainTypes = buildTree(filterByCategory(data.typeTree, 'standard'));
-                  const customTypes = buildTree(filterByCategory(data.typeTree, 'custom'));
-                  const valueTypes = buildTree(filterByCategory(data.typeTree, 'value'));
+                  const typeTree = data.typeTree;
 
-                  // Initialisiere die 3 Trees
-                  new Treeview({
-                      containerId: "tree-main",
-                      data: mainTypes,
-                      initiallyExpanded: false,
-                      searchEnabled: true,
-                      multiSelectEnabled: false,
-                      cascadeSelectChildren: false,
-                      showSelectAllButton: false,
-                      showExpandCollapseAllButtons: true,
-                  });
 
-                  new Treeview({
-                      containerId: "tree-custom",
-                      data: customTypes,
-                      initiallyExpanded: false,
-                      searchEnabled: true,
-                      multiSelectEnabled: false,
-                      cascadeSelectChildren: false,
-                      showSelectAllButton: false,
-                      showExpandCollapseAllButtons: true,
-                  });
 
-                  new Treeview({
-                      containerId: "tree-value",
-                      data: valueTypes,
-                      initiallyExpanded: false,
-                      searchEnabled: true,
-                      multiSelectEnabled: false,
-                      cascadeSelectChildren: false,
-                      showSelectAllButton: false,
-                      showExpandCollapseAllButtons: true,
-                  });
+                  const mainTypes = buildTree(filterByCategoryAndIds(data.typeTree, 'standard', typeFilters.standard || []));
+
+                  const customTypes = buildTree(filterByCategoryAndIds(typeTree, 'custom', Object.keys(typeTree).map(Number)));
+                  const valueTypes = buildTree(filterByCategoryAndIds(typeTree, 'value', Object.keys(typeTree).map(Number)));
+
+                  new Treeview({containerId: "tree-main", data: mainTypes});
+                  new Treeview({containerId: "tree-custom", data: customTypes});
+                  new Treeview({containerId: "tree-value", data: valueTypes});
               })
               .catch(err => {
                   console.error("Failed to fetch or build tree data:", err);
-                  document.getElementById("quercus-tree").innerText = "Failed to load vocabulary.";
               });
       });
   </script>
