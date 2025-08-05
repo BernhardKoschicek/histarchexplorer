@@ -97,7 +97,6 @@ class Entity:
             iiif_manifest = ""
             if data.get("IIIFManifest"):
                 iiif_manifest = f'{data["IIIFManifest"]}?url={url_for("index", _external=True)}'
-
             depiction = Depiction(
                 id_=id_,
                 link=data.get("@id"),
@@ -107,7 +106,7 @@ class Entity:
                 creator=data.get("creator"),
                 url=data.get("url"),
                 mimetype=mimetype,
-                iiif_manifest=iiif_manifest,
+                iiif_manifest=iiif_manifest if mimetype.startswith("image/") else None,
                 iiif_base_path=data.get("IIIFBasePath"),
                 entity_id=self.id,
                 main_image=main_image,
