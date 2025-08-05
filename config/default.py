@@ -93,15 +93,7 @@ SIDEBAR_OPTIONS = [
 ]
 
 
-TYPE_TREE_TOP_LEVEL = {
-    "Main Classes": [  # These are type IDs
-        73,  # Place
-        13362,  # Feature
-        13365,  # Stratigraphic unit
-        157754,  # Artifact
-        119334,  # Human remains
-    ]
-}
+
 TYPE_FILTERS = {
     "standard": [
         73,  # Place
