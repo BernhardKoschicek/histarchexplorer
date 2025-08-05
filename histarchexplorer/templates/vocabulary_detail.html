@@ -4,14 +4,16 @@
 <div style="padding-top: 100px;"></div>
 <div class="container">
 
-  <h2>{{ this_type.name }} (ID: {{ this_type.id }})</h2>
-
-  {% if this_type.description %}
-    <p><strong>Description:</strong> {{ this_type.description }}</p>
+  <h2>{{ entity.name }} (ID: {{ type.id }})</h2>
+    <div class="cite-wrapper">
+    {{ cite_button.button_html | safe }}
+  </div>
+  {% if type.description %}
+    <p><strong>Description:</strong> {{ type.description }}</p>
   {% endif %}
 
-  {% if this_type.category %}
-    <p><strong>Category:</strong> {{ this_type.category }}</p>
+  {% if type.category %}
+    <p><strong>Category:</strong> {{ type.category }}</p>
   {% endif %}
 
   {% if parents %}
@@ -61,4 +63,7 @@
   {% endif %}
 
 </div>
+{{ cite_button.modal_html | safe }}
+
+
 {% endblock %}

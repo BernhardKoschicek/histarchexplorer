@@ -24,8 +24,9 @@ app.config['CACHE_DEFAULT_TIMEOUT'] = 3600
 cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
+import histarchexplorer.views
 from histarchexplorer.views import (
-    admin, login, views, about, entity, landing, search, media)
+    admin, login, views, about, entity, landing, search, media, vocabulary)
 from histarchexplorer.utils import view_util
 
 
