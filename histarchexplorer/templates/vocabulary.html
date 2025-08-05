@@ -40,12 +40,27 @@
       .tree-container.active {
           display: block;
       }
+
+      .tab-buttons-container {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 10px;
+          padding-right: 10px;
+      }
+
+      .tab-buttons {
+          display: flex;
+          gap: 6px;
+      }
   </style>
 
-  <div class="tab-buttons">
-    <button id="tab-main" class="active" onclick="showTab('main')">Main Classes</button>
-    <button id="tab-custom" onclick="showTab('custom')">Types</button>
-    <button id="tab-value" onclick="showTab('value')">Value Types</button>
+  <!-- Tab Buttons -->
+  <div class="tab-buttons-container">
+    <div class="tab-buttons">
+      <button id="tab-main" class="active" onclick="showTab('main')">Main Classes</button>
+      <button id="tab-custom" onclick="showTab('custom')">Types</button>
+      <button id="tab-value" onclick="showTab('value')">Value Types</button>
+    </div>
   </div>
 
   <div id="tree-main" class="tree-container active"></div>
@@ -54,9 +69,9 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
   <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
-<script>
-    const typeFilters = {{ type_filters | tojson }};
-</script>
+  <script>
+      const typeFilters = {{ type_filters | tojson }};
+  </script>
 
   <script>
       function buildTree(flatData) {
@@ -92,33 +107,33 @@
       }
 
       function collectWithChildren(data, allowedIds) {
-    const result = {};
-    const visited = new Set();
+          const result = {};
+          const visited = new Set();
 
-    function collect(id) {
-        if (visited.has(id) || !data[id]) return;
-        visited.add(id);
-        result[id] = data[id];
-        if (data[id].subs) {
-            data[id].subs.forEach(childId => collect(childId));
-        }
-    }
+          function collect(id) {
+              if (visited.has(id) || !data[id]) return;
+              visited.add(id);
+              result[id] = data[id];
+              if (data[id].subs) {
+                  data[id].subs.forEach(childId => collect(childId));
+              }
+          }
 
-    allowedIds.forEach(id => collect(id));
-    return result;
-}
+          allowedIds.forEach(id => collect(id));
+          return result;
+      }
 
-function filterByCategoryAndIds(data, category, allowedIds) {
-    const relevant = collectWithChildren(data, allowedIds);
-    const filtered = {};
-    for (const key in relevant) {
-        const item = relevant[key];
-        if (item.category === category) {
-            filtered[key] = item;
-        }
-    }
-    return filtered;
-}
+      function filterByCategoryAndIds(data, category, allowedIds) {
+          const relevant = collectWithChildren(data, allowedIds);
+          const filtered = {};
+          for (const key in relevant) {
+              const item = relevant[key];
+              if (item.category === category) {
+                  filtered[key] = item;
+              }
+          }
+          return filtered;
+      }
 
 
       function showTab(tab) {
@@ -134,7 +149,6 @@ function filterByCategoryAndIds(data, category, allowedIds) {
               .then(res => res.json())
               .then(data => {
                   const typeTree = data.typeTree;
-
 
 
                   const mainTypes = buildTree(filterByCategoryAndIds(data.typeTree, 'standard', typeFilters.standard || []));
