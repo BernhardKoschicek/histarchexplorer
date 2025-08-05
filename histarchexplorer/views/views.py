@@ -48,24 +48,51 @@ import requests
 @app.route("/vocabulary/<int:type_id>")
 def vocabulary_detail(type_id):
     try:
-        # Fetch full type tree
+        # Type Tree laden
         res = requests.get("https://thanados.openatlas.eu/api/0.4/type_tree/")
         res.raise_for_status()
         type_tree = res.json().get("typeTree", {})
 
-        # Get the type by ID
+        # Aktuellen Typ abrufen
         this_type = type_tree.get(str(type_id))
         if not this_type:
             return f"Type with ID {type_id} not found.", 404
 
-        # Resolve parents and children (as full objects)
+        # Eltern- und Kindtypen auflösen
         parents = [type_tree.get(str(pid)) for pid in this_type.get("root", [])]
         children = [type_tree.get(str(cid)) for cid in this_type.get("subs", [])]
 
-        return render_template("vocabulary_detail.html",
-                               this_type=this_type,
-                               parents=parents,
-                               children=children)
+        # --------------------------
+        # Exact Matches (nur dieser Typ)
+        # --------------------------
+        exact_res = requests.get(f"https://thanados.openatlas.eu/api/0.4/type_entities/{type_id}")
+        exact_res.raise_for_status()
+        exact_entities = exact_res.json().get("features", [])
+
+        # --------------------------
+        # Subcategory Matches (Kinder und tiefer)
+        # --------------------------
+        all_res = requests.get(f"https://thanados.openatlas.eu/api/0.4/type_entities_all/{type_id}")
+        all_res.raise_for_status()
+        raw_results = all_res.json().get("results", [])
+
+        # Alle Features extrahieren
+        all_entities = [feature for group in raw_results for feature in group.get("features", [])]
+
+        # Nur Subcategory Matches (exklusive exact matches)
+        subcategory_entities = [
+            entity for entity in all_entities
+            if entity not in exact_entities
+        ]
+
+        return render_template(
+            "vocabulary_detail.html",
+            this_type=this_type,
+            parents=parents,
+            children=children,
+            exact_entities=exact_entities,
+            subcategory_entities=subcategory_entities
+        )
+
     except Exception as e:
         return f"Error loading type: {e}", 500
-

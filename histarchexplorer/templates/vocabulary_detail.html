@@ -1,32 +1,64 @@
 {% extends "layout.html" %}
 
 {% block content %}
-  <div style="padding-top: 100px;"></div>
+<div style="padding-top: 100px;"></div>
+<div class="container">
 
-  <div class="container">
-    <h1>{{ this_type.name }}</h1>
-    {% if this_type.description %}
-      <p><strong>Description:</strong> {{ this_type.description }}</p>
-    {% endif %}
+  <h2>{{ this_type.name }} (ID: {{ this_type.id }})</h2>
 
+  {% if this_type.description %}
+    <p><strong>Description:</strong> {{ this_type.description }}</p>
+  {% endif %}
+
+  {% if this_type.category %}
     <p><strong>Category:</strong> {{ this_type.category }}</p>
+  {% endif %}
 
-    {% if parents %}
-      <p><strong>Parent Types:</strong>
-        {% for parent in parents if parent %}
-          <a href="{{ url_for('vocabulary_detail', type_id=parent.id) }}">{{ parent.name }}</a>{% if not loop.last %}, {% endif %}
+  {% if parents %}
+    <p><strong>Parent Types:</strong>
+      {{ parents | selectattr('name') | map(attribute='name') | join(', ') }}
+    </p>
+  {% endif %}
+
+  {% if children %}
+    <p><strong>Child Types:</strong>
+      {{ children | selectattr('name') | map(attribute='name') | join(', ') }}
+    </p>
+  {% endif %}
+
+  <hr>
+
+  <!-- Exact Matches -->
+  <h4>🔍 Exact Matches ({{ exact_entities | length }})</h4>
+  {% if exact_entities %}
+    <details open>
+      <summary>Show exact matches</summary>
+      <ul>
+        {% for ent in exact_entities %}
+          <li>{{ ent.properties.title }} (ID: {{ ent.properties.id }})</li>
         {% endfor %}
-      </p>
-    {% endif %}
+      </ul>
+    </details>
+  {% else %}
+    <p>No exact matches found.</p>
+  {% endif %}
 
-    {% if children %}
-      <p><strong>Child Types:</strong>
-        <ul>
-          {% for child in children if child %}
-            <li><a href="{{ url_for('vocabulary_detail', type_id=child.id) }}">{{ child.name }}</a></li>
-          {% endfor %}
-        </ul>
-      </p>
-    {% endif %}
-  </div>
+  <br>
+
+  <!-- Subcategory Matches -->
+  <h4>📂 Subcategory Matches ({{ subcategory_entities | length }})</h4>
+  {% if subcategory_entities %}
+    <details open>
+      <summary>Show subcategory matches</summary>
+      <ul>
+        {% for ent in subcategory_entities %}
+          <li>{{ ent.properties.title }} (ID: {{ ent.properties.id }})</li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% else %}
+    <p>No subcategory matches found.</p>
+  {% endif %}
+
+</div>
 {% endblock %}
