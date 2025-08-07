@@ -260,7 +260,7 @@
         {
             title: "TypeId",
             field: "type_id",
-            visible: false
+            visible: true
         },
         {
             title: "Type",
@@ -418,7 +418,8 @@
 
             if (!isNaN(beginMin) && !isNaN(beginMax)) {
                 filteredData = filteredData.filter(item =>
-                    item.beginDBP >= beginMin && item.beginDBP <= beginMax
+                    (item.beginDBP === null || item.beginDBP === undefined) ||
+                    (item.beginDBP >= beginMin && item.beginDBP <= beginMax)
                 );
             }
         }
@@ -429,7 +430,8 @@
 
             if (!isNaN(endMin) && !isNaN(endMax)) {
                 filteredData = filteredData.filter(item =>
-                    item.endDBP >= endMin && item.endDBP <= endMax
+                    (item.endDBP === null || item.endDBP === undefined) ||
+                    (item.endDBP >= endMin && item.endDBP <= endMax)
                 );
             }
         }
@@ -643,9 +645,16 @@
             const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
 
             if (!isNaN(beginMin) && !isNaN(beginMax)) {
-                filters.push({field: "beginDBP", type: ">=", value: beginMin});
-                filters.push({field: "beginDBP", type: "<=", value: beginMax});
+                filters.push({
+                    type: "or",
+                    filters: [
+                        {field: "beginDBP", type: ">=", value: beginMin},
+                        {field: "beginDBP", type: "<=", value: beginMax},
+                        {field: "beginDBP", type: "=", value: null}  // include missing values
+                    ]
+                });
             }
+
         }
 
         if ({{ tab_name }}Data.fields.includes("end") && typeof sliderEnd{{ tab_name }} !== 'undefined' && sliderEnd{{ tab_name }}.noUiSlider) {
@@ -653,8 +662,14 @@
             const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
 
             if (!isNaN(endMin) && !isNaN(endMax)) {
-                filters.push({field: "endDBP", type: ">=", value: endMin});
-                filters.push({field: "endDBP", type: "<=", value: endMax});
+                filters.push({
+                    type: "or",
+                    filters: [
+                        {field: "endDBP", type: ">=", value: endMin},
+                        {field: "endDBP", type: "<=", value: endMax},
+                        {field: "endDBP", type: "=", value: null}  // include missing values
+                    ]
+                });
             }
         }
 

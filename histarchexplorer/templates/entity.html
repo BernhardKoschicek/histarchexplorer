@@ -25,8 +25,10 @@
                 entity.endDBP = calculateTimeBP(entity.end);
                 if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
                 if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
+
                 entity.all = [entity.description, entity.class, entity.type, entity.name]
                     .filter(v => v !== null && v !== undefined && v !== '')
+                    .map(v => v.replace(/[\r\n]+/g, ' '))  // <- Replace line breaks with spaces
                     .join(' ');
             });
 

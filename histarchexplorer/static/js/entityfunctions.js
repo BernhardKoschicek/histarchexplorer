@@ -225,20 +225,6 @@ function cloneWithChildren(items, typeIds) {
         .filter(Boolean);
 }
 
-function filterTree(data, allowedIds) {
-  return data
-      .map(item => {
-      // Recursively filter children
-      const filteredChildren = filterTree(item.children || [], allowedIds);
-
-      // Keep item if its id is in allowedIds OR any child remains
-      if (allowedIds.includes(item.id) || filteredChildren.length > 0) {
-        return { ...item, children: filteredChildren };
-      }
-      return null;
-    })
-    .filter(Boolean); // remove null entries
-}
 
 function deepEqual(a, b) {
     return JSON.stringify(a) === JSON.stringify(b);
