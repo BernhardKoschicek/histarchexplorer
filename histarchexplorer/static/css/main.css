@@ -69,6 +69,18 @@ body {
   height: calc(100vh - var(--navbar-height) - var(--logo-height));
 }
 
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: var(--navbar-height);
+}
+
+.scrollable-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
 .MuiAppBar-positionAbsolute,
 .mirador-viewer {
   top: 3.5rem;
@@ -12277,8 +12289,8 @@ textarea.form-control-lg {
 }
 
 .tabulator-container {
-  margin: 1.5rem !important;
-  max-width: calc(100% - 4rem);
+  max-height: calc(100vh - var(--navbar-height) - 52px - 3rem);
+  margin: 0 1rem 1rem 1rem !important;
   box-sizing: border-box;
   border: 1px solid #dee2e6 !important;
   border-radius: 8px;
@@ -12518,6 +12530,17 @@ textarea.form-control-lg {
   display: block;
   margin: 0 auto;
   position: relative;
+}
+
+.image {
+  position: relative;
+}
+.image .hover-max {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+.image:hover .hover-max {
+  opacity: 1;
 }
 
 .tile-label {
@@ -12835,6 +12858,7 @@ button.btn-whitish[disabled] {
   padding: 0.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 @media (max-width: 769px) {
@@ -12859,6 +12883,8 @@ button.btn-whitish[disabled] {
 }
 
 .attribute-area {
+  position: relative;
+  top: 1rem;
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.5);
   padding: 1.25rem;
@@ -12875,6 +12901,33 @@ button.btn-whitish[disabled] {
     align-content: center;
     align-items: center;
   }
+}
+
+.cite-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cite-button {
+  background: whitesmoke;
+  height: 2rem;
+  border: none;
+  padding: 0.25rem 0.25rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  color: #444;
+  margin-right: 0.5rem;
+}
+.cite-button i {
+  font-size: 1rem;
+}
+.cite-button:hover {
+  background-color: rgb(254, 254, 254);
+}
+.cite-button:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 #offcanvasSidebar .nav-pills .nav-item {

@@ -1,32 +1,11 @@
-<div id="{{ tab_name }}-header" class="d-flex align-items-center justify-content-between flex-wrap gap-3 m-5">
+<div id="{{ tab_name }}-header"
+     class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 mt-3 ms-3 me-3">
 
     <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}</h3>
 
-    <div class="input-group" style="max-width: 400px;">
+    <div class="input-group" style="max-width: 600px;">
         <input type="text" id="filterInput{{ tab_name }}" class="form-control" placeholder="Search / Filter">
         <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
-    </div>
-
-
-    <div style="min-width: 400px;" class="d-none" id="begin-{{ tab_name }}-container">
-        <div id="sliderBegin{{ tab_name }}"></div>
-        <div class="form-check mt-1">
-            <input class="form-check-input" type="checkbox" id="includeNoBegin{{ tab_name }}" checked>
-            <label class="form-check-label" for="includeNoBegin{{ tab_name }}">
-                include {{ tab_name }} without begin date
-            </label>
-        </div>
-    </div>
-
-
-    <div style="min-width: 400px;" class="d-none" id="end-{{ tab_name }}-container">
-        <div id="sliderEnd{{ tab_name }}"></div>
-        <div class="form-check mt-1">
-            <input class="form-check-input" type="checkbox" id="includeNoEnd{{ tab_name }}" checked>
-            <label class="form-check-label" for="includeNoEnd{{ tab_name }}">
-                include {{ tab_name }} without end date
-            </label>
-        </div>
     </div>
 
     <div class="dropdown d-none" id="classDropdown{{ tab_name }}">
@@ -47,6 +26,29 @@
             onclick="{{ tab_name }}Modal.show()" title="Advanced Sort">
         <i class="bi bi-funnel"></i>
     </button>
+
+    <div class="d-flex flex-wrap gap-3">
+        <div style="min-width: 300px;" class="d-none ms-3 me-3" id="begin-{{ tab_name }}-container">
+            <div id="sliderBegin{{ tab_name }}"></div>
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="includeNoBegin{{ tab_name }}" checked>
+                <label class="form-check-label" for="includeNoBegin{{ tab_name }}">
+                    include {{ tab_name }} without begin date
+                </label>
+            </div>
+        </div>
+
+        <div style="min-width: 300px;" class="d-none ms-3 me-3" id="end-{{ tab_name }}-container">
+            <div id="sliderEnd{{ tab_name }}"></div>
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="includeNoEnd{{ tab_name }}" checked>
+                <label class="form-check-label" for="includeNoEnd{{ tab_name }}">
+                    include {{ tab_name }} without end date
+                </label>
+            </div>
+        </div>
+    </div>
+
 
 </div>
 
@@ -643,102 +645,102 @@
     }
 
     // applyCombinedFilter function
-function applyCombinedFilter{{ tab_name }}() {
-    const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
-    const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
-    const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
-    const filters = [];
+    function applyCombinedFilter{{ tab_name }}() {
+        const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
+        const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
+        const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
+        const filters = [];
 
-    // Type filter
-    if (selectedNodes{{ tab_name }}.length > 0) {
-        filters.push({
-            field: "type_id",
-            type: "in",
-            value: selectedNodes{{ tab_name }}
-        });
-    }
+        // Type filter
+        if (selectedNodes{{ tab_name }}.length > 0) {
+            filters.push({
+                field: "type_id",
+                type: "in",
+                value: selectedNodes{{ tab_name }}
+            });
+        }
 
-    // Text filter
-    if (textValue) {
-        filters.push({
-            field: "all",
-            type: "like",
-            value: textValue
-        });
-    }
+        // Text filter
+        if (textValue) {
+            filters.push({
+                field: "all",
+                type: "like",
+                value: textValue
+            });
+        }
 
-    // Class filter
-    if (selectedClasses.length > 0) {
-        filters.push({
-            field: "class",
-            type: "in",
-            value: selectedClasses
-        });
-    }
+        // Class filter
+        if (selectedClasses.length > 0) {
+            filters.push({
+                field: "class",
+                type: "in",
+                value: selectedClasses
+            });
+        }
 
-    // Begin date filter
-    if (
-        {{ tab_name }}Data.fields.includes("begin") &&
-        typeof sliderBegin{{ tab_name }} !== 'undefined' &&
-        sliderBegin{{ tab_name }}.noUiSlider
-    ) {
-        const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
-        const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
-        const includeNoBegin = document.getElementById('includeNoBegin{{ tab_name }}').checked;
+        // Begin date filter
+        if (
+            {{ tab_name }}Data.fields.includes("begin") &&
+            typeof sliderBegin{{ tab_name }} !== 'undefined' &&
+            sliderBegin{{ tab_name }}.noUiSlider
+        ) {
+            const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
+            const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
+            const includeNoBegin = document.getElementById('includeNoBegin{{ tab_name }}').checked;
 
-        if (!isNaN(beginMin) && !isNaN(beginMax)) {
-            if (includeNoBegin) {
-                // OR group: (in range) OR (null)
-                filters.push([
-                    { field: "beginDBP", type: ">=", value: beginMin },
-                    { field: "beginDBP", type: "=", value: null }
-                ]);
-                filters.push([
-                    { field: "beginDBP", type: "<=", value: beginMax },
-                    { field: "endDBP", type: "=", value: null }
-                ]);
-            } else {
-                filters.push({ field: "beginDBP", type: ">=", value: beginMin });
-                filters.push({ field: "beginDBP", type: "<=", value: beginMax });
+            if (!isNaN(beginMin) && !isNaN(beginMax)) {
+                if (includeNoBegin) {
+                    // OR group: (in range) OR (null)
+                    filters.push([
+                        {field: "beginDBP", type: ">=", value: beginMin},
+                        {field: "beginDBP", type: "=", value: null}
+                    ]);
+                    filters.push([
+                        {field: "beginDBP", type: "<=", value: beginMax},
+                        {field: "endDBP", type: "=", value: null}
+                    ]);
+                } else {
+                    filters.push({field: "beginDBP", type: ">=", value: beginMin});
+                    filters.push({field: "beginDBP", type: "<=", value: beginMax});
+                }
             }
         }
-    }
 
-    // End date filter
-    if (
-        {{ tab_name }}Data.fields.includes("end") &&
-        typeof sliderEnd{{ tab_name }} !== 'undefined' &&
-        sliderEnd{{ tab_name }}.noUiSlider
-    ) {
-        const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
-        const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
-        const includeNoEnd = document.getElementById('includeNoEnd{{ tab_name }}').checked;
+        // End date filter
+        if (
+            {{ tab_name }}Data.fields.includes("end") &&
+            typeof sliderEnd{{ tab_name }} !== 'undefined' &&
+            sliderEnd{{ tab_name }}.noUiSlider
+        ) {
+            const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
+            const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
+            const includeNoEnd = document.getElementById('includeNoEnd{{ tab_name }}').checked;
 
-        if (!isNaN(endMin) && !isNaN(endMax)) {
-            if (includeNoEnd) {
-                // OR group: (in range) OR (null)
-                filters.push([
-                    { field: "endDBP", type: ">=", value: endMin },
-                    { field: "endDBP", type: "=", value: null }
-                ]);
-                filters.push([
-                    { field: "endDBP", type: "<=", value: endMax },
-                    { field: "endDBP", type: "=", value: null }
-                ]);
-            } else {
-                filters.push({ field: "endDBP", type: ">=", value: endMin });
-                filters.push({ field: "endDBP", type: "<=", value: endMax });
+            if (!isNaN(endMin) && !isNaN(endMax)) {
+                if (includeNoEnd) {
+                    // OR group: (in range) OR (null)
+                    filters.push([
+                        {field: "endDBP", type: ">=", value: endMin},
+                        {field: "endDBP", type: "=", value: null}
+                    ]);
+                    filters.push([
+                        {field: "endDBP", type: "<=", value: endMax},
+                        {field: "endDBP", type: "=", value: null}
+                    ]);
+                } else {
+                    filters.push({field: "endDBP", type: ">=", value: endMin});
+                    filters.push({field: "endDBP", type: "<=", value: endMax});
+                }
             }
         }
-    }
 
-    // Apply filters
-    if (filters.length > 0) {
-        table{{ tab_name }}.setFilter(filters);
-    } else {
-        table{{ tab_name }}.clearFilter();
+        // Apply filters
+        if (filters.length > 0) {
+            table{{ tab_name }}.setFilter(filters);
+        } else {
+            table{{ tab_name }}.clearFilter();
+        }
     }
-}
 
 
     // Filter input event listener
@@ -762,7 +764,7 @@ function applyCombinedFilter{{ tab_name }}() {
             range: {min: 0, max: arbitraryValuesForSlider{{ tab_name }}.length - 1},
             start: [arbitraryValuesForSlider{{ tab_name }}[0], arbitraryValuesForSlider{{ tab_name }}[arbitraryValuesForSlider{{ tab_name }}.length - 1]],
             step: 1,
-            tooltips: true,
+            tooltips: false,
             format: {
                 to: function (value) {
                     return arbitraryValuesForSlider{{ tab_name }}[Math.round(value)];
@@ -789,7 +791,7 @@ function applyCombinedFilter{{ tab_name }}() {
             range: {min: 0, max: arbitraryValuesForSlider{{ tab_name }}.length - 1},
             start: [arbitraryValuesForSlider{{ tab_name }}[0], arbitraryValuesForSlider{{ tab_name }}[arbitraryValuesForSlider{{ tab_name }}.length - 1]],
             step: 1,
-            tooltips: true,
+            tooltips: false,
             format: {
                 to: function (value) {
                     return arbitraryValuesForSlider{{ tab_name }}[Math.round(value)];
@@ -870,6 +872,33 @@ function applyCombinedFilter{{ tab_name }}() {
         console.log(selectedNodes{{ tab_name }})
         applyCombinedFilter{{ tab_name }}()
     }
+
+    function adjustTableHeight{{ tab_name }}() {
+        // small delay to ensure layout is ready
+        setTimeout(function () {
+            const header = document.getElementById(`{{tab_name}}-header`);
+            const table = document.getElementById(`table-{{tab_name}}`);
+
+            if (!header || !table) return;
+
+            const headerHeight = header.offsetHeight;
+
+            // 100vh - 96px - headerHeight - 3rem
+            const maxHeight = window.innerHeight - 96 - headerHeight - (3 * 16); // 3rem = 48px
+            table.style.maxHeight = `${maxHeight}px`;
+        }, 500);
+    }
+
+    // Run on resize
+    window.addEventListener("resize", function () {
+        adjustTableHeight{{tab_name}}();
+    });
+
+    // Run on initial load
+    adjustTableHeight{{tab_name}}();
+    document.getElementById('toggleSidebar').addEventListener('click', function () {
+        adjustTableHeight{{tab_name}}();
+    })
 
 
 </script>

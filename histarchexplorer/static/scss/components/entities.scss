@@ -187,8 +187,8 @@
 }
 
 .tabulator-container {
-  margin: 1.5rem !important;
-  max-width: calc(100% - 4rem);
+  max-height: calc(100vh - var(--navbar-height) - 52px - 3rem);
+  margin: 0 1rem 1rem 1rem !important;
   box-sizing: border-box;
   border: 1px solid #dee2e6 !important;
   border-radius: 8px;
