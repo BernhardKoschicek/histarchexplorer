@@ -1,4 +1,4 @@
-<div id="{{ tab_name }}-header" class="d-flex align-items-center justify-content-between flex-wrap gap-3 m-3">
+<div id="{{ tab_name }}-header" class="d-flex align-items-center justify-content-between flex-wrap gap-3 m-5">
 
     <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}</h3>
 
@@ -7,24 +7,24 @@
         <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
     </div>
 
-    <!-- Begin slider + checkbox -->
-    <div style="min-width: 400px;">
+
+    <div style="min-width: 400px;" class="d-none" id="begin-{{ tab_name }}-container">
         <div id="sliderBegin{{ tab_name }}"></div>
         <div class="form-check mt-1">
             <input class="form-check-input" type="checkbox" id="includeNoBegin{{ tab_name }}" checked>
             <label class="form-check-label" for="includeNoBegin{{ tab_name }}">
-                include entries without begin date
+                include {{ tab_name }} without begin date
             </label>
         </div>
     </div>
 
-    <!-- End slider + checkbox -->
-    <div style="min-width: 400px;">
+
+    <div style="min-width: 400px;" class="d-none" id="end-{{ tab_name }}-container">
         <div id="sliderEnd{{ tab_name }}"></div>
         <div class="form-check mt-1">
             <input class="form-check-input" type="checkbox" id="includeNoEnd{{ tab_name }}" checked>
             <label class="form-check-label" for="includeNoEnd{{ tab_name }}">
-                include entries without end date
+                include {{ tab_name }} without end date
             </label>
         </div>
     </div>
@@ -38,7 +38,8 @@
         </ul>
     </div>
 
-    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
+    <button id="{{ tab_name }}TypesButton" type="button"
+            class="d-none btn btn-outline-secondary d-flex align-items-center gap-2"
             onclick="{{ tab_name }}TreeModal.show()" title="Types">Types
     </button>
 
@@ -147,12 +148,24 @@
     {{ tab_name }}Data.timelineBegin = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "beginString", "beginDBP");
     {{ tab_name }}Data.timelineEnd = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "endString", "endDBP");
 
+    const classList{{ tab_name }} = {{ tab_name }}Data.classes;
+
 
     //columns for table
     let beginDBP{{tab_name}} = null
     let endDBP{{tab_name}} = null
     let type_id{{tab_name}} = null
     let type_value{{tab_name}} = false
+
+    if ({{ tab_name }}Data.fields.includes("begin")) {
+        document.getElementById("begin-{{ tab_name }}-container").classList.remove("d-none")
+    }
+    if ({{ tab_name }}Data.fields.includes("end")) {
+        document.getElementById("end-{{ tab_name }}-container").classList.remove("d-none")
+    }
+    if ({{ tab_name }}Data.fields.includes("type")) {
+        document.getElementById("{{ tab_name }}TypesButton").classList.remove("d-none")
+    }
 
 
     const columns{{ tab_name }} = [
@@ -280,7 +293,7 @@
         {
             title: "TypeId",
             field: "type_id",
-            visible: true
+            visible: false
         },
         {
             title: "Type",
@@ -328,7 +341,7 @@
     let sortLevelId{{ tab_name }} = 0;
 
     function addSortLevel{{ tab_name }}() {
-        const level{{ tab_name }} = createSortLevel(sortLevelId{{ tab_name }}++, {{ tab_name }}Data.fields);
+        const level{{ tab_name }} = createSortLevel(sortLevelId{{ tab_name }}++, {{ tab_name }}Data.fields, {{ tab_name }}Data.classes, {{ tab_name }}Data.typeIds);
         sortLevelsContainer{{ tab_name }}.appendChild(level{{ tab_name }});
     }
 
@@ -341,6 +354,13 @@
             e.target.closest('.row').remove();
         }
     });
+
+    document.getElementById('includeNoBegin{{ tab_name }}').addEventListener('change', () => {
+        applyCombinedFilter{{ tab_name }}()
+    })
+    document.getElementById('includeNoEnd{{ tab_name }}').addEventListener('change', () => {
+        applyCombinedFilter{{ tab_name }}()
+    })
 
     document.getElementById('apply-sort-btn-{{ tab_name }}').addEventListener('click', () => {
         const sorters{{ tab_name }} = [];
@@ -378,9 +398,6 @@
         applyCombinedFilter{{ tab_name }}();
         filterInput{{ tab_name }}.focus();
     });
-
-    //filter classes
-    const classList{{ tab_name }} = {{ tab_name }}Data.classes;
 
 
     if (classList{{ tab_name }}.length > 1) {
@@ -525,20 +542,13 @@
             styleElement.textContent = `
                 /* Enhance the existing .not-selectable class */
                 .custom-treeview-wrapper .treeview-node-content.not-selectable {
-                    opacity: 0.4 !important; /* More faded than default 0.6 */
-                    color: #999 !important;
+                    opacity: 0.6 !important; /* More faded than default 0.6 */
                     font-style: italic !important;
                 }
 
                 /* Also grey out the checkbox if present */
                 .custom-treeview-wrapper .treeview-node-content.not-selectable .treeview-checkbox {
-                    opacity: 0.3 !important;
-                }
-
-                /* Add a subtle strikethrough effect */
-                .custom-treeview-wrapper .treeview-node-content.not-selectable .treeview-node-text {
-                    text-decoration: line-through;
-                    text-decoration-color: #ccc;
+                    opacity: 0.4 !important;
                 }
             `;
             document.head.appendChild(styleElement);
@@ -633,72 +643,103 @@
     }
 
     // applyCombinedFilter function
-    function applyCombinedFilter{{ tab_name }}() {
-        const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
-        const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
-        const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
+function applyCombinedFilter{{ tab_name }}() {
+    const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
+    const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
+    const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
+    const filters = [];
 
-        const filters = [];
+    // Type filter
+    if (selectedNodes{{ tab_name }}.length > 0) {
+        filters.push({
+            field: "type_id",
+            type: "in",
+            value: selectedNodes{{ tab_name }}
+        });
+    }
 
-        if (selectedNodes{{ tab_name }}.length > 0) {
-            filters.push({
-                field: "type_id",
-                type: "in",
-                value: selectedNodes{{ tab_name }}
-            });
-        }
+    // Text filter
+    if (textValue) {
+        filters.push({
+            field: "all",
+            type: "like",
+            value: textValue
+        });
+    }
 
-        if (textValue) {
-            filters.push({field: "all", type: "like", value: textValue});
-        }
+    // Class filter
+    if (selectedClasses.length > 0) {
+        filters.push({
+            field: "class",
+            type: "in",
+            value: selectedClasses
+        });
+    }
 
-        if (selectedClasses.length > 0) {
-            filters.push({
-                field: "class",
-                type: "in",
-                value: selectedClasses
-            });
-        }
+    // Begin date filter
+    if (
+        {{ tab_name }}Data.fields.includes("begin") &&
+        typeof sliderBegin{{ tab_name }} !== 'undefined' &&
+        sliderBegin{{ tab_name }}.noUiSlider
+    ) {
+        const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
+        const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
+        const includeNoBegin = document.getElementById('includeNoBegin{{ tab_name }}').checked;
 
-        if ({{ tab_name }}Data.fields.includes("begin") && typeof sliderBegin{{ tab_name }} !== 'undefined' && sliderBegin{{ tab_name }}.noUiSlider) {
-            const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
-            const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
-
-            if (!isNaN(beginMin) && !isNaN(beginMax)) {
-                filters.push({
-                    type: "or",
-                    filters: [
-                        {field: "beginDBP", type: ">=", value: beginMin},
-                        {field: "beginDBP", type: "<=", value: beginMax},
-                        {field: "beginDBP", type: "=", value: null}  // include missing values
-                    ]
-                });
+        if (!isNaN(beginMin) && !isNaN(beginMax)) {
+            if (includeNoBegin) {
+                // OR group: (in range) OR (null)
+                filters.push([
+                    { field: "beginDBP", type: ">=", value: beginMin },
+                    { field: "beginDBP", type: "=", value: null }
+                ]);
+                filters.push([
+                    { field: "beginDBP", type: "<=", value: beginMax },
+                    { field: "endDBP", type: "=", value: null }
+                ]);
+            } else {
+                filters.push({ field: "beginDBP", type: ">=", value: beginMin });
+                filters.push({ field: "beginDBP", type: "<=", value: beginMax });
             }
-
-        }
-
-        if ({{ tab_name }}Data.fields.includes("end") && typeof sliderEnd{{ tab_name }} !== 'undefined' && sliderEnd{{ tab_name }}.noUiSlider) {
-            const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
-            const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
-
-            if (!isNaN(endMin) && !isNaN(endMax)) {
-                filters.push({
-                    type: "or",
-                    filters: [
-                        {field: "endDBP", type: ">=", value: endMin},
-                        {field: "endDBP", type: "<=", value: endMax},
-                        {field: "endDBP", type: "=", value: null}  // include missing values
-                    ]
-                });
-            }
-        }
-
-        if (filters.length > 0) {
-            table{{tab_name}}.setFilter(filters);
-        } else {
-            table{{tab_name}}.clearFilter();
         }
     }
+
+    // End date filter
+    if (
+        {{ tab_name }}Data.fields.includes("end") &&
+        typeof sliderEnd{{ tab_name }} !== 'undefined' &&
+        sliderEnd{{ tab_name }}.noUiSlider
+    ) {
+        const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
+        const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
+        const includeNoEnd = document.getElementById('includeNoEnd{{ tab_name }}').checked;
+
+        if (!isNaN(endMin) && !isNaN(endMax)) {
+            if (includeNoEnd) {
+                // OR group: (in range) OR (null)
+                filters.push([
+                    { field: "endDBP", type: ">=", value: endMin },
+                    { field: "endDBP", type: "=", value: null }
+                ]);
+                filters.push([
+                    { field: "endDBP", type: "<=", value: endMax },
+                    { field: "endDBP", type: "=", value: null }
+                ]);
+            } else {
+                filters.push({ field: "endDBP", type: ">=", value: endMin });
+                filters.push({ field: "endDBP", type: "<=", value: endMax });
+            }
+        }
+    }
+
+    // Apply filters
+    if (filters.length > 0) {
+        table{{ tab_name }}.setFilter(filters);
+    } else {
+        table{{ tab_name }}.clearFilter();
+    }
+}
+
 
     // Filter input event listener
     filterInput{{ tab_name }}.addEventListener("input", function () {
@@ -784,7 +825,6 @@
         {{ tab_name }}CurrentContainer.appendChild(div);
         const {{ tab_name }}Checkbox = document.getElementById("include-subcategories-{{ tab_name }}");
 
-        let selectedNodes{{ tab_name }} = [];
 
         // Create a Treeview instance – store it in an object instead of dynamic variable
         const treeview = new Treeview({

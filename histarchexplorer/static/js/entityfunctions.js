@@ -103,17 +103,20 @@ function getUniqueValues(data, field) {
     return [...new Set(data.map(row => row[field]).filter(Boolean))].sort();
 }
 
-function createSortLevel(id, fields) {
+function createSortLevel(id, fields, classList, typeIds,) {
     const div = document.createElement('div');
     div.classList.add('row', 'align-items-end', 'mb-2');
     div.dataset.id = id;
-
+    let showClasses = false;
+    let showTypes = false;
+    if (fields.includes('class') && classList.length > 1) {showClasses = true}
+    if (fields.includes('type') && typeIds.length > 1) {showTypes = true}
     div.innerHTML = `
     <div class="col">
       <select class="form-select sort-field">
         ${fields.includes('name') ? `<option value="name">Name</option>` : ''}
-        ${fields.includes('class') ? `<option value="class">Class</option>` : ''}
-        ${fields.includes('type') ? `<option value="type">Type</option>` : ''}
+        ${showClasses ? `<option value="class">Class</option>` : ''}
+        ${showTypes ? `<option value="type">Type</option>` : ''}
         ${fields.includes('beginDBP') ? `<option value="beginDBP">Begin</option>` : ''}
         ${fields.includes('endDBP') ? `<option value="endDBP">End</option>` : ''}
       </select>
