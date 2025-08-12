@@ -293,6 +293,41 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
     g.cursor.execute(query, tuple(params))
     data['entities'] = g.cursor.fetchone()[0] or []
 
+    geom_query = f"""
+            SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', jsonb_agg(
+                    jsonb_build_object(
+                        'type', 'Feature',
+                        'geometry', ST_AsGeoJSON(
+            
+                                COALESCE(g.geom_point, g.geom_polygon, g.geom_linestring), 4326
+            
+                        )::jsonb,
+                        'properties', jsonb_build_object(
+                            'id', e.id,
+                            'name', e.name
+                        )
+                    )
+                )
+            ) AS geojson
+            FROM model.entity e
+            JOIN model.link l
+                ON e.id = l.domain_id
+            JOIN model.gis g
+                ON g.entity_id = l.range_id
+            {where_sql} 
+            AND l.property_code = 'P53'
+              AND (
+                  g.geom_point IS NOT NULL
+                  OR g.geom_polygon IS NOT NULL
+                  OR g.geom_linestring IS NOT NULL
+              );
+"""
+
+    g.cursor.execute(geom_query, tuple(params))
+    data['geometries'] = g.cursor.fetchone()[0] or []
+
     count_query = f"""
                      SELECT e.openatlas_class_name, COUNT(*) AS count
                      FROM model.entity e
