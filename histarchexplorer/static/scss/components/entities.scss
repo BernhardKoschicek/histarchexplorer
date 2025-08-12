@@ -210,4 +210,52 @@
   background-color: transparent!important;
 }
 
+/* Round slider styling */
+.slider-styled {
+    height: 10px !important;
+}
 
+.slider-styled .noUi-target {
+    border: none !important;
+    box-shadow: none !important;
+    height: 10px !important;
+    border-radius: 5px !important;
+}
+
+.slider-styled .noUi-base {
+    height: 10px !important;
+}
+
+.slider-styled .noUi-connect {
+    background: #2936c1 !important;
+    height: 10px !important;
+    border-radius: 5px !important;
+    z-index: 10 !important;
+    position: relative !important;
+}
+
+.slider-styled .noUi-handle {
+    height: 18px !important;
+    width: 18px !important;
+    top: -5px !important;
+    right: -9px !important;
+    border-radius: 50% !important;
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 20 !important;
+}
+
+.slider-styled .noUi-handle:before,
+.slider-styled .noUi-handle:after {
+    display: none !important;
+}
+
+.slider-styled .noUi-touch-area {
+    height: 40px !important;
+    width: 40px !important;
+    margin: -11px !important;
+}
