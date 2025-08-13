@@ -301,8 +301,11 @@
 </div>
 
 <script>
+
+var filteredData{{ tab_name }} = [];
 // Declare the grid variable with template
 var grid{{ tab_name }} = null;
+
 
 function populateGridWithData{{ tab_name }}() {
     console.log('populateGridWithData called for {{ tab_name }}');
@@ -323,21 +326,21 @@ function populateGridWithData{{ tab_name }}() {
         });
     }
 
-    // Use all data (this includes any applied filters)
-    const allData = table{{ tab_name }}.getData();
-    console.log('Got all data:', allData.length);
+    // Use the tracked filtered data
+    const allFilteredData = filteredData{{ tab_name }};
+    console.log('Using tracked filtered data:', allFilteredData.length);
 
+    // Apply pagination to filtered results
     const pageSize = table{{ tab_name }}.getPageSize();
     const currentPage = table{{ tab_name }}.getPage();
 
     const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = Math.min(startIndex + pageSize, allData.length);
-    const currentPageData = allData.slice(startIndex, endIndex);
+    const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
+    const currentPageData = allFilteredData.slice(startIndex, endIndex);
 
-    console.log(`Using pagination: page ${currentPage}, size ${pageSize}, total data ${allData.length}`);
-    console.log(`Showing items ${startIndex} to ${endIndex-1} (${currentPageData.length} items)`);
+    console.log(`Showing page ${currentPage}: items ${startIndex} to ${endIndex-1} (${currentPageData.length} items) from ${allFilteredData.length} total filtered results`);
 
-    // Add all items to DOM first
+    // Add current page items to DOM
     currentPageData.forEach((item, index) => {
         const gridItem = createGridItem{{ tab_name }}(item);
         gridContainer.appendChild(gridItem);
@@ -481,33 +484,6 @@ function {{tab_name}}ToggleView(view) {
     });
 }
 
-function createTilePagination{{ tab_name }}() {
-    const paginationContainer = document.getElementById('tile-pagination-{{ tab_name }}');
-    if (!paginationContainer) return;
-
-    // Use all data (which includes filters)
-    const totalData = table{{ tab_name }}.getData().length;
-    const pageSize = table{{ tab_name }}.getPageSize();
-    const currentPage = table{{ tab_name }}.getPage();
-    const totalPages = Math.ceil(totalData / pageSize);
-
-    const startItem = ((currentPage - 1) * pageSize) + 1;
-    const endItem = Math.min(currentPage * pageSize, totalData);
-
-    paginationContainer.innerHTML = `
-        <div class="pagination-controls">
-            <button onclick="goToTilePage{{ tab_name }}(1)" ${currentPage === 1 ? 'disabled' : ''}>First</button>
-            <button onclick="goToTilePage{{ tab_name }}(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
-        </div>
-        <div class="pagination-info">
-            Showing ${startItem} to ${endItem} of ${totalData} entries (Page ${currentPage} of ${totalPages})
-        </div>
-        <div class="pagination-controls">
-            <button onclick="goToTilePage{{ tab_name }}(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
-            <button onclick="goToTilePage{{ tab_name }}(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>Last</button>
-        </div>
-    `;
-}
 
 function goToTilePage{{ tab_name }}(pageNum) {
     console.log('Going to tile page:', pageNum);
@@ -535,6 +511,36 @@ function goToTilePage{{ tab_name }}(pageNum) {
         grid{{ tab_name }}.refreshItems().layout();
     }, 100);
 }
+
+function createTilePagination{{ tab_name }}() {
+    const paginationContainer = document.getElementById('tile-pagination-{{ tab_name }}');
+    if (!paginationContainer) return;
+
+    // Use tracked filtered data
+    const totalData = filteredData{{ tab_name }}.length;
+    const pageSize = table{{ tab_name }}.getPageSize();
+    const currentPage = table{{ tab_name }}.getPage();
+    const totalPages = Math.ceil(totalData / pageSize);
+
+    const startItem = ((currentPage - 1) * pageSize) + 1;
+    const endItem = Math.min(currentPage * pageSize, totalData);
+
+    paginationContainer.innerHTML = `
+        <div class="pagination-controls">
+            <button onclick="goToTilePage{{ tab_name }}(1)" ${currentPage === 1 ? 'disabled' : ''}>First</button>
+            <button onclick="goToTilePage{{ tab_name }}(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
+        </div>
+        <div class="pagination-info">
+            Showing ${startItem} to ${endItem} of ${totalData} entries (Page ${currentPage} of ${totalPages})
+        </div>
+        <div class="pagination-controls">
+            <button onclick="goToTilePage{{ tab_name }}(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+            <button onclick="goToTilePage{{ tab_name }}(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>Last</button>
+        </div>
+    `;
+}
+
+
     //prepare data
     const {{ tab_name }}Data = {}
 
@@ -731,17 +737,32 @@ function goToTilePage{{ tab_name }}(pageNum) {
         }
     });
 
-table{{ tab_name }}.on("pageLoaded", function (pageno) {
-    console.log('Table page changed to:', pageno);
-    // Update tile pagination if it exists
-    if (document.getElementById('tile-pagination-{{ tab_name }}')) {
-        createTilePagination{{ tab_name }}();
-    }
-    // If grid exists, refresh it with current page data
-    if (grid{{ tab_name }}) {
-        populateGridWithData{{ tab_name }}();
-    }
-});
+    table{{ tab_name }}.on("pageLoaded", function (pageno) {
+        console.log('Table page changed to:', pageno);
+        // Update tile pagination if it exists
+        if (document.getElementById('tile-pagination-{{ tab_name }}')) {
+            createTilePagination{{ tab_name }}();
+        }
+        // If grid exists, refresh it with current page data
+        if (grid{{ tab_name }}) {
+            populateGridWithData{{ tab_name }}();
+        }
+    });
+
+    // ADD THIS NEW EVENT LISTENER HERE:
+    table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
+        console.log('Table data filtered, rows count:', rows.length);
+        filteredData{{ tab_name }} = rows.map(row => row.getData());
+        console.log('Stored filtered data:', filteredData{{ tab_name }}.length);
+
+        // If grid exists and is visible, update it
+        const tileContainer = document.getElementById('tile-{{ tab_name }}');
+        if (grid{{ tab_name }} && tileContainer && !tileContainer.classList.contains('d-none')) {
+            console.log('Updating grid due to filter change');
+            populateGridWithData{{ tab_name }}();
+            createTilePagination{{ tab_name }}();
+        }
+    });
 
     //advanced filter/sort modal
     const {{tab_name}}Modal = new bootstrap.Modal('#modal-{{ tab_name }}', {})
@@ -1151,10 +1172,28 @@ table{{ tab_name }}.on("pageLoaded", function (pageno) {
             table{{ tab_name }}.clearFilter();
         }
 
-        if (grid{{ tab_name }}) {
-            populateGridWithData{{ tab_name }}();
-            createTilePagination{{ tab_name }}();
-        }
+        // If we're currently viewing tiles, rebuild the grid properly
+    const tileContainer = document.getElementById('tile-{{ tab_name }}');
+    if (grid{{ tab_name }} && tileContainer && !tileContainer.classList.contains('d-none')) {
+        console.log('Filter applied, rebuilding grid');
+
+        // Destroy the existing grid completely
+        grid{{ tab_name }}.destroy();
+        grid{{ tab_name }} = null;
+
+        // Reset to page 1 when filtering
+        table{{ tab_name }}.setPage(1);
+
+        // Rebuild everything fresh
+        populateGridWithData{{ tab_name }}();
+        createTilePagination{{ tab_name }}();
+
+        setTimeout(() => {
+            grid{{ tab_name }} = new Muuri('#tile-{{ tab_name }} .grid');
+            console.log('Grid rebuilt after filter with items:', grid{{ tab_name }}.getItems().length);
+            grid{{ tab_name }}.refreshItems().layout();
+        }, 100);
+    }
 
     }
 
