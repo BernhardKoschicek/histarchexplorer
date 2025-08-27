@@ -8,7 +8,8 @@
   --footer-bg-dark: hsl(0, 0%, 31%);
   --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
-  --over-bg:
+  --ov-bg-light: whitesmoke;
+  --ov-bg-dark: none;
   --light-hierarchy-item: hsl(0, 0%, 83%);
   --dark-hierarchy-item: hsl(0, 0%, 35%);
   --light-label: black;
@@ -37,6 +38,7 @@
 }
 
 body.light {
+  --ov-bg: var(--ov-bg-light);
   --counters-bg: var(--counters-bg-light);
   --footer-bg: var(--footer-bg-light);
   --card-bg: var(--light-card);
@@ -56,6 +58,7 @@ body.dark {
   --hierarchy-item: var(--dark-hierarchy-item);
   --reference-label: var(--dark-label);
   --reference-text: var(--dark-text);
+  --ov-bg: var(--ov-bg-dark);
 }
 
 :root {
@@ -12276,42 +12279,6 @@ textarea.form-control-lg {
   margin-top: 1.25rem;
 }
 
-.name-column-date-subtitle {
-  color: grey;
-}
-
-.category-column-type-subtitle {
-  color: grey;
-  font-style: italic;
-}
-
-.tabulator-cell-clearfix {
-  clear: both;
-}
-
-.tabulator-container {
-  margin: 1.5rem !important;
-  max-width: calc(100% - 4rem);
-  box-sizing: border-box;
-  border: 1px solid #dee2e6 !important;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.tabulator-row .tabulator-responsive-collapse table tr td:first-of-type {
-  padding-right: 0px;
-  display: none;
-}
-
-.tabulator-row .tabulator-responsive-collapse {
-  border-top: none !important;
-  padding: 20px !important;
-}
-
-.tabulator-footer {
-  background-color: transparent !important;
-}
-
 .cards_home {
   opacity: 0;
   display: grid;
@@ -12364,6 +12331,42 @@ textarea.form-control-lg {
 }
 #entities_mobile .bi-arrow-down-circle-fill {
   font-size: 3.5rem;
+}
+
+.name-column-date-subtitle {
+  color: grey;
+}
+
+.category-column-type-subtitle {
+  color: grey;
+  font-style: italic;
+}
+
+.tabulator-cell-clearfix {
+  clear: both;
+}
+
+.tabulator-container {
+  margin: 1.5rem !important;
+  max-width: calc(100% - 4rem);
+  box-sizing: border-box;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tabulator-row .tabulator-responsive-collapse table tr td:first-of-type {
+  padding-right: 0px;
+  display: none;
+}
+
+.tabulator-row .tabulator-responsive-collapse {
+  border-top: none !important;
+  padding: 20px !important;
+}
+
+.tabulator-footer {
+  background-color: transparent !important;
 }
 
 .grid-muuri {
