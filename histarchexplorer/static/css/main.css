@@ -12775,6 +12775,7 @@ textarea.form-control-lg {
   padding-bottom: 0.3125rem;
   max-width: 80%;
   margin: auto;
+  margin-top: 1rem;
   display: grid;
   border-top: 0.3125rem solid transparent;
   border-bottom: 0.3125rem solid transparent;
@@ -12783,6 +12784,7 @@ textarea.form-control-lg {
   .main-entity-ellipse {
     max-width: 90%;
     margin: auto;
+    margin-top: 1rem;
     display: grid;
     align-content: center;
     align-items: center;
@@ -12885,7 +12887,6 @@ button.btn-whitish[disabled] {
 .hierarchy-item {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
-  display: grid;
   min-height: calc(100vh - 106px);
 }
 
@@ -12898,7 +12899,7 @@ button.btn-whitish[disabled] {
   max-width: 80%;
   margin: auto;
   display: grid;
-  margin-bottom: 1.25rem;
+  margin-bottom: 3rem;
 }
 @media (min-width: 1921px) or (max-width: 769px) {
   .attribute-area {
