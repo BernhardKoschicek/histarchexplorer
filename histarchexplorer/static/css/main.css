@@ -6,12 +6,8 @@
   --dark-card-hover: hsl(230, 19%, 36%);
   --footer-bg-light: transparent;
   --footer-bg-dark: hsl(0, 0%, 31%);
-  --light-muuri-tile: hsla(0, 2%, 84%, 0.3);
+  --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
-  --dark-nav-link-hover: white;
-  --light-nav-link-hover: black;
-  --light-bg-muuri-container: whitesmoke;
-  --darh-bg-muuri-container: black;
   --light-hierarchy-item: hsl(0, 0%, 83%);
   --dark-hierarchy-item: hsl(0, 0%, 35%);
   --light-label: black;
@@ -48,8 +44,6 @@ body.light {
   --hierarchy-item: var(--light-hierarchy-item);
   --reference-label: var(--light-label);
   --reference-text: var(--light-text);
-  --bg-muuricont: var(--light-bg-muuri-container);
-  --nav-link-hover: var(--light-nav-link-hover);
 }
 
 body.dark {
@@ -61,8 +55,6 @@ body.dark {
   --hierarchy-item: var(--dark-hierarchy-item);
   --reference-label: var(--dark-label);
   --reference-text: var(--dark-text);
-  --bg-muuricont: var(--dark-bg-muuri-container);
-  --nav-link-hover: var(--dark-nav-link-hover);
 }
 
 :root {
@@ -137,10 +129,6 @@ body {
   }
 }
 
-.navbar .nav-link:hover {
-  color: var(--nav-link-hover) !important;
-}
-
 .navbar-nav .nav-link-hover {
   border-bottom: 2px solid transparent;
 }
@@ -157,7 +145,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   height: 2px;
-  background-color: #868686;
+  background-color: #151515;
 }
 
 main {
@@ -12378,7 +12366,6 @@ textarea.form-control-lg {
 }
 
 .grid-muuri {
-  background-color: var(--bg-muuricont);
   width: 100%;
   position: relative;
 }
@@ -12399,6 +12386,15 @@ textarea.form-control-lg {
   display: none !important;
 }
 
+.item,
+.item-half,
+.item-middle,
+.item-fit,
+.item-5-6 {
+  border-radius: 7.5px;
+  box-shadow: 1px 1px 2px 0px rgba(110, 109, 109, 0.66);
+}
+
 .item {
   display: block;
   margin: 5px;
@@ -12406,8 +12402,6 @@ textarea.form-control-lg {
   width: calc((100% - 20px) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
-  border-radius: 7.5px;
-  box-shadow: 1px 1px 2px 0px rgba(110, 109, 109, 0.66);
 }
 
 @media (max-width: 1400px) {
@@ -12420,15 +12414,10 @@ textarea.form-control-lg {
     width: 100%;
     margin: 0px;
     padding: 0px;
-    box-shadow: none;
   }
 }
 .item-middle {
-  display: block;
   width: 66.6666666667%;
-  border-radius: 7.5px;
-  margin: 5px;
-  box-shadow: 1px 1px 2px 0px rgba(110, 109, 109, 0.66);
 }
 
 @media (max-width: 1400px) {
@@ -12439,7 +12428,6 @@ textarea.form-control-lg {
 @media (max-width: 766px) {
   .item-middle {
     width: calc(100% - 10px);
-    box-shadow: none;
   }
 }
 .item-5-6 {
@@ -12456,20 +12444,17 @@ textarea.form-control-lg {
     width: 100%;
     margin: 0px;
     padding: 0px;
-    box-shadow: none;
   }
 }
 .item-half {
   display: block;
   margin: 2.5px;
-  margin-top: 5px;
   position: absolute;
   width: calc(((100% - 30px) / 3 - 10px) / 2);
   max-height: fit-content;
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
-  box-shadow: 1px 1px 2px 0px rgba(110, 109, 109, 0.66);
 }
 
 @media (max-width: 1400px) {
@@ -12482,7 +12467,6 @@ textarea.form-control-lg {
     width: 100%;
     margin: 0px;
     padding: 0px;
-    box-shadow: none;
   }
 }
 .item-wide {
@@ -12497,7 +12481,6 @@ textarea.form-control-lg {
 @media (max-width: 766px) {
   .item-wide {
     width: calc(100% - 10px);
-    box-shadow: none;
   }
 }
 @media (min-width: 767px) and (max-width: 992px) {
@@ -12521,7 +12504,6 @@ textarea.form-control-lg {
   .item-fit {
     border-radius: 0;
     padding-bottom: 0.625rem;
-    box-shadow: none;
   }
 }
 .item-fit {
@@ -12596,7 +12578,7 @@ textarea.form-control-lg {
   hyphens: auto;
 }
 
-.badge.custom-secondary.text-wrap {
+.badge.bg-secondary.text-wrap {
   font-size: 1.1rem;
   line-height: 1.5;
 }
@@ -12665,7 +12647,6 @@ textarea.form-control-lg {
 @media (max-height: 766px) {
   #expand-button {
     margin-top: 0px;
-    box-shadow: none;
   }
 }
 #expand-button i {
@@ -12758,7 +12739,6 @@ textarea.form-control-lg {
     margin-right: 0;
     padding: 0;
     overflow-y: visible;
-    box-shadow: none;
   }
 }
 
