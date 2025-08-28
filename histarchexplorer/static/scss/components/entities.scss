@@ -259,3 +259,8 @@
     width: 40px !important;
     margin: -11px !important;
 }
+
+.map-container {
+  opacity: 0;
+  transition: opacity 1000ms ease-in-out;
+}
