@@ -743,6 +743,20 @@ function createTilePagination{{ tab_name }}() {
         columns: columns{{ tab_name }},
     });
 
+    filteredData{{ tab_name }} = table{{ tab_name }}.getData("active");
+
+    table{{ tab_name }}.on("dataSorted", function (sorters, rows) {
+        // rows = alle gefilterten Zeilen in sortierter Reihenfolge
+        filteredData{{ tab_name }} = rows.map(r => r.getData());
+
+        const tileContainer = document.getElementById('tile-{{ tab_name }}');
+        if (grid{{ tab_name }} && tileContainer && !tileContainer.classList.contains('d-none')) {
+            populateGridWithData{{ tab_name }}();
+            createTilePagination{{ tab_name }}();
+            setTimeout(() => grid{{ tab_name }}.refreshItems().layout(), 50);
+        }
+    });
+
 
     table{{ tab_name }}.on("rowClick", function (e, row) {
         const rowData = row.getData();
