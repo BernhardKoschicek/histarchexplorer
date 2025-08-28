@@ -333,39 +333,44 @@ function populateGridWithData{{ tab_name }}() {
         return;
     }
 
-    // Clear existing items
-    gridContainer.innerHTML = '';
+    // ⚠️ WICHTIG: NICHT sofort leeren, solange ein Muuri-Grid existiert!
+    // gridContainer.innerHTML = '';  // <-- Entfernen/verschieben (siehe unten)
 
-    // If grid exists, destroy items first
+    // Bestehende Muuri-Items KORREKT entfernen, bevor wir neue hinzufügen
     if (grid{{ tab_name }}) {
-        grid{{ tab_name }}.getItems().forEach(item => {
-            grid{{ tab_name }}.remove(item, {removeElements: true});
-        });
+        const items = grid{{ tab_name }}.getItems();
+        if (items.length) {
+            grid{{ tab_name }}.remove(items, { removeElements: true });
+        }
+    } else {
+        // Nur wenn KEIN Grid existiert, dürfen wir den Container hart leeren
+        gridContainer.innerHTML = '';
     }
 
-    // Use the tracked filtered data
+    // Datenseite bestimmen (unverändert)
     const allFilteredData = filteredData{{ tab_name }};
-    console.log('Using tracked filtered data:', allFilteredData.length);
-
-    // Apply pagination to filtered results
     const pageSize = table{{ tab_name }}.getPageSize();
     const currentPage = table{{ tab_name }}.getPage();
-
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
     const currentPageData = allFilteredData.slice(startIndex, endIndex);
 
-    console.log(`Showing page ${currentPage}: items ${startIndex} to ${endIndex-1} (${currentPageData.length} items) from ${allFilteredData.length} total filtered results`);
+    // Neue DOM-Knoten bauen (und in Array sammeln!)
+    const newNodes = currentPageData.map(item => createGridItem{{ tab_name }}(item));
 
-    // Add current page items to DOM
-    currentPageData.forEach((item, index) => {
-        const gridItem = createGridItem{{ tab_name }}(item);
-        gridContainer.appendChild(gridItem);
-    });
+    if (grid{{ tab_name }}) {
+        // 👉 Der entscheidende Schritt: Muuri die neuen Elemente bekannt machen
+        grid{{ tab_name }}.add(newNodes);
+        // Danach sauber layouten
+        grid{{ tab_name }}.layout();
+    } else {
+        // Kein Grid aktiv: normal anhängen; Muuri liest sie später beim Init ein
+        newNodes.forEach(node => gridContainer.appendChild(node));
+    }
 
-    console.log('Items added to container:', gridContainer.children.length);
+    console.log('Items prepared for container:', newNodes.length);
 
-    // Force Muuri to refresh and layout after DOM is ready
+    // Optional kleines Refresh; nicht zwingend nötig nach add(), aber schadet nicht
     setTimeout(() => {
         if (grid{{ tab_name }}) {
             grid{{ tab_name }}.refreshItems().layout();
@@ -373,6 +378,7 @@ function populateGridWithData{{ tab_name }}() {
         }
     }, 50);
 }
+
 
 
 function initializeMuuriGrid{{ tab_name }}() {
