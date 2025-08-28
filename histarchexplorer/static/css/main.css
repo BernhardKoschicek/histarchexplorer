@@ -8,6 +8,8 @@
   --footer-bg-dark: hsl(0, 0%, 31%);
   --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
+  --ov-bg-light: none;
+  --ov-bg-dark: none;
   --light-hierarchy-item: hsl(0, 0%, 83%);
   --dark-hierarchy-item: hsl(0, 0%, 35%);
   --light-label: black;
@@ -36,6 +38,7 @@
 }
 
 body.light {
+  --ov-bg: var(--ov-bg-light);
   --counters-bg: var(--counters-bg-light);
   --footer-bg: var(--footer-bg-light);
   --card-bg: var(--light-card);
@@ -55,6 +58,7 @@ body.dark {
   --hierarchy-item: var(--dark-hierarchy-item);
   --reference-label: var(--dark-label);
   --reference-text: var(--dark-text);
+  --ov-bg: var(--ov-bg-dark);
 }
 
 :root {
@@ -12999,7 +13003,7 @@ textarea.form-control-lg {
   padding-bottom: 0.3125rem;
   max-width: 80%;
   margin: auto;
-  display: grid;
+  margin-top: 1rem;
   border-top: 0.3125rem solid transparent;
   border-bottom: 0.3125rem solid transparent;
 }
@@ -13007,6 +13011,7 @@ textarea.form-control-lg {
   .main-entity-ellipse {
     max-width: 90%;
     margin: auto;
+    margin-top: 1rem;
     display: grid;
     align-content: center;
     align-items: center;
@@ -13109,7 +13114,6 @@ button.btn-whitish[disabled] {
 .hierarchy-item {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
-  display: grid;
   min-height: calc(100vh - 106px);
 }
 
@@ -13122,7 +13126,7 @@ button.btn-whitish[disabled] {
   max-width: 80%;
   margin: auto;
   display: grid;
-  margin-bottom: 1.25rem;
+  margin-bottom: 3rem;
 }
 @media (min-width: 1921px) or (max-width: 769px) {
   .attribute-area {
@@ -13312,6 +13316,7 @@ button.btn-whitish[disabled] {
 }
 
 .entity-content {
+  background-color: var(--ov-bg);
   height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));
