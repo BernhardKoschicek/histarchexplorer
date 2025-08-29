@@ -12535,6 +12535,11 @@ textarea.form-control-lg {
   border-color: #007bff;
 }
 
+.maplibregl-popup-content {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
 .cards_home {
   opacity: 0;
   display: grid;

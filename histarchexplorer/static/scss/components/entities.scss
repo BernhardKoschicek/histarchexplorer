@@ -410,3 +410,8 @@
   color: white;
   border-color: #007bff;
 }
+
+.maplibregl-popup-content {
+  max-height: 50vh;
+  overflow-y: auto;
+}
