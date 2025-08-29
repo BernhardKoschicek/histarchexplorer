@@ -74,12 +74,15 @@ const DPR_CAP{{ tab_name }} = Math.min(window.devicePixelRatio || 1, 2);
   const iiifMap{{ tab_name }} = new Map();
 
   // Build a sized IIIF image URL from the IIIFBasePath we get in LPX
-  function buildIiifSizedUrl{{ tab_name }}(iiifBasePath, w = 200, h = 360) {
-    if (!iiifBasePath) return null;
-    // Example base: https://iiif.bitem.at/iiif/2/276877.jpg
-    // IIIF v2 path: {base}/full/!W,H/0/default.jpg
-    return `${iiifBasePath}/full/!${w},${h}/0/default.jpg`;
-  }
+function buildIiifSizedUrl{{ tab_name }}(iiifObjOrBase, w = 200, h = 360) {
+  // accept the old string OR the new {base, ext} object
+  const base = typeof iiifObjOrBase === 'string' ? iiifObjOrBase : (iiifObjOrBase?.base || null);
+  if (!base) return null;
+  // request JPG as the rendered output format
+  return `${base}/full/!${w},${h}/0/default.jpg`;
+}
+
+
 
   // Fetch IIIFBasePath for a batch of entity ids via LPX "depictions"
   async function fetchDepictionsBatch{{ tab_name }}(ids) {
@@ -112,11 +115,22 @@ const DPR_CAP{{ tab_name }} = Math.min(window.devicePixelRatio || 1, 2);
         const idStr = (feature['@id'] || '').split('/').pop();
         const entityId = Number(idStr);
         const dep = feature.depictions?.[0];
-        const iiifBase = dep?.IIIFBasePath || null;
+const iiifBase = dep?.IIIFBasePath || null;
+const mime     = (dep?.mimetype || '').toLowerCase();
 
-        if (!Number.isNaN(entityId)) {
-          iiifMap{{ tab_name }}.set(entityId, iiifBase);
-        }
+// map mimetype → extension used in the IIIF request format segment
+let ext = 'jpg';
+if (mime.includes('png'))  ext = 'png';
+else if (mime.includes('tif'))  ext = 'tif';   // covers tiff/tif
+else if (mime.includes('webp')) ext = 'webp';
+else if (mime.includes('gif'))  ext = 'gif';
+// (jpeg/default → 'jpg')
+
+if (!Number.isNaN(entityId)) {
+  // store BOTH the base and the ext
+  iiifMap{{ tab_name }}.set(entityId, { base: iiifBase, ext });
+}
+
       }
 
       // Any ids not returned → cache null to avoid repeat fetching
@@ -143,8 +157,8 @@ const DPR_CAP{{ tab_name }} = Math.min(window.devicePixelRatio || 1, 2);
     const bg = el.querySelector('.item-bg');
     if (!bg) return;
 
-    const iiifBase = iiifMap{{ tab_name }}.get(id);
-    if (!iiifBase) return; // keep grey fallback
+    const iiifObj = iiifMap{{ tab_name }}.get(id);
+if (!iiifObj) return; // keep grey fallback
 
     // request a crisp raster sized to the tile and DPR
     const tileW = Math.max(el.clientWidth, 1);
@@ -152,7 +166,7 @@ const DPR_CAP{{ tab_name }} = Math.min(window.devicePixelRatio || 1, 2);
     const wReq  = Math.round(tileW * QUALITY * DPRCAP);
     const hReq  = Math.round(tileH * QUALITY * DPRCAP);
 
-    const url = buildIiifSizedUrl{{ tab_name }}(iiifBase, wReq, hReq);
+    const url = buildIiifSizedUrl{{ tab_name }}(iiifObj, wReq, hReq);
     if (!url) return;
 
     const img = new Image();
