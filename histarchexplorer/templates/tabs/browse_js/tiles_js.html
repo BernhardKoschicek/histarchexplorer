@@ -72,32 +72,58 @@
   flex-shrink: 0;                 /* ✅ don’t collapse / push scroll */
 }
 
-/* === Pager tiles (Previous / Next) === */
+/* === Pager tiles (circle arrow + label centered) === */
 .tile-container .grid .item.pager {
+  cursor: pointer;
+  user-select: none;
+  background: #fafafa;
+  transition: transform .1s ease, background .2s ease;
+  outline: none;
+  text-align: center;
+  display: block;               /* keep same as normal tiles */
+}
+
+.tile-container .grid .item.pager:hover {
+  background: #f2f2f2;
+}
+
+.tile-container .grid .item.pager:active {
+  transform: scale(0.97);
+}
+
+.tile-container .grid .item.pager .pager-content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;       /* label on top, circle below */
+  align-items: center;          /* center horizontally */
+  justify-content: center;      /* center vertically */
+}
+
+.tile-container .grid .item.pager .pager-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+.tile-container .grid .item.pager .pager-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #666;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  border: 1px dashed #bbb;
-  background: #fafafa;
-  transition: transform .05s ease, background .2s ease, border-color .2s ease;
-  outline: none;
+  font-size: 24px;
+  color: #333;
+  background: white;
+  transition: all .2s ease;
 }
-.tile-container .grid .item.pager:hover { background: #f2f2f2; border-color: #999; }
-.tile-container .grid .item.pager:active { transform: scale(0.98); }
-.tile-container .grid .item.pager .pager-content {
-  text-align: center;
-  padding: 10px 12px;
-  line-height: 1.2;
-}
-.tile-container .grid .item.pager .pager-arrow {
-  font-size: 20px;
-  display: block;
-}
-.tile-container .grid .item.pager .pager-label {
-  font-size: 13px;
-  opacity: .8;
+
+.tile-container .grid .item.pager:hover .pager-circle {
+  border-color: #222;
+  background: #eee;
 }
 
 
@@ -494,11 +520,11 @@
   const arrow = dir === 'prev' ? '←' : '→';
   const label = dir === 'prev' ? 'Previous' : 'Next';
   div.innerHTML = `
-    <div class="pager-content">
-      <span class="pager-arrow">${arrow}</span>
-      <span class="pager-label">${label}</span>
-    </div>
-  `;
+  <div class="pager-content">
+    <div class="pager-label">${label}</div>
+    <div class="pager-circle">${arrow}</div>
+  </div>
+`;
 
   if (!disabled) {
     const go = () => goToTilePage{{ tab_name }}(targetPage);
