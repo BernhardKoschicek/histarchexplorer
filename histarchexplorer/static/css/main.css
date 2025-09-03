@@ -12191,20 +12191,22 @@ textarea.form-control-lg {
   margin-top: var(--navbar-height);
 }
 
-/*.entity-cards {
+.entity-cards {
   display: grid;
   grid-template-columns: 1fr;
-  gap: rem(30);
-
-  @include breakpoint(medium) {
+  gap: 1.875rem;
+}
+@media (min-width: 40em) {
+  .entity-cards {
     grid-template-columns: repeat(2, 1fr);
-
-    @include breakpoint(large) {
-      grid-template-columns: repeat(4, 1fr);
-    }
   }
 }
-*/
+@media (min-width: 40em) and (min-width: 71.875em) {
+  .entity-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .entity-card {
   position: relative;
   overflow: hidden;
