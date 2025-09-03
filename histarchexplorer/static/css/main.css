@@ -298,7 +298,7 @@ body {
   z-index: 0;
 }
 
-.map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
+.map-gray .maplibregl-canvas {
   -webkit-filter: grayscale(100%) opacity(0.9);
   filter: grayscale(100%) opacity(0.9);
 }
@@ -13006,13 +13006,17 @@ textarea.form-control-lg {
   line-height: 1.4;
 }
 
+.custom-badge {
+  background-color: var(--badge-color);
+}
+
 .main-entity-ellipse {
   border-radius: 30px;
   background-color: rgba(255, 255, 255, 0.5);
   padding-bottom: 0.3125rem;
   max-width: 80%;
   margin: auto;
-  display: grid;
+  margin-top: 1rem;
   border-top: 0.3125rem solid transparent;
   border-bottom: 0.3125rem solid transparent;
 }
@@ -13020,6 +13024,7 @@ textarea.form-control-lg {
   .main-entity-ellipse {
     max-width: 90%;
     margin: auto;
+    margin-top: 1rem;
     display: grid;
     align-content: center;
     align-items: center;
@@ -13122,7 +13127,6 @@ button.btn-whitish[disabled] {
 .hierarchy-item {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
-  display: grid;
   min-height: calc(100vh - 106px);
 }
 
@@ -13135,7 +13139,7 @@ button.btn-whitish[disabled] {
   max-width: 80%;
   margin: auto;
   display: grid;
-  margin-bottom: 1.25rem;
+  margin-bottom: 3rem;
 }
 @media (min-width: 1921px) or (max-width: 769px) {
   .attribute-area {
@@ -13325,6 +13329,7 @@ button.btn-whitish[disabled] {
 }
 
 .entity-content {
+  background-color: var(--ov-bg);
   height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));
