@@ -1,90 +1,77 @@
 <style>
-  /* === Tile background image layer === */
-  .tile-container .grid .item {
-      position: relative;
-      overflow: hidden;
+/* === Tile background image layer === */
+.tile-container .grid .item {
+  position: relative;
+  overflow: hidden;
 
-      /* defaults for our per-tile animation (JS overrides these) */
-      --bg-start: 118%; /* base (acts like cover) */
-      --bg-target: 100%; /* hover (acts like contain for most wide imgs) */
-  }
+  /* defaults for our per-tile animation (JS overrides these) */
+  --bg-start: 118%; /* base (acts like cover) */
+  --bg-target: 100%; /* hover (acts like contain for most wide imgs) */
+}
 
-  .tile-container .grid .item .item-bg {
-      position: absolute;
-      inset: 0;
-      background-position: center;
-      background-repeat: no-repeat;
+.tile-container .grid .item .item-bg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: var(--bg-start);
+  opacity: 0;
+  transition: opacity .25s ease, background-size .35s ease;
+  z-index: 0; /* under overlay/content */
+}
 
-      /* base uses computed "cover" percentage */
-      background-size: var(--bg-start);
+/* reveal image when loaded */
+.tile-container .grid .item.has-bg .item-bg { opacity: 1; }
 
-      opacity: 0;
-      transition: opacity .25s ease, background-size .35s ease;
-      z-index: 0; /* under overlay/content */
-  }
+/* hover animates to computed "contain" percentage */
+.tile-container .grid .item:hover .item-bg { background-size: var(--bg-target); }
 
-  /* reveal image when loaded */
-  .tile-container .grid .item.has-bg .item-bg {
-      opacity: 1;
-  }
+/* Optional: readability overlay (doesn't block hover) */
+.tile-container .grid .item .item-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(241, 241, 241, 0.79);
+  opacity: 1;
+  transition: opacity .2s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+.tile-container .grid .item:hover .item-overlay { opacity: .4; }
+.tile-container .grid .item:hover .item-content { opacity: .4; }
 
-  /* hover animates to computed "contain" percentage */
-  .tile-container .grid .item:hover .item-bg {
-      background-size: var(--bg-target);
-  }
+/* Content on top */
+.tile-container .grid .item .item-content { position: relative; z-index: 2; }
 
-  /* Optional: readability overlay (doesn't block hover) */
-  .tile-container .grid .item .item-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(241, 241, 241, 0.79);
-      opacity: 1;
-      transition: opacity .2s ease;
-      z-index: 1;
-      pointer-events: none;
-  }
+/* === Sticky pagination, compact with spacing === */
+.tile-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;               /* ✅ prevent outer scroll */
+}
 
-  .tile-container .grid .item:hover .item-overlay {
-      opacity: .4;
-  }
+.tile-container .grid {
+  flex: 1;
+  overflow: auto;                 /* ✅ only the grid scrolls */
+  padding-bottom: 48px;           /* keep space so pagination isn’t flush */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
 
-  .tile-container .grid .item:hover .item-content {
-      opacity: .4;
-  }
-
-  /* Content on top */
-  .tile-container .grid .item .item-content {
-      position: relative;
-      z-index: 2;
-  }
-
-  /* === Sticky pagination, compact with spacing === */
-  .tile-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .tile-container .grid {
-    flex: 1;
-    overflow-y: auto;
-    padding-bottom: 48px; /* keep space so pagination isn’t flush */
-  }
-
-  .tile-container .tile-pagination {
+.tile-container .tile-pagination {
   position: sticky;
   bottom: 0;
   background: #fff;
   border-top: 1px solid #ccc;
   z-index: 5;
-
-  padding: 6px 8px;      /* space inside */
+  padding: 6px 8px;
   font-size: 13px;
-  min-height: 40px;      /* a little taller bar */
-
-  display: flex;         /* enable flexbox */
-  align-items: center;   /* center vertically */
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;                 /* ✅ don’t collapse / push scroll */
 }
+
 
 </style>
 
