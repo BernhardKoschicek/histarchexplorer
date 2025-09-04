@@ -96,24 +96,28 @@
 
 /* ===== Container & Grid Base ===== */
 .tile-container {
+
   position: relative;
   width: 100%;
-  height: calc(100vh - 100px - 4rem); /* Match table height */
-  max-height: 830px; /* Match table max-height */
-  overflow-y: auto; /* Enable scrolling within the container */
+  overflow-y: hidden;
   overflow-x: hidden;
-  padding: 20px;
+  padding: 0;
   box-sizing: border-box;
+}
+
+.tile-container .grid-container {
+  overflow-y: auto; /* Enable scrolling within the container */
+  max-height: calc(100vh - 80px - 24px - 58px - 24px - 40px);
 }
 
 /* Responsive column config (defaults for big screens) */
 .tile-container .grid {
+  overflow-y: hidden;
+  overflow-x: hidden;
   --cols: 8; /* Big displays → 8 tiles per row */
   --gap: 16px; /* Space between tiles */
   position: relative !important; /* Muuri container should be relative */
   width: 100%;
-  min-height: 100%;
-  padding: 0; /* gutters handled by item margins */
   box-sizing: border-box;
 }
 
@@ -223,11 +227,13 @@
 
 /* ===== Pagination (unchanged) ===== */
 .tile-pagination {
-  position: relative;
+  position: sticky;
+  bottom: 0;
+  height: 40px;
+  max-height: 40px;
   background: #fff;
   border-top: 1px solid #ddd;
   padding: 10px;
-  margin-top: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -246,7 +252,7 @@
 }
 
 .tile-pagination button {
-  padding: 5px 10px;
+  padding: 3px 10px;
   border: 1px solid #ddd;
   background: #fff;
   cursor: pointer;
