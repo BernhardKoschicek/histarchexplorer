@@ -389,7 +389,7 @@
   div.dataset.targetPage = String(targetPage);
 
   // No background/overlay layers; just content
-  const arrow = dir === 'prev' ? '←' : '→';
+  const arrow = dir === 'prev' ? '<i class="bi bi-arrow-left"></i>' : '<i class="bi bi-arrow-right"></i>';
   const label = dir === 'prev' ? 'Previous' : 'Next';
   div.innerHTML = `
   <div class="pager-content">
