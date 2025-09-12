@@ -286,8 +286,8 @@ class PresentationView:
                     public=f["publicShareable"],
                     url=f.get("url"),
                     mime_type=f.get("mimetype"),
-                    iiif_manifest=f.get("iiifManifest"),
-                    iiif_base_path=f.get("iiifBasePath"),
+                    iiif_manifest=f.get("IIIFManifest"),
+                    iiif_base_path=f.get("IIIFBasePath"),
                     main_image=g.main_images.get(entity_id) == entity_id,
                     render_type=get_render_type(f.get("mimetype"))))
         return files
@@ -336,10 +336,3 @@ class PresentationView:
             relations=cls.parse_relations(data.get("relations", {})),
             start=start_date,
             end=end_date)
-
-class Entity(PresentationView):
-    def __init__(self):
-        self.geometries_collection = {
-            'structure':
-                {},
-            'collection': []}

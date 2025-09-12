@@ -204,7 +204,10 @@ def get_entity(id_: int, tab_name=None) -> str:
     hierarchy = None
 
 
+
     main_entity = PresentationView.from_api(id_)
+    data = {'entity': main_entity.to_json()}
+
     match tab_name:
         case 'feature':
             feature = Entity.get_entity(id_, Parser())
@@ -226,7 +229,7 @@ def get_entity(id_: int, tab_name=None) -> str:
             c_entities = Entity.get_linked_entities_by_properties_recursive(
                 id_,
                 get_parser_for_landing(id_))
-            if get_main_entity(id_, c_entities).system_class != 'Place':
+            if main_entity.system_class != 'place':
                 catalogue_entities = []
             else:
                 catalogue_entities = build_entity_tree(c_entities)
@@ -234,9 +237,6 @@ def get_entity(id_: int, tab_name=None) -> str:
                     entity.all_child_depictions = collect_child_depictions(entity_)
 
         case 'overview':
-            main_entity = PresentationView.from_api(id_)
-            data = {'entity': main_entity.to_json()}
-
             images = []
             for image in main_entity.files:
                 if image.main_image:
@@ -252,23 +252,12 @@ def get_entity(id_: int, tab_name=None) -> str:
             more_images = len(remaining_images) > 0
             number_of_images = len(images+[main_image])
             categorized_types = get_categorized_types(main_entity)
-        #case 'media':
-        #    entities = Entity.get_linked_entities_by_properties_recursive(
-        #        id_,
-        #        get_parser_for_landing(id_))
-        #    main_entity = get_main_entity(id_, entities)
-#
-        #    all_images = main_entity.depictions
-#
-        #    data = {
-        #        'entity': json.dumps(
-        #            main_entity.to_serializable(),
-        #            ensure_ascii=False)}
-#
+        case 'media':
+            pass
+
         case _ if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
-
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
@@ -280,8 +269,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         remaining_images=remaining_images,
         more_images=more_images,
         total_images=number_of_images,
-        all_images=all_images,
-        manifests=[img.iiif_manifest for img in all_images],
+        manifests=[img.iiif_manifest for img in main_entity.files],
         related_entities=related_entities or {},
         cite_button=get_cite_button(main_entity),
         catalogue_entities=catalogue_entities,
@@ -343,12 +331,6 @@ def get_parser_for_landing(id_: int) -> Parser:
 
 
 
-def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
-    for entity_ in set(entities):
-        if entity_.id == id_:
-            return entity_
-    raise ValueError(f"Entity with id {id_} not found.")
-
 
 def get_ancestor_entities(main_entity: Entity, entities: list[Entity]) -> list[dict]:
     ancestor_entities = []
@@ -376,25 +358,7 @@ def get_ancestor_entities(main_entity: Entity, entities: list[Entity]) -> list[d
     return ancestor_entities
 
 
-def get_related_entities(
-        main_entity: Entity,
-        entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
-    related_entities: dict[str, Any] = defaultdict(lambda: defaultdict(list))
-    for subunit in entities:
-        if subunit.id == main_entity.id:
-            continue
-        match subunit.system_class:
-            case 'Group' | 'Person':
-                related_entities[subunit.system_class][subunit.name].append(
-                    subunit)
-            case _:
-                if not subunit.types:
-                    continue
-                for type_ in subunit.types:
-                    label = type_.type_hierarchy[0]['label']
-                    if label in app.config['STANDARD_TYPES']:
-                        related_entities[label][type_.label].append(subunit.to_serializable())
-    return related_entities
+
 
 
 def get_categorized_types(main_entity: PresentationView) -> dict[str, list[EntityTypeModel]]:
