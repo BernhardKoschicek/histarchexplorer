@@ -203,6 +203,8 @@
   {% endif %}
 
   <!-- Bibliography and External References -->
+<!-- todo: get also the references from the root entity -->
+<!--    This is just a model thing, Bernhard will include this in the API call, so nothing to do here -->
   {% if entity.references %}
     <div class="item item-5-6" data-type="reference">
       <div class="item-content">
@@ -214,7 +216,7 @@
                 <li>
                   <div class="reference-content">
                     <div class="reference-header">
-                      {% if reference.system_class  == "bibliography" %}
+                      {% if reference.system_class == "bibliography" %}
                         <i class="bi bi-book"></i>
                         <a href="{{ url_for('entity', id_=reference.id) }}"
                            class="reference-name">
