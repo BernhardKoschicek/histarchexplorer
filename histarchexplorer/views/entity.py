@@ -1,8 +1,5 @@
 
 import json
-import time
-from dataclasses import asdict
-
 from collections import defaultdict
 from typing import Any
 
@@ -14,7 +11,6 @@ from histarchexplorer.models.depiction import Depiction
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.presentation_view import EntityTypeModel, \
     PresentationView
-from histarchexplorer.models.types import Types
 from histarchexplorer.utils.view_util import get_cite_button
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
@@ -205,6 +201,8 @@ def get_entity(id_: int, tab_name=None) -> str:
     all_images = []
     ancestor_entities = []
     feature = None
+    hierarchy = None
+
 
     main_entity = PresentationView.from_api(id_)
     match tab_name:
@@ -237,7 +235,6 @@ def get_entity(id_: int, tab_name=None) -> str:
 
         case 'overview':
             main_entity = PresentationView.from_api(id_)
-            print(main_entity.when)
             data = {'entity': main_entity.to_json()}
 
             images = []

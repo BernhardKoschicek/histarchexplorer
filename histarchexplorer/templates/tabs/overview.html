@@ -3,20 +3,12 @@
 
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
 <script>
-  const data = {{ data | tojson }};
-
   // asign array inside geometry collection to gisData; if array directly; single object -> array
-  let gisData = [];
-  if (entity.geometry) {
-    if (entity.geometry.type === "GeometryCollection" && Array.isArray(entity.geometry.geometries)) {
-      gisData = entity.geometry.geometries;
-    } else {
-      gisData = Array.isArray(entity.geometry) ? entity.geometry : [entity.geometry];
-    }
-  }
 
+  gisData = entity.geometries
+  console.log(entity.geometries)
 </script>
-<script> const entityName = entity.name</script>
+<script> const entityName = entity.title</script>
 <script src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
 
 
@@ -25,7 +17,7 @@
     <div class="cite-wrapper">
       {{ cite_button.button_html | safe }}
     </div>
-    <!-- todo: ancestor entities -->
+    <!-- todo: ancestor entities (Bernhard will do this)-->
     {% if ancestor_entities %}
       {% for entity in ancestor_entities %}
         <div class="hierarchy-button">
@@ -83,16 +75,17 @@
         </div>
         <div class="hierarchy-card-label mb-0">{{ entity.title }}</div>
         <div class="entity-type mb-0 ">
-          {% if entity.standard_type %}
-            <p>{{ entity.standard_type.label | upper }}</p>
-          {% endif %}
+          {% for type in entity.types %}
+            {% if type.is_standard %}
+              <p>{{ type.title | upper }}</p>
+            {% endif %}
+          {% endfor %}
         </div>
-
-
         <div class="entity-date">
           {% if entity.start or entity.end %}
             <p>{{ ui.date_template_format(entity.start, entity.end) }}</p>
           {% elif entity.types %}
+            <!-- todo: chronology will not work, need to refactor (Bernhard will do this)-->
             {% for type in entity.types if type.root == 'Chronology' %}
               <p>{{ type.label or 'No date available' }}</p>
             {% endfor %}
@@ -108,7 +101,8 @@
         <button type="button" class="btn btn-whitish rounded-5" disabled>
           <i class="bi bi-diagram-3"></i>
           <span class="nude-link">
-                                    {{ entity.subunits | length }}
+
+            {{ entity.subunits | length }}
             {{ "Subentity" if entity.subunits | length == 1 else "Subentities" }}</span>
 
         </button>
@@ -155,7 +149,8 @@
 
   <!-- Map Location -->
   <!-- Todo: Map Location -->
-  {% if entity.geometry %}
+  <!--    Geoemtries are now in entity.geometries, and should be formated that it can be used right away -->
+  {% if entity.geometries %}
     <div class="item" data-type="map">
       <div class="map-wrapper">
         <div class="item-content item-content-full">
