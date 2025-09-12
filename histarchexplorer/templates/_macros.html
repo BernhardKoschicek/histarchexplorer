@@ -59,3 +59,13 @@
     </div>
   </div>
 {% endmacro %}
+
+{% macro date_template_format(begin, end) %}
+    {% if begin and end %}
+        {{ begin }} - {{ end }}
+    {% elif begin %}
+        {{ begin }}
+    {% elif end %}
+        {{ end }}
+    {% endif %}
+{% endmacro %}

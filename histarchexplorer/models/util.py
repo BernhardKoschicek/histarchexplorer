@@ -23,6 +23,7 @@ def check_timespan_date(date_from: str, date_to: str) -> bool:
 def format_date(
         date_from: str,
         date_to: str) -> Optional[str]:
+
     # Check if date is BC and remove leading '-'
     bc_date_from = '-' in date_from
     bc_date_to = '-' in date_to

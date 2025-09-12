@@ -8,8 +8,8 @@ from flask import g
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
-from histarchexplorer.models.util import get_divisions, get_icon, \
-    get_render_type
+from histarchexplorer.models.util import format_date, get_divisions, get_icon, \
+    get_render_type, split_date_string
 
 
 @dataclass
@@ -152,6 +152,8 @@ class PresentationView:
     title: str
     description: str
     aliases: list[str]
+    start: str
+    end: str
     geometries: list[FeatureModel] = field(default_factory=list)
     when: Optional[TimeRangeModel] = None
     types: list[EntityTypeModel] = field(default_factory=list)
@@ -293,13 +295,25 @@ class PresentationView:
     @classmethod
     @cache.memoize()
     def from_api(cls, entity_id: int) -> 'PresentationView':
-        url = f"{app.config['API_URL']}entity_presentation_view/{entity_id}"
         response = requests.get(
-            url,
+            f"{app.config['API_URL']}entity_presentation_view/{entity_id}",
             proxies=PROXIES,
             timeout=30)
         response.raise_for_status()
         data = response.json()
+
+        when_data = cls.parse_time_range(data.get("when"))
+
+        start_date = None
+        end_date = None
+        if when_data and when_data.start:
+            start_date = format_date(
+                split_date_string(when_data.start.earliest),
+                split_date_string(when_data.start.latest))
+        if when_data and when_data.end:
+            end_date = format_date(
+                split_date_string(when_data.end.earliest),
+                split_date_string(when_data.end.latest))
 
         return cls(
             id=data["id"],
@@ -308,7 +322,7 @@ class PresentationView:
             description=data.get("description", ""),
             aliases=data.get("aliases", []),
             geometries=cls.parse_geometries(data.get("geometries", {})),
-            when=cls.parse_time_range(data.get("when")),
+            when=when_data,
             types=cls.parse_types(data.get("types", [])),
             externalReferenceSystems=[
                 ExternalReferenceModel.from_dict(er)
@@ -319,8 +333,9 @@ class PresentationView:
                 for ref in data.get("references", [])
                 if isinstance(ref, dict)],
             files=cls.parse_file(data["id"], data.get('files', [])),
-            relations=cls.parse_relations(data.get("relations", {})))
-
+            relations=cls.parse_relations(data.get("relations", {})),
+            start=start_date,
+            end=end_date)
 
 class Entity(PresentationView):
     def __init__(self):

@@ -237,7 +237,7 @@ def get_entity(id_: int, tab_name=None) -> str:
 
         case 'overview':
             main_entity = PresentationView.from_api(id_)
-
+            print(main_entity.when)
             data = {'entity': main_entity.to_json()}
 
             images = []
@@ -404,12 +404,12 @@ def get_categorized_types(main_entity: PresentationView) -> dict[str, list[Entit
     divisions = defaultdict(list)
     for type_ in main_entity.types:
         divisions[type_.division['label'].replace(' ', '_')].append({
-            'type': type_.to_json(), 'icon': type_.division['icon']})
+            'type': type_, 'icon': type_.division['icon']})
     sorted_divisions = dict(sorted(
         divisions.items(),
         key=lambda x: (x[0] == x[0] == 'case_study', 'other', x[0])
     ))
-
+    print(sorted_divisions)
     return sorted_divisions
 
 def collect_child_depictions(entity_: Entity) -> list[Depiction]:
