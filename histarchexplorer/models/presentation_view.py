@@ -1,4 +1,3 @@
-# pragma: no cover
 import json
 from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
@@ -8,7 +7,8 @@ from flask import g
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
-from histarchexplorer.models.util import format_date, get_divisions, get_icon, \
+from histarchexplorer.models.util import format_date, \
+    get_description_translated, get_divisions, get_icon, \
     get_render_type, split_date_string
 
 
@@ -74,6 +74,7 @@ class EntityTypeModel:
     def to_json(self, *, indent: Optional[int] = 2) -> str:
         return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
 
+
 @dataclass
 class ExternalReferenceModel:
     id: int
@@ -138,7 +139,7 @@ class Relation:
     name: str
     system_class: str
     relation_types: Optional[list[dict[str, Any]]] = None
-    description: Optional[str] = None
+    description: dict[str, str] | None = None
     aliases: Optional[list[str]] = None
     time_range: Optional[TimeRangeModel] = None
     geometries: list[FeatureModel] = field(default_factory=list)
@@ -150,7 +151,7 @@ class PresentationView:
     id: int
     system_class: str
     title: str
-    description: str
+    description: dict[str, str]
     aliases: list[str]
     start: str
     end: str
@@ -224,7 +225,8 @@ class PresentationView:
                 value=type_.get("value"),
                 unit=type_.get("unit"),
                 icon=get_icon(type_["id"], type_.get("typeHierarchy")),
-                division=get_divisions(type_["id"], type_.get("typeHierarchy"))))
+                division=get_divisions(type_["id"],
+                                       type_.get("typeHierarchy"))))
         return types
 
     @staticmethod
@@ -259,7 +261,8 @@ class PresentationView:
                     name=rel.get("title"),
                     system_class=rel.get("systemClass", system_class),
                     relation_types=rel.get("relationTypes"),
-                    description=rel.get("description"),
+                    description=get_description_translated(
+                        rel.get("description")),
                     aliases=rel.get("aliases", []),
                     time_range=time_range,
                     geometries=rel_geometries,
@@ -297,6 +300,10 @@ class PresentationView:
     def from_api(cls, entity_id: int) -> 'PresentationView':
         response = requests.get(
             f"{app.config['API_URL']}entity_presentation_view/{entity_id}",
+            params={
+                'place_hierarchy': 'true',
+                'remove_empty_values': 'true',
+                'centroid': 'true'},
             proxies=PROXIES,
             timeout=30)
         response.raise_for_status()
@@ -319,7 +326,8 @@ class PresentationView:
             id=data["id"],
             system_class=data.get("systemClass", ""),
             title=data.get("title", ""),
-            description=data.get("description", ""),
+            description=get_description_translated(
+                data.get("description", "")),
             aliases=data.get("aliases", []),
             geometries=cls.parse_geometries(data.get("geometries", {})),
             when=when_data,

@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 
 from flask import g
@@ -98,3 +99,21 @@ def get_divisions(id_: int, type_hierarchy: dict[str, str]) -> dict[str, str]:
                 break
     return (division or
             {'label': 'other', 'icon': '<i class="bi bi-boxes"></i>'})
+
+
+def get_description_translated(description: str) -> dict[str, str]:
+    matches = re.findall(r'##(\w+)_##(.*?)##_\1##', description, re.DOTALL)
+    if matches:
+        lang_dict = {lang: text.strip() for lang, text in matches}
+        if 'de' not in lang_dict and 'en' in lang_dict:
+            lang_dict['de'] = lang_dict['en']
+
+        return lang_dict
+    parts = description.split('##German')
+    if len(parts) > 1:
+        return {
+            'en': parts[0].strip(),
+            'de': parts[1].strip()}
+
+    fallback_text = description.strip()
+    return {'en': fallback_text, 'de': fallback_text}

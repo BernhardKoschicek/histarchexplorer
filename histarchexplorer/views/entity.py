@@ -1,7 +1,8 @@
 
 import json
 from collections import defaultdict
-from typing import Any
+from dataclasses import asdict
+from typing import Any, Dict, List, Optional
 
 from flask import abort, g, render_template
 
@@ -10,7 +11,7 @@ from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.depiction import Depiction
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.presentation_view import EntityTypeModel, \
-    PresentationView
+    PresentationView, Relation
 from histarchexplorer.utils.view_util import get_cite_button
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
@@ -188,17 +189,15 @@ def entity(id_: int, tab_name="overview") -> str:
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
 def get_entity(id_: int, tab_name=None) -> str:
-    data = {}
-    main_entity = None
     related_entities = {}
     catalogue_entities = []
     categorized_types = None
+
     main_image = None
     initial_images = []
     remaining_images = []
     more_images = False
     number_of_images = 0
-    all_images = []
     ancestor_entities = []
     feature = None
     hierarchy = None
@@ -210,6 +209,7 @@ def get_entity(id_: int, tab_name=None) -> str:
 
     match tab_name:
         case 'feature':
+            # todo: core information about the feature are available in the main entity
             feature = Entity.get_entity(id_, Parser())
         # todo: test if really needed
         #case 'features':
@@ -246,18 +246,23 @@ def get_entity(id_: int, tab_name=None) -> str:
 
             if not main_image and images:
                 main_image = images.pop(0)
-
             initial_images = images[:2]
             remaining_images = images[2:]
             more_images = len(remaining_images) > 0
             number_of_images = len(images+[main_image])
+
             categorized_types = get_categorized_types(main_entity)
+            hierarchy = {
+                'subs': get_sub_count(main_entity),
+                'root': get_hierarchy(main_entity)}
         case 'media':
             pass
 
         case _ if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
+
+
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
@@ -273,7 +278,8 @@ def get_entity(id_: int, tab_name=None) -> str:
         related_entities=related_entities or {},
         cite_button=get_cite_button(main_entity),
         catalogue_entities=catalogue_entities,
-        ancestor_entities=ancestor_entities)
+        ancestor_entities=ancestor_entities,
+        hierarchy=hierarchy)
 
 
 def get_map_data(id_):
@@ -370,7 +376,6 @@ def get_categorized_types(main_entity: PresentationView) -> dict[str, list[Entit
         divisions.items(),
         key=lambda x: (x[0] == x[0] == 'case_study', 'other', x[0])
     ))
-    print(sorted_divisions)
     return sorted_divisions
 
 def collect_child_depictions(entity_: Entity) -> list[Depiction]:
@@ -407,3 +412,43 @@ def build_entity_tree(entities: list[Entity]) -> list[Entity]:
         if hasattr(entity_, 'children'):
             tree.extend(entity_.children)
     return tree
+
+
+
+def get_hierarchy(main_entity: PresentationView) -> list[Relation]:
+    root = []
+    match main_entity.system_class:
+        case 'feature':
+            root.append(main_entity.relations['place'][0])
+        case 'stratigraphic_unit':
+            for feature in main_entity.relations.get('feature', []):
+                for relation in feature.relation_types:
+                    if relation['relationTo'] == main_entity.id:
+                        root.append(feature)
+            root.append(main_entity.relations['place'][0])
+        case 'artifact':
+            stratigraphic_unit_id = None
+            for feature in main_entity.relations.get('stratigraphic_unit', []):
+                for relation in feature.relation_types:
+                    if relation['relationTo'] == main_entity.id:
+                        root.append(feature)
+                        stratigraphic_unit_id = feature.id
+            for feature in main_entity.relations.get('feature', []):
+                for relation in feature.relation_types:
+                    if relation['relationTo'] == stratigraphic_unit_id:
+                        root.append(feature)
+            root.append(main_entity.relations['place'][0])
+    root.reverse()
+    return root
+
+
+def get_sub_count(main_entity: PresentationView) -> int:
+    count = 0
+    sub_relations_map = {
+        'place': ['feature', 'stratigraphic_unit', 'artifact'],
+        'feature': ['stratigraphic_unit', 'artifact'],
+        'stratigraphic_unit': ['artifact'],
+        'artifact': ['artifact']}
+    for rel_type in sub_relations_map.get(main_entity.system_class, []):
+        count += len(main_entity.relations.get(rel_type, []))
+    return  count

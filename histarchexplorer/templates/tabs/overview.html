@@ -17,12 +17,12 @@
     <div class="cite-wrapper">
       {{ cite_button.button_html | safe }}
     </div>
-    <!-- todo: ancestor entities (Bernhard will do this)-->
-    {% if ancestor_entities %}
-      {% for entity in ancestor_entities %}
+    {% if hierarchy.root %}
+      {% for entity in hierarchy.root %}
         <div class="hierarchy-button">
           <button type="button"
-                  class="btn btn-whitish rounded-5">
+                  class="btn btn-whitish rounded-5"
+                  title="{{ entity.types[0].title }}&#010;&#010;{{ entity.description[CURRENT_LANGUAGE] }}">
             <a href="{{ url_for('entity', id_=entity.id) }}"
                class="nude-link text-decoration-none">
               {{ entity.name }}
@@ -32,7 +32,7 @@
         </div>
       {% endfor %}
     {% endif %}
-    <!-- todo: why is this needed? Is this not available through app.config? -->
+    <!-- todo: can we move this in a .py file? Isn't this in VIEW_CLASSES? -->
     {% set system_class_map = {
                     'place': 'places',
                     'feature': 'places',
@@ -95,15 +95,15 @@
     {% endif %}
 
     <!--  Subunits button -->
-    {% if entity.subunits %}
+    {% if hierarchy.subs %}
       <div class="hierarchy-button">
         <div class="hierarchy-line"></div>
         <button type="button" class="btn btn-whitish rounded-5" disabled>
           <i class="bi bi-diagram-3"></i>
           <span class="nude-link">
 
-            {{ entity.subunits | length }}
-            {{ "Subentity" if entity.subunits | length == 1 else "Subentities" }}</span>
+            {{ hierarchy.subs }}
+            {{ "Subentity" if hierarchy.subs == 1 else "Subentities" }}</span>
 
         </button>
       </div>
@@ -137,11 +137,11 @@
 
   <!-- Description -->
   {% if entity.description %}
-    <div class="item {{ entity.description_class }}">
+    <div class="item {% if entity.description[CURRENT_LANGUAGE] | length > 1500 %}item-middle{% endif %}">
       <div class="item-content" data-type="description">
         <div class="muuri-description">
           <span class="tile-label">{{ _("description") | upper }}</span>
-          <p>{{ entity.description }}</p>
+          <p>{{ entity.description[CURRENT_LANGUAGE]  }}</p>
         </div>
       </div>
     </div>
