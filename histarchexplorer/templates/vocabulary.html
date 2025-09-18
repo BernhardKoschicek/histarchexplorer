@@ -2,23 +2,24 @@
 {% block content %}
   <div style="padding-top: 100px;"></div>
 
+  <!-- Load Quercus first so our overrides below can win -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
+
   <style>
     :root{
       --bg:        #f6f7f9;
       --surface:   #ffffff;
-      --surface-2: #f1f3f5;
+      --surface-2: #f2f4f7;
       --border:    #e5e7eb;
       --text:      #1f2937;
       --muted:     #6b7280;
-      --chip:      #eef0f3;
-      --chip-act:  #e3e6ea;
-      --focus:     #4b5563;
       --radius:    10px;
       --radius-sm: 8px;
-      --shadow:    0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.04);
+      --shadow:    0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.04);
+      --blue:      #2563eb;
     }
 
-    body, html {
+    html, body {
       height: 100%;
       background: var(--bg);
       color: var(--text);
@@ -27,179 +28,190 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Left-anchored page area */
-    .page {
+    /* Left-anchored wrapper for tabs + panel */
+    .vocab {
       margin-left: clamp(16px, 4vw, 32px);
       margin-right: auto;
-      max-width: 1100px; /* controls content width; still left aligned */
+      max-width: 1100px;
     }
 
-    /* Card/panel */
+    /* Tabs strip (nav-tabs look) */
+    .tabs {
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: .25rem;
+      margin: 0;
+    }
+    .tabs .tab {
+      appearance: none;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-bottom-color: var(--border);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      padding: 8px 14px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+      line-height: 1.1;
+      transform: translateY(1px);
+    }
+    .tabs .tab:hover { background: #e9ecf1; }
+    .tabs .tab.active {
+      background: var(--surface);
+      border-color: var(--border);
+      border-bottom-color: var(--surface);
+      color: var(--text);
+    }
+    .tabs .tab-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      padding: 8px 0;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-bottom-color: var(--border);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      color: var(--blue);
+      text-decoration: none;
+      transform: translateY(1px);
+    }
+    .tabs .tab-icon:hover { background: #e9ecf1; }
+
+    /* Panel under tabs */
     .panel {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
       box-shadow: var(--shadow);
-      padding: 14px;
+      padding: 12px;
+      margin: 0;
     }
 
-    /* Header row (tabs) */
-    .tab-buttons-container {
-      position: sticky;
-      top: 72px; /* keep below your site header */
-      z-index: 5;
-      background: transparent;
-      margin-bottom: 10px;
-      padding-right: 10px;
-      display: flex;
-      justify-content: flex-start; /* LEFT, not centered */
-    }
-
-    .tab-buttons {
-      display: inline-flex;
-      gap: 6px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 6px;
-      box-shadow: var(--shadow);
-    }
-
-    .tab-buttons button {
-      padding: 8px 14px;
-      border: 1px solid transparent;
-      background: var(--chip);
-      cursor: pointer;
-      border-radius: 7px;
-      font-weight: 600;
-      color: var(--text);
-      transition: background .15s ease, border-color .15s ease, transform .02s ease;
-      line-height: 1;
-    }
-    .tab-buttons button:hover {
-      background: var(--chip-act);
-    }
-    .tab-buttons button:active {
-      transform: translateY(1px);
-    }
-    .tab-buttons button:focus-visible {
-      outline: 2px solid var(--focus);
-      outline-offset: 2px;
-    }
-    .tab-buttons button.active {
-      background: var(--surface-2);
-      border-color: var(--border);
-    }
-
-    /* Tree container */
-    .tree-wrap {
-      margin-top: 12px;
-    }
-
+    /* Tree containers */
     .tree-container {
+      display: none;
       max-height: 70vh;
       overflow-y: auto;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px;
-      display: none;
       background: var(--surface);
+      width: 100%;
+      margin: 0; /* keep flush left */
     }
     .tree-container.active { display: block; }
 
-    /* Subtle list polish (works with most tree libs) */
-    .tree-container ul { margin: 0; padding-left: 12px; }
-    .tree-container li { margin: 2px 0; }
-    .tree-container .treeview-node-text {
+    /* === Hard overrides against quercus.css centering === */
+    .vocab .tree-container .treeview {
+      max-width: none !important;
+      width: 100% !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      display: block !important;       /* in case quercus uses flex */
+      text-align: left !important;     /* in case quercus centers via text-align */
+      justify-content: flex-start !important;
+    }
+    .vocab .tree-container .treeview > ul {
+      margin-left: 0 !important;
+      padding-left: 0 !important;
+    }
+
+    /* Node look (rounded blocks like your screenshot) */
+    .tree-container ul { list-style: none; margin: 0; padding-left: 0; }
+    .tree-container li { margin: 10px 6px; }
+
+    .tree-container > ul > li > .treeview-node-text,
+    .tree-container > .treeview > ul > li > .treeview-node-text {
+      display: inline-block;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      color: var(--blue);
+      font-weight: 600;
+    }
+    .tree-container > ul > li > .treeview-node-text:hover,
+    .tree-container > .treeview > ul > li > .treeview-node-text:hover {
+      background: #e9ecf1;
+    }
+
+    .tree-container li li .treeview-node-text {
+      display: inline-block;
+      background: transparent;
+      border: none;
       padding: 2px 4px;
       border-radius: 6px;
+      color: var(--text);
+      font-weight: 500;
     }
-    .tree-container li[data-id] .treeview-node-text:hover {
+    .tree-container li li .treeview-node-text:hover {
       background: var(--surface-2);
     }
 
     .detail-btn {
-      margin-left: 6px;
+      margin-left: 8px;
       text-decoration: none;
       font-size: 0.9em;
-      opacity: 0.75;
+      opacity: 0.85;
       border: 1px solid var(--border);
       padding: 0 6px;
       border-radius: 6px;
       background: var(--surface);
+      color: var(--muted);
     }
     .detail-btn:hover { opacity: 1; }
 
-    /* Thin modern scrollbars */
     .tree-container::-webkit-scrollbar { width: 8px; }
-    .tree-container::-webkit-scrollbar-thumb {
-      background: #d2d6db;
-      border-radius: 8px;
-    }
+    .tree-container::-webkit-scrollbar-thumb { background: #d4d7dc; border-radius: 8px; }
     .tree-container::-webkit-scrollbar-track { background: transparent; }
-    .tree-container { scrollbar-width: thin; scrollbar-color: #d2d6db transparent; }
+    .tree-container { scrollbar-width: thin; scrollbar-color: #d4d7dc transparent; }
 
-    /* Loading placeholder */
-    .placeholder {
-      color: var(--muted);
-      font-size: 0.95rem;
-      padding: 6px;
-    }
+    .placeholder { color: var(--muted); padding: 6px; }
   </style>
 
-  <div class="page">
+  <div class="vocab">
     <!-- Tabs -->
-    <div class="tab-buttons-container" {% if vocab_tabs|length <= 1 %}style="display:none"{% endif %}>
-      <div class="tab-buttons">
-        {% for t in vocab_tabs %}
-          <button id="tab-{{ t.key }}" class="{% if loop.first %}active{% endif %}" onclick="showTab('{{ t.key }}')">
-            {{ t.label }}
-          </button>
-        {% endfor %}
-      </div>
+    <div class="tabs" {% if vocab_tabs|length <= 1 %}style="display:none"{% endif %}>
+      {% for t in vocab_tabs %}
+        <button id="tab-{{ t.key }}" class="tab {% if loop.first %}active{% endif %}"
+                onclick="showTab('{{ t.key }}')">
+          {{ t.label }}
+        </button>
+      {% endfor %}
+      <a class="tab-icon" href="#" title="Search">🔍</a>
     </div>
 
-    <!-- Panel -->
+    <!-- Panel under tabs -->
     <div class="panel">
-      <div class="tree-wrap">
-        {% for t in vocab_tabs %}
-          <div id="tree-{{ t.key }}" class="tree-container {% if loop.first %}active{% endif %}">
-            <div class="placeholder">Loading {{ t.label }}…</div>
-          </div>
-        {% endfor %}
-      </div>
+      {% for t in vocab_tabs %}
+        <div id="tree-{{ t.key }}" class="tree-container {% if loop.first %}active{% endif %}">
+          <div class="placeholder">Loading {{ t.label }}…</div>
+        </div>
+      {% endfor %}
     </div>
   </div>
 
-  <!-- Quercus JS + CSS -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
+  <!-- Quercus JS -->
   <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
 
   <script>
     "use strict";
     const VOCAB_TABS = {{ vocab_tabs | tojson }};
     const TYPE_TREE_URL = {{ type_tree_api_url | tojson }};
-  </script>
 
-  <script>
-    // --- util: build & order tree (respects tab.roots order when it's an array) ---
     function buildTree(flatData, topLevelOrder = null) {
       const nodesById = {};
       Object.values(flatData).forEach(node => {
         nodesById[String(node.id)] = { id: node.id, name: node.name, children: [] };
       });
-
       Object.values(flatData).forEach(node => {
         node.subs?.forEach(childId => {
           const child = nodesById[String(childId)];
           if (child) nodesById[String(node.id)].children.push(child);
         });
       });
-
       const hasParent = new Set();
       Object.values(flatData).forEach(node => node.subs?.forEach(childId => hasParent.add(String(childId))));
-
-      const roots = Object.values(nodesById).filter(node => !hasParent.has(String(node.id)));
+      const roots = Object.values(nodesById).filter(n => !hasParent.has(String(n.id)));
 
       if (Array.isArray(topLevelOrder) && topLevelOrder.length) {
         const orderIndex = new Map(topLevelOrder.map((id, i) => [String(id), i]));
@@ -211,14 +223,12 @@
       } else {
         roots.sort((a, b) => String(a.name).localeCompare(String(b.name)));
       }
-
       return roots;
     }
 
     function collectWithChildren(data, rootIds) {
       const result = {};
       const visited = new Set();
-
       function collect(id) {
         const key = String(id);
         if (visited.has(key) || !data[key]) return;
@@ -226,18 +236,13 @@
         result[key] = data[key];
         data[key].subs?.forEach(childId => collect(childId));
       }
-
       rootIds.forEach(id => collect(id));
       return result;
     }
 
     function filterByCategoryAndRoots(data, tab) {
-      if (!("roots" in tab)) {
-        throw new Error(`Missing 'roots' in VOCAB_TREES for tab key='${tab.key}'`);
-      }
       const allIds = Object.keys(data).map(Number);
       const rootIds = tab.roots === "all" ? allIds : tab.roots;
-
       const relevant = collectWithChildren(data, rootIds);
       const filtered = {};
       for (const key in relevant) {
@@ -250,14 +255,11 @@
     function injectDetailIcons(containerId) {
       const container = document.getElementById(containerId);
       if (!container) return;
-
       container.querySelectorAll('li[data-id]').forEach(li => {
         const id = li.getAttribute('data-id');
         if (!id || li.querySelector('.detail-btn')) return;
-
         const nodeText = li.querySelector('.treeview-node-text');
         if (!nodeText) return;
-
         const btn = document.createElement('a');
         btn.href = `/vocabulary/${id}`;
         btn.textContent = '🔍';
@@ -269,7 +271,7 @@
     }
 
     function showTab(tabKey) {
-      document.querySelectorAll('.tab-buttons button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
       const tabBtn = document.getElementById('tab-' + tabKey);
       if (tabBtn) tabBtn.classList.add('active');
 
@@ -286,13 +288,11 @@
             const order = Array.isArray(tab.roots) ? tab.roots : null;
             const filtered = filterByCategoryAndRoots(typeTree, tab);
             const treeData = buildTree(filtered, order);
-
             const containerId = `tree-${tab.key}`;
             const el = document.getElementById(containerId);
-            if (el) el.innerHTML = ""; // clear placeholder
+            if (el) el.innerHTML = "";
             new Treeview({ containerId, data: treeData });
           });
-
           setTimeout(() => {
             VOCAB_TABS.forEach(tab => injectDetailIcons(`tree-${tab.key}`));
           }, 5);

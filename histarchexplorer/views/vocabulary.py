@@ -24,8 +24,12 @@ def vocabulary():
 def vocabulary_detail(type_id: int):
     entity = Entity.get_entity(type_id, Parser())
 
-    # Use the same configured endpoint
-    res = requests.get(current_app.config["VOCAB_TYPE_TREE_URL"])
+    # BEFORE:
+    # res = requests.get(current_app.config["VOCAB_TYPE_TREE_URL"])
+
+    # AFTER:
+    res = requests.get(TYPE_TREE_API_URL)
+
     res.raise_for_status()
     type_tree = res.json().get("typeTree", {})
 
@@ -43,8 +47,7 @@ def vocabulary_detail(type_id: int):
     all_res = requests.get(f"https://thanados.openatlas.eu/api/0.4/type_entities_all/{type_id}")
     all_res.raise_for_status()
     raw_results = all_res.json().get("results", [])
-
-    all_entities = [feature for group in raw_results for feature in group.get("features", [])]
+    all_entities = [f for g in raw_results for f in g.get("features", [])]
     subcategory_entities = [e for e in all_entities if e not in exact_entities]
 
     return render_template(
@@ -57,3 +60,4 @@ def vocabulary_detail(type_id: int):
         subcategory_entities=subcategory_entities,
         cite_button=get_cite_button(entity),
     )
+
