@@ -94,18 +94,31 @@ SIDEBAR_OPTIONS = [
 
 
 
-TYPE_FILTERS = {
-    "standard": [
-        73,  # Place
-        13362,  # Feature
-        13365,  # Stratigraphic unit
-        157754,  # Artifact
-        11933    # Human remains
-    ],
-    "custom": [
 
-    ],
-    "value": [
-
-    ],
-}
+# Tabs/trees to render on /vocabulary (order matters)
+VOCAB_TREES = [
+    {
+        "key": "custom",
+        "label": "Types",
+        "category": "custom",
+        "roots": "all" # or a list of root IDs, e.g. [699, 700]
+    },
+    {
+        "key": "main",
+        "label": "Main Classes",
+        "category": "standard",
+        "roots": [10],
+    },
+    {
+        "key": "place",
+        "label": "Place",
+        "category": "place",
+        "roots": "all"
+    },
+    {
+        "key": "value",
+        "label": "Value Types",
+        "category": "value",
+        "roots": [15678,117198],
+    }
+]

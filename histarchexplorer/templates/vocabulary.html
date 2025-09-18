@@ -1,208 +1,309 @@
 {% extends "layout.html" %}
-
 {% block content %}
   <div style="padding-top: 100px;"></div>
 
   <style>
-      body, html {
-          height: 100%;
-          overflow-y: auto;
-      }
+    :root{
+      --bg:        #f6f7f9;
+      --surface:   #ffffff;
+      --surface-2: #f1f3f5;
+      --border:    #e5e7eb;
+      --text:      #1f2937;
+      --muted:     #6b7280;
+      --chip:      #eef0f3;
+      --chip-act:  #e3e6ea;
+      --focus:     #4b5563;
+      --radius:    10px;
+      --radius-sm: 8px;
+      --shadow:    0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.04);
+    }
 
-      .tab-buttons-container {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 10px;
-          padding-right: 10px;
-      }
+    body, html {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      overflow-y: auto;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
-      .tab-buttons {
-          display: flex;
-          gap: 6px;
-      }
+    /* Left-anchored page area */
+    .page {
+      margin-left: clamp(16px, 4vw, 32px);
+      margin-right: auto;
+      max-width: 1100px; /* controls content width; still left aligned */
+    }
 
-      .tab-buttons button {
-          padding: 8px 16px;
-          border: 1px solid #ccc;
-          background: #f0f0f0;
-          cursor: pointer;
-          border-radius: 4px;
-          font-weight: bold;
-      }
+    /* Card/panel */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
 
-      .tab-buttons button.active {
-          background: #007bff;
-          color: white;
-          border-color: #007bff;
-      }
+    /* Header row (tabs) */
+    .tab-buttons-container {
+      position: sticky;
+      top: 72px; /* keep below your site header */
+      z-index: 5;
+      background: transparent;
+      margin-bottom: 10px;
+      padding-right: 10px;
+      display: flex;
+      justify-content: flex-start; /* LEFT, not centered */
+    }
 
-      .tree-container {
-          max-height: 70vh;
-          overflow-y: auto;
-          border: 1px solid #ccc;
-          padding: 10px;
-          display: none;
-      }
+    .tab-buttons {
+      display: inline-flex;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px;
+      box-shadow: var(--shadow);
+    }
 
-      .tree-container.active {
-          display: block;
-      }
+    .tab-buttons button {
+      padding: 8px 14px;
+      border: 1px solid transparent;
+      background: var(--chip);
+      cursor: pointer;
+      border-radius: 7px;
+      font-weight: 600;
+      color: var(--text);
+      transition: background .15s ease, border-color .15s ease, transform .02s ease;
+      line-height: 1;
+    }
+    .tab-buttons button:hover {
+      background: var(--chip-act);
+    }
+    .tab-buttons button:active {
+      transform: translateY(1px);
+    }
+    .tab-buttons button:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+    .tab-buttons button.active {
+      background: var(--surface-2);
+      border-color: var(--border);
+    }
 
-      .detail-btn {
-          margin-left: 8px;
-          text-decoration: none;
-          font-size: 0.9em;
-          opacity: 0.7;
-      }
+    /* Tree container */
+    .tree-wrap {
+      margin-top: 12px;
+    }
 
-      .detail-btn:hover {
-          opacity: 1;
-      }
+    .tree-container {
+      max-height: 70vh;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      display: none;
+      background: var(--surface);
+    }
+    .tree-container.active { display: block; }
+
+    /* Subtle list polish (works with most tree libs) */
+    .tree-container ul { margin: 0; padding-left: 12px; }
+    .tree-container li { margin: 2px 0; }
+    .tree-container .treeview-node-text {
+      padding: 2px 4px;
+      border-radius: 6px;
+    }
+    .tree-container li[data-id] .treeview-node-text:hover {
+      background: var(--surface-2);
+    }
+
+    .detail-btn {
+      margin-left: 6px;
+      text-decoration: none;
+      font-size: 0.9em;
+      opacity: 0.75;
+      border: 1px solid var(--border);
+      padding: 0 6px;
+      border-radius: 6px;
+      background: var(--surface);
+    }
+    .detail-btn:hover { opacity: 1; }
+
+    /* Thin modern scrollbars */
+    .tree-container::-webkit-scrollbar { width: 8px; }
+    .tree-container::-webkit-scrollbar-thumb {
+      background: #d2d6db;
+      border-radius: 8px;
+    }
+    .tree-container::-webkit-scrollbar-track { background: transparent; }
+    .tree-container { scrollbar-width: thin; scrollbar-color: #d2d6db transparent; }
+
+    /* Loading placeholder */
+    .placeholder {
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 6px;
+    }
   </style>
 
-  <!-- Tab Buttons -->
-  <div class="tab-buttons-container">
-    <div class="tab-buttons">
-      <button id="tab-main" class="active" onclick="showTab('main')">Main Classes</button>
-      <button id="tab-custom" onclick="showTab('custom')">Types</button>
-      <button id="tab-value" onclick="showTab('value')">Value Types</button>
+  <div class="page">
+    <!-- Tabs -->
+    <div class="tab-buttons-container" {% if vocab_tabs|length <= 1 %}style="display:none"{% endif %}>
+      <div class="tab-buttons">
+        {% for t in vocab_tabs %}
+          <button id="tab-{{ t.key }}" class="{% if loop.first %}active{% endif %}" onclick="showTab('{{ t.key }}')">
+            {{ t.label }}
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Panel -->
+    <div class="panel">
+      <div class="tree-wrap">
+        {% for t in vocab_tabs %}
+          <div id="tree-{{ t.key }}" class="tree-container {% if loop.first %}active{% endif %}">
+            <div class="placeholder">Loading {{ t.label }}…</div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
-
-  <!-- Tree Containers -->
-  <div id="tree-main" class="tree-container active"></div>
-  <div id="tree-custom" class="tree-container"></div>
-  <div id="tree-value" class="tree-container"></div>
 
   <!-- Quercus JS + CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
   <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
 
   <script>
-      const typeFilters = {{ type_filters | tojson }};
+    "use strict";
+    const VOCAB_TABS = {{ vocab_tabs | tojson }};
+    const TYPE_TREE_URL = {{ type_tree_api_url | tojson }};
   </script>
 
   <script>
-      function buildTree(flatData) {
-          const nodesById = {};
-          Object.values(flatData).forEach(node => {
-              nodesById[node.id] = {
-                  id: node.id,
-                  name: node.name,
-                  children: []
-              };
-          });
+    // --- util: build & order tree (respects tab.roots order when it's an array) ---
+    function buildTree(flatData, topLevelOrder = null) {
+      const nodesById = {};
+      Object.values(flatData).forEach(node => {
+        nodesById[String(node.id)] = { id: node.id, name: node.name, children: [] };
+      });
 
-          Object.values(flatData).forEach(node => {
-              if (node.subs?.length) {
-                  node.subs.forEach(childId => {
-                      if (nodesById[childId]) {
-                          nodesById[node.id].children.push(nodesById[childId]);
-                      }
-                  });
-              }
-          });
+      Object.values(flatData).forEach(node => {
+        node.subs?.forEach(childId => {
+          const child = nodesById[String(childId)];
+          if (child) nodesById[String(node.id)].children.push(child);
+        });
+      });
 
-          const hasParent = new Set();
-          Object.values(flatData).forEach(node => {
-              if (node.subs?.length) {
-                  node.subs.forEach(childId => hasParent.add(childId));
-              }
-          });
+      const hasParent = new Set();
+      Object.values(flatData).forEach(node => node.subs?.forEach(childId => hasParent.add(String(childId))));
 
-          return Object.values(nodesById)
-              .filter(node => !hasParent.has(node.id))
-              .sort((a, b) => a.name.localeCompare(b.name));
+      const roots = Object.values(nodesById).filter(node => !hasParent.has(String(node.id)));
+
+      if (Array.isArray(topLevelOrder) && topLevelOrder.length) {
+        const orderIndex = new Map(topLevelOrder.map((id, i) => [String(id), i]));
+        roots.sort((a, b) => {
+          const ai = orderIndex.has(String(a.id)) ? orderIndex.get(String(a.id)) : Number.MAX_SAFE_INTEGER;
+          const bi = orderIndex.has(String(b.id)) ? orderIndex.get(String(b.id)) : Number.MAX_SAFE_INTEGER;
+          return ai !== bi ? ai - bi : String(a.name).localeCompare(String(b.name));
+        });
+      } else {
+        roots.sort((a, b) => String(a.name).localeCompare(String(b.name)));
       }
 
-      function collectWithChildren(data, allowedIds) {
-          const result = {};
-          const visited = new Set();
+      return roots;
+    }
 
-          function collect(id) {
-              if (visited.has(id) || !data[id]) return;
-              visited.add(id);
-              result[id] = data[id];
-              if (data[id].subs) {
-                  data[id].subs.forEach(childId => collect(childId));
-              }
-          }
+    function collectWithChildren(data, rootIds) {
+      const result = {};
+      const visited = new Set();
 
-          allowedIds.forEach(id => collect(id));
-          return result;
+      function collect(id) {
+        const key = String(id);
+        if (visited.has(key) || !data[key]) return;
+        visited.add(key);
+        result[key] = data[key];
+        data[key].subs?.forEach(childId => collect(childId));
       }
 
-      function filterByCategoryAndIds(data, category, allowedIds) {
-          const relevant = collectWithChildren(data, allowedIds);
-          const filtered = {};
-          for (const key in relevant) {
-              const item = relevant[key];
-              if (item.category === category) {
-                  filtered[key] = item;
-              }
-          }
-          return filtered;
+      rootIds.forEach(id => collect(id));
+      return result;
+    }
+
+    function filterByCategoryAndRoots(data, tab) {
+      if (!("roots" in tab)) {
+        throw new Error(`Missing 'roots' in VOCAB_TREES for tab key='${tab.key}'`);
       }
+      const allIds = Object.keys(data).map(Number);
+      const rootIds = tab.roots === "all" ? allIds : tab.roots;
 
-      function injectDetailIcons(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+      const relevant = collectWithChildren(data, rootIds);
+      const filtered = {};
+      for (const key in relevant) {
+        const item = relevant[key];
+        if (item.category === tab.category) filtered[key] = item;
+      }
+      return filtered;
+    }
 
-    container.querySelectorAll('li[data-id]').forEach(li => {
+    function injectDetailIcons(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      container.querySelectorAll('li[data-id]').forEach(li => {
         const id = li.getAttribute('data-id');
-        if (!id) return;
-
-        // Avoid duplication
-        if (li.querySelector('.detail-btn')) return;
+        if (!id || li.querySelector('.detail-btn')) return;
 
         const nodeText = li.querySelector('.treeview-node-text');
         if (!nodeText) return;
 
         const btn = document.createElement('a');
         btn.href = `/vocabulary/${id}`;
-        btn.textContent = ' 🔍'; // leading space to separate from text
+        btn.textContent = '🔍';
         btn.className = 'detail-btn';
         btn.title = 'View details';
         btn.target = '_blank';
-        btn.style.textDecoration = 'none';
-        btn.style.opacity = '0.8';
-
         nodeText.appendChild(btn);
-    });
-}
-
-
-      function showTab(tab) {
-          document.querySelectorAll('.tree-container').forEach(div => div.classList.remove('active'));
-          document.getElementById('tree-' + tab).classList.add('active');
-
-          document.querySelectorAll('.tab-buttons button').forEach(btn => btn.classList.remove('active'));
-          document.getElementById('tab-' + tab).classList.add('active');
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-          fetch("https://thanados.openatlas.eu/api/0.4/type_tree/")
-              .then(res => res.json())
-              .then(data => {
-                  const typeTree = data.typeTree;
-
-                  const mainTypes = buildTree(filterByCategoryAndIds(typeTree, 'standard', typeFilters.standard || []));
-                  const customTypes = buildTree(filterByCategoryAndIds(typeTree, 'custom', Object.keys(typeTree).map(Number)));
-                  const valueTypes = buildTree(filterByCategoryAndIds(typeTree, 'value', Object.keys(typeTree).map(Number)));
-
-                  new Treeview({containerId: "tree-main", data: mainTypes});
-                  new Treeview({containerId: "tree-custom", data: customTypes});
-                  new Treeview({containerId: "tree-value", data: valueTypes});
-
-                  setTimeout(() => {
-                      injectDetailIcons("tree-main");
-                      injectDetailIcons("tree-custom");
-                      injectDetailIcons("tree-value");
-                  }, 300);
-              })
-              .catch(err => {
-                  console.error("Failed to fetch or build tree data:", err);
-              });
       });
+    }
+
+    function showTab(tabKey) {
+      document.querySelectorAll('.tab-buttons button').forEach(btn => btn.classList.remove('active'));
+      const tabBtn = document.getElementById('tab-' + tabKey);
+      if (tabBtn) tabBtn.classList.add('active');
+
+      document.querySelectorAll('.tree-container').forEach(div => div.classList.remove('active'));
+      document.getElementById('tree-' + tabKey).classList.add('active');
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetch(TYPE_TREE_URL)
+        .then(res => res.json())
+        .then(payload => {
+          const typeTree = payload.typeTree || {};
+          VOCAB_TABS.forEach(tab => {
+            const order = Array.isArray(tab.roots) ? tab.roots : null;
+            const filtered = filterByCategoryAndRoots(typeTree, tab);
+            const treeData = buildTree(filtered, order);
+
+            const containerId = `tree-${tab.key}`;
+            const el = document.getElementById(containerId);
+            if (el) el.innerHTML = ""; // clear placeholder
+            new Treeview({ containerId, data: treeData });
+          });
+
+          setTimeout(() => {
+            VOCAB_TABS.forEach(tab => injectDetailIcons(`tree-${tab.key}`));
+          }, 5);
+        })
+        .catch(err => {
+          console.error("Failed to fetch/build tree data:", err);
+          VOCAB_TABS.forEach(tab => {
+            const el = document.getElementById(`tree-${tab.key}`);
+            if (el) el.innerHTML = `<div class="placeholder">Could not load ${tab.label}.</div>`;
+          });
+        });
+    });
   </script>
 {% endblock %}
