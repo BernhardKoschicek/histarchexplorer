@@ -393,16 +393,15 @@ def get_parser_for_landing(id_: int) -> Parser:
         centroid='true')
 
 
-def get_categorized_types(main_entity: PresentationView) -> dict[
-    str, list[EntityTypeModel]]:
+def get_categorized_types(
+        main_entity: PresentationView) -> dict[str, list[EntityTypeModel]]:
     divisions = defaultdict(list)
     for type_ in main_entity.types:
         divisions[type_.division['label'].replace(' ', '_')].append({
             'type': type_, 'icon': type_.division['icon']})
     sorted_divisions = dict(sorted(
         divisions.items(),
-        key=lambda x: (x[0] == x[0] == 'case_study', 'other', x[0])
-    ))
+        key=lambda x: (x[0] == x[0] == 'case_study', 'other', x[0])))
     return sorted_divisions
 
 
@@ -448,6 +447,7 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
         case 'feature':
             if 'place' in main_entity.relations and main_entity.relations[
                 'place']:  # nur wenn dict key place hat und liste nicht leer
+                # Bernhard: Wann passiert es, dass ein feature keinen Place hat? Das darf nicht vorkommen.
                 root.append(main_entity.relations['place'][0])
         case 'stratigraphic_unit':
             for feature in main_entity.relations.get('feature', []):
@@ -455,6 +455,7 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
                     if relation['relationTo'] == main_entity.id:
                         root.append(feature)
             if 'place' in main_entity.relations and main_entity.relations['place']:
+                # Bernhard: Kann mir bitte jemand sagen, wann das vorkommt?
                 root.append(main_entity.relations['place'][0])
         case 'artifact' | 'human_remains':
             stratigraphic_unit_id = None
@@ -475,12 +476,20 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
 
 def get_sub_count(main_entity: PresentationView) -> int:
     count = 0
+    # It was not wished to show all subunits, only direct ones
+    #sub_relations_map = {
+    #    'place': ['feature', 'stratigraphic_unit', 'artifact',
+    #              'human_remains'],
+    #    'feature': ['stratigraphic_unit', 'artifact', 'human_remains'],
+    #    'stratigraphic_unit': ['artifact', 'human_remains'],
+    #    'artifact': ['artifact'],
+    #    'human_remains': ['human_remains']}
     sub_relations_map = {
-        'place': ['feature', 'stratigraphic_unit', 'artifact',
-                  'human_remains'],
-        'feature': ['stratigraphic_unit', 'artifact', 'human_remains'],
+        'place': ['feature'],
+        'feature': ['stratigraphic_unit'],
         'stratigraphic_unit': ['artifact', 'human_remains'],
-        'artifact': ['artifact', 'human_remains']}
+        'artifact': ['artifact'],
+        'human_remains': ['human_remains']}
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
         count += len(main_entity.relations.get(rel_type, []))
     return count

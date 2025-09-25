@@ -22,6 +22,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection mode
 # API configuration
 API_URL = 'https://thanados.openatlas.eu/api/'
 API_PROXY = ''  # Optional proxy for API requests
+API_TOKEN = ''
 
 # Data handling
 CLASSES_TO_SKIP = {  # Entity classes excluded from processing
@@ -100,3 +101,4 @@ SIDEBAR_OPTIONS = [
     {'order': 4, 'route': 'catalogue', 'icon': 'bi bi-journal-text'},
     {'order': 5, 'route': 'subunits', 'icon': 'bi bi-diagram-3'},
 ]
+

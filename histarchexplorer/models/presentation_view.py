@@ -304,6 +304,7 @@ class PresentationView:
                 'place_hierarchy': 'true',
                 'remove_empty_values': 'true',
                 'centroid': 'true'},
+            headers=g.api_headers,
             proxies=PROXIES,
             timeout=30)
         response.raise_for_status()

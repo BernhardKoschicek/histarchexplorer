@@ -1,6 +1,8 @@
 import requests
 import json
 
+from flask import g
+
 
 class SearchService:
     """Service layer for handling search-related business logic."""
@@ -19,7 +21,10 @@ class SearchService:
             list: A list of results from the API, or an empty list on error.
         """
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(
+                url,
+                headers=g.api_headers,
+                timeout=10)
             response.raise_for_status()
             data = response.json()
             results = data.get("results", [])
@@ -73,7 +78,10 @@ class SearchService:
         """
         url = f"{self.api_url}entity/{entity_id}"
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(
+                url,
+                headers=g.api_headers,
+                timeout=10)
             response.raise_for_status()
             data = response.json()
             return data.get('features', [None])[0]
