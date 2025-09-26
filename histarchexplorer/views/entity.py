@@ -221,7 +221,10 @@ def get_entity(id_: int, tab_name=None) -> str:
     feature = None
 
     main_entity = PresentationView.from_api(id_)
-    data = {'entity': main_entity.to_json()}
+    overview_map = [geom.to_json() for geom in main_entity.geometries]
+    data = {
+    'entity': main_entity.to_json(),
+    'overview_map': overview_map}
     categorized_types = get_categorized_types(main_entity)
     hierarchy = {
         'subs': get_sub_count(main_entity),

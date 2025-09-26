@@ -2,9 +2,9 @@
 <script src="../../static/js/overview.js"></script>
 
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
+<script> const overviewMap = JSON.parse(JSON.parse({{ data|tojson }}).overview_map)</script>
 <script>
   // asign array inside geometry collection to gisData; if array directly; single object -> array
-
   gisData = entity.geometries
   //console.log(entity.geometries)
 </script>

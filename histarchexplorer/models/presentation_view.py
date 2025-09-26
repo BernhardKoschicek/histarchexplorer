@@ -18,6 +18,25 @@ class GeometryModel:
     type: str
     coordinates: Any
 
+    def swap_latlng(self) -> "GeometryModel":
+        def flip(coord):
+            return [coord[1], coord[0]]
+
+        if self.type == "Point":
+            new_coords = flip(self.coordinates)
+
+        elif self.type == "LineString":
+            new_coords = [flip(c) for c in self.coordinates]
+
+        elif self.type == "Polygon":
+            # Polygons are lists of linear rings (outer ring + holes)
+            new_coords = [[flip(c) for c in ring] for ring in self.coordinates]
+
+        else:
+            # Leave untouched if unknown geometry type
+            new_coords = self.coordinates
+
+        return GeometryModel(id=self.id, type=self.type, coordinates=new_coords)
 
 @dataclass
 class PropertyModel:
@@ -38,6 +57,13 @@ class FeatureModel:
             "geometry": asdict(self.geometry),
             "properties": asdict(self.properties)}
 
+    def to_json(self, **kwargs) -> str:
+        return json.dumps(self.to_dict(), **kwargs)
+
+    def swap_latlng(self) -> "FeatureModel":
+        return FeatureModel(
+            geometry=self.geometry.swap_latlng(),
+            properties=self.properties)
 
 @dataclass
 class TimePointModel:
