@@ -120,6 +120,8 @@ def before_request() -> None:
         'main-project': 5}
     g.config_entities = ConfigEntity.get_all_localized()
     g.search_service = SearchService(app)
+    g.case_study_ids = [
+        config.case_study for config in g.config_entities if config.case_study]
     return None
 
 

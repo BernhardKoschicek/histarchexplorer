@@ -14,7 +14,6 @@ from histarchexplorer.models.util import format_date, \
 
 @dataclass
 class GeometryModel:
-    id: int
     type: str
     coordinates: Any
 
@@ -36,11 +35,12 @@ class GeometryModel:
             # Leave untouched if unknown geometry type
             new_coords = self.coordinates
 
-        return GeometryModel(id=self.id, type=self.type, coordinates=new_coords)
+        return GeometryModel(type=self.type, coordinates=new_coords)
 
 @dataclass
 class PropertyModel:
     locationId: int
+    entityId: int
     title: str
     description: str
     shapeType: str
@@ -194,20 +194,18 @@ class PresentationView:
         return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
 
     @staticmethod
-    def parse_geometries(
-            geometry_data: Any,
-            relation_id: int = 0) -> list["FeatureModel"]:
+    def parse_geometries(geometry_data: Any) -> list["FeatureModel"]:
 
         if not geometry_data:
             return []
 
         def parse_single(data: dict) -> "FeatureModel":
             geometry_model = GeometryModel(
-                id=relation_id,
                 type=data['geometry']["type"],
                 coordinates=data["geometry"]["coordinates"])
             property_model = PropertyModel(
                 locationId=data["properties"]["locationId"],
+                entityId=data["properties"]["entityId"],
                 title=data["properties"]["title"],
                 description=data["properties"]["description"],
                 shapeType=data["properties"]["shapeType"])
@@ -265,7 +263,7 @@ class PresentationView:
                     continue
 
                 rel_geometries = PresentationView.parse_geometries(
-                    rel.get("geometries"), rel.get("id", 0))
+                    rel.get("geometries"))
                 time_range = PresentationView.parse_time_range(rel.get("when"))
                 rel_types = []
 

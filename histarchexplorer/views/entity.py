@@ -248,10 +248,13 @@ def get_entity(id_: int, tab_name=None) -> str:
             #   can bring the geometries on map, but they are not filled and
             #   clickable
             map_data_ = {'type': 'FeatureCollection', 'features': []}
+            print(main_entity.geometries[0].to_dict())
+            map_data_['features'].append(main_entity.geometries[0].to_dict())
             first_geom = None
             tmp_root = hierarchy['root'].copy()
             tmp_root.reverse()
             for entry in tmp_root:
+
                 if entry.geometries and entry.system_class != 'place':
                     first_geom = entry.geometries[0]
                     break
@@ -265,28 +268,38 @@ def get_entity(id_: int, tab_name=None) -> str:
                         geometry['properties']['id'] = item.id
                         geometry['properties']['label'] = item.name
                         geometry['properties']['class'] = item.system_class
-                        if first_geom and first_geom.geometry.id == item.id:
-                            geometry['properties']['main'] = True
-                        geometry['geometry']['shapeType'] = \
+                        # if first_geom and first_geom.geometry.id == item.id:
+                        #     geometry['properties']['main'] = True
+                        geometry['geometry']['title'] = ''
+                        geometry['geometry']['description'] = ''
+                        geometry['geometry']['placeId'] = item.id
+                        geometry['geometry']['locationId'] = geometry['properties']['locationId']
+                        geometry['geometry']['shapeType'] =  \
                             geometry['properties']['shapeType']
                         map_data_['features'].append(geometry)
 
+                        del geometry['properties']['locationId']
+                        del geometry['properties']['title']
+                        del geometry['properties']['description']
+                        del geometry['properties']['shapeType']
+
             map_data = get_map_data(id_)
+            #print(map_data_)
             if not map_data['features']:
                 abort(404)
             data['spatial'] = map_data
 
-        case 'catalogue':
-            c_entities = Entity.get_linked_entities_by_properties_recursive(
-                id_,
-                get_parser_for_landing(id_))
-            if main_entity.system_class != 'place':
-                catalogue_entities = []
-            else:
-                catalogue_entities = build_entity_tree(c_entities)
-                for entity_ in catalogue_entities:
-                    entity.all_child_depictions = collect_child_depictions(
-                        entity_)
+        # case 'catalogue':
+        #     c_entities = Entity.get_linked_entities_by_properties_recursive(
+        #         id_,
+        #         get_parser_for_landing(id_))
+        #     if main_entity.system_class != 'place':
+        #         catalogue_entities = []
+        #     else:
+        #         catalogue_entities = build_entity_tree(c_entities)
+        #         for entity_ in catalogue_entities:
+        #             entity.all_child_depictions = collect_child_depictions(
+        #                 entity_)
 
         case 'overview':
             images = []
