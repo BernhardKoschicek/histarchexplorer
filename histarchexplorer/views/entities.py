@@ -60,13 +60,12 @@ def get_browse_list_entities(id=None):
         if not shown_ids:
             return None
 
-
-
     data = {
         'shown classes': g.settings.shown_classes,
         'hidden classes': g.settings.hidden_classes,
         'shown types': build_id_collection(g.settings.shown_types),
         'hidden types': build_id_collection(g.settings.hidden_types),
+        'shown case studies':  g.case_study_ids,
         'shown ids': shown_ids,
         'hidden ids': g.settings.hidden_ids}
 
@@ -85,6 +84,10 @@ def get_browse_list_entities(id=None):
     if shown_types:= data['shown types']:
         where_clauses.append("e.id IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(shown_types)
+
+    if shown_case_studies:= data['shown case studies']:
+        where_clauses.append("e.id IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
+        params.append(shown_case_studies)
 
     if hidden_types:= data['hidden types']:
         where_clauses.append("e.id NOT IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
