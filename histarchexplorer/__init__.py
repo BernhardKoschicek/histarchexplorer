@@ -25,7 +25,7 @@ cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
-    admin, login, views, about, entity, entities, search, media)
+    admin, login, views, about, entity, entities, search, media, vocabulary)
 from histarchexplorer.utils import view_util
 
 
@@ -100,6 +100,9 @@ def before_request() -> None:
         'language',
         request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
     g.preferred_langauge = app.config['PREFERRED_LANGUAGE']
+    g.api_headers = {}
+    if app.config['API_TOKEN']:
+        g.api_headers["Authorization"] = f"Bearer {app.config['API_TOKEN']}"
     g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
