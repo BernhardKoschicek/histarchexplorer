@@ -275,8 +275,7 @@ def get_entity(id_: int, tab_name=None) -> str:
 
             if not map_data['features']:
                 abort(404)
-            print(get_map_data(id_))
-            data['spatial'] = map_data
+            data['spatial'] = get_map_data(id_)
 
         # case 'catalogue':
         #     c_entities = Entity.get_linked_entities_by_properties_recursive(
