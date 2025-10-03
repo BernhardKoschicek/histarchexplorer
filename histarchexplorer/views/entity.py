@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 from typing import Any
 
-from flask import abort, g, render_template
+from flask import abort, g, jsonify, render_template
 
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
@@ -222,14 +222,21 @@ def get_entity(id_: int, tab_name=None) -> str:
     feature = None
 
     main_entity = PresentationView.from_api(id_)
-    overview_map = [geom.to_json() for geom in main_entity.geometries]
-    data: dict[str, list[str] | dict[str, Any]] = {
-        'entity': main_entity.to_json(),
-        'overview_map': overview_map }
     categorized_types = get_categorized_types(main_entity)
     hierarchy = {
         'subs': get_sub_count(main_entity),
         'root': get_hierarchy(main_entity)}
+
+    overview_map_geometry = main_entity.geometry_json
+    if not overview_map_geometry:
+        for root_element in reversed(hierarchy['root']):
+            if root_element.geometries:
+                overview_map_geometry = root_element.geometry_json
+                break
+
+    data: dict[str, list[str] | dict[str, Any]] = {
+        'entity': main_entity.to_json(),
+        'overview_map': json.dumps(overview_map_geometry) }
     match tab_name:
         case 'feature':
             # todo: core information about the feature are available in the
@@ -339,7 +346,8 @@ def get_entity(id_: int, tab_name=None) -> str:
         related_entities=related_entities or {},
         cite_button=get_cite_button(main_entity),
         catalogue_entities=catalogue_entities,
-        hierarchy=hierarchy)
+        hierarchy=hierarchy,
+        overview_map_geometry=overview_map_geometry)
 
 
 def get_map_data(id_):

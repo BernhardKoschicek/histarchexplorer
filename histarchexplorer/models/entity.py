@@ -190,7 +190,7 @@ class Entity:
     #             ApiAccess.get_by_system_class(class_, parser)]
 
     @staticmethod
-    @cache.memoize()
+    #@cache.memoize()
     def get_linked_entities_by_properties_recursive(
             id_: int,
             parser: Parser) -> list[Entity]:

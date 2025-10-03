@@ -143,9 +143,7 @@
   {% endif %}
 
   <!-- Map Location -->
-  <!-- Todo: Map Location -->
-  <!--    Geoemtries are now in entity.geometries, and should be formated that it can be used right away -->
-  {% if entity.geometries %}
+  {% if entity.geometries or overview_map_geometry%}
     <div class="item" data-type="map">
       <div class="map-wrapper">
         <div class="item-content item-content-full">

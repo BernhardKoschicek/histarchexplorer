@@ -192,6 +192,7 @@ class Relation:
     aliases: Optional[list[str]] = None
     time_range: Optional[TimeRangeModel] = None
     geometries: list[FeatureModel] = field(default_factory=list)
+    geometry_json: dict[str, Any] = None
     types: list[EntityTypeModel] = field(default_factory=list)
 
 
@@ -205,7 +206,7 @@ class PresentationView:
     start: str
     end: str
     geometries: list[FeatureModel] = field(default_factory=list)
-    geometry_json: str = None
+    geometry_json: dict[str, Any] = None
     when: Optional[TimeRangeModel] = None
     types: list[EntityTypeModel] = field(default_factory=list)
     externalReferenceSystems: list[ExternalReferenceModel] = field(
@@ -319,6 +320,7 @@ class PresentationView:
                     aliases=rel.get("aliases", []),
                     time_range=time_range,
                     geometries=rel_geometries,
+                    geometry_json=rel.get("geometries"),
                     types=rel_types)
 
                 relations.append(relation)

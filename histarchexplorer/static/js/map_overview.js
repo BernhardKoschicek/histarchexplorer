@@ -1,4 +1,4 @@
-const mapOverview = entity.geometry_json
+const mapOverview = overviewMap
 
 // Initialize MapLibre map
 const overview_map = new maplibregl.Map({
