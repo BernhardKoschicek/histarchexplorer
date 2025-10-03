@@ -209,6 +209,21 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
         for category, items in categorized_counts.items()
     }
 
+    data['cs_ids'] = []
+    #build id lists for case studies
+    if shown_case_studies:
+        sql_case_studies = """
+            SELECT jsonb_agg(domain_id) as ids
+            FROM model.link
+            WHERE range_id = %(cs_id)s
+              AND property_code = 'P2';
+        """
+        for case_study in shown_case_studies:
+            g.cursor.execute(sql_case_studies, {'cs_id':case_study})
+            results = g.cursor.fetchone()
+            cs = {'id': case_study, 'ids': results}
+            data['cs_ids'].append(cs)
+
     data['totals'] = category_totals
     data['counts'] = categorized_counts
     return data
