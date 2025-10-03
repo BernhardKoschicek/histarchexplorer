@@ -17,47 +17,6 @@
                 return data.entities.filter(entity => validClasses.includes(entity.class));
             }
 
-            function getCaseStudiesByTab(entities, classList, cs_ids, tab_names) {
-                // 1. Create a Set of valid Case Study IDs for O(1) lookup speed.
-                const validCsIdSet = new Set(cs_ids.map(cs => cs.id));
-
-                // 2. Initialize the final result array.
-                const CaseStudies = [];
-
-                for (const tab of tab_names) {
-                    // Get the classes relevant for the current tab, defaulting to an empty array.
-                    const relevantClasses = classList[tab] || [];
-
-                    // Use a Set to store unique Case Study IDs found for the current tab.
-                    const uniqueCaseStudyIds = new Set();
-
-                    // 3. Iterate through all entities to perform filtering and mapping.
-                    for (const entity of entities) {
-                        const entityClass = entity.class;
-                        const entityCsId = entity.cs_id; // Assumed field name for the case study link
-
-                        // Check 1: Does the entity's class match one relevant for this tab?
-                        const isRelevantClass = relevantClasses.includes(entityClass);
-
-                        // Check 2: Is the entity linked to one of the tracked case studies?
-                        const isTrackedCsId = validCsIdSet.has(entityCsId);
-
-                        if (isRelevantClass && isTrackedCsId) {
-                            // If both checks pass, add the case study ID to the Set for uniqueness.
-                            uniqueCaseStudyIds.add(entityCsId);
-                        }
-                    }
-
-                    // 4. Build the result object for the current tab.
-                    CaseStudies.push({
-                        tab: tab,
-                        caseStudies: Array.from(uniqueCaseStudyIds) // Convert Set to Array
-                    });
-                }
-
-                return CaseStudies;
-            }
-
             data.entities.forEach(entity => {
                 entity.beginDBP = calculateTimeBP(entity.begin);
                 entity.endDBP = calculateTimeBP(entity.end);
