@@ -1,5 +1,6 @@
 import json
 from collections import defaultdict
+from typing import Any
 
 from flask import abort, g, render_template
 
@@ -222,9 +223,9 @@ def get_entity(id_: int, tab_name=None) -> str:
 
     main_entity = PresentationView.from_api(id_)
     overview_map = [geom.to_json() for geom in main_entity.geometries]
-    data = {
-    'entity': main_entity.to_json(),
-    'overview_map': overview_map }
+    data: dict[str, list[str] | dict[str, Any]] = {
+        'entity': main_entity.to_json(),
+        'overview_map': overview_map }
     categorized_types = get_categorized_types(main_entity)
     hierarchy = {
         'subs': get_sub_count(main_entity),
@@ -275,8 +276,7 @@ def get_entity(id_: int, tab_name=None) -> str:
 
             if not map_data['features']:
                 abort(404)
-            print(get_map_data(id_))
-            data['spatial'] = map_data
+            data['spatial'] = get_map_data(id_)
 
         # case 'catalogue':
         #     c_entities = Entity.get_linked_entities_by_properties_recursive(
@@ -301,7 +301,6 @@ def get_entity(id_: int, tab_name=None) -> str:
             if not main_image and images:
                 main_image = images.pop(0)
             initial_images = images[:2]
-
         case 'media':
             pass
 

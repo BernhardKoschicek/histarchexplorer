@@ -205,6 +205,7 @@ class PresentationView:
     start: str
     end: str
     geometries: list[FeatureModel] = field(default_factory=list)
+    geometry_json: str = None
     when: Optional[TimeRangeModel] = None
     types: list[EntityTypeModel] = field(default_factory=list)
     externalReferenceSystems: list[ExternalReferenceModel] = field(
@@ -275,7 +276,8 @@ class PresentationView:
                 value=type_.get("value"),
                 unit=type_.get("unit"),
                 icon=get_icon(type_["id"], type_.get("typeHierarchy")),
-                division=get_divisions(type_["id"],
+                division=get_divisions(
+                    type_["id"],
                                        type_.get("typeHierarchy"))))
         return types
 
@@ -384,6 +386,7 @@ class PresentationView:
             geometries=cls.parse_geometries(
                 data.get("geometries", {}),
                 data.get("systemClass", "")),
+            geometry_json=data.get("geometries", {}),
             when=when_data,
             types=cls.parse_types(data.get("types", [])),
             externalReferenceSystems=[

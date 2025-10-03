@@ -271,7 +271,6 @@ def select_entities() -> Response:
 @login_required
 def deselect_entities() -> Response:
     check_manager_user()
-    print(request.form.getlist('selected_entities'))
     if request.method == 'POST':
         Admin.set_hidden_classes(request.form.getlist('selected_entities'))
         flash(_('set hidden entities'), 'info')
