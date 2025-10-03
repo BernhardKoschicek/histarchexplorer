@@ -73,8 +73,44 @@ if ('{{ tab_name }}' == 'subunits') {
 {{ tab_name }}Data.timelineBegin = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "beginString", "beginDBP");
 {{ tab_name }}Data.timelineEnd = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "endString", "endDBP");
 
+const {{ tab_name }}Ids = new Set({{ tab_name }}Data.tableData.map(item => item.id));
+
+const {{ tab_name }}csMap = new Map();
+for (const csObject of data.cs_ids) {
+    {{ tab_name }}csMap.set(csObject.id, csObject);
+}
+
+if (!{{ tab_name }}Data.caseStudies) {
+    {{ tab_name }}Data.caseStudies = [];
+}
+const {{ tab_name }}matchingCsIds = new Set();
+
+for (const csObject of data.cs_ids) {
+    const individualEntityIds = csObject.ids.flat();
+    for (const entityId of individualEntityIds) {
+        if ({{ tab_name }}Ids.has(Number(entityId))) {
+            {{ tab_name }}matchingCsIds.add(csObject.id);
+            break;
+        }
+    }
+}
+
+{{ tab_name }}Data.caseStudies = [];
+
+for (const csId of {{ tab_name }}matchingCsIds) {
+    const csObject = {{ tab_name }}csMap.get(csId);
+
+    if (csObject) {
+        {{ tab_name }}Data.caseStudies.push({
+            id: csObject.id,
+            name: csObject.name,
+            description: csObject.description || null // Description is optional
+        });
+    }
+}
+
 const classList{{ tab_name }} = {{ tab_name }}Data.classes;
-console.log({{ tab_name }}Data)
+
 
 function adjustTableHeight{{ tab_name }}() {
     // small delay to ensure layout is ready

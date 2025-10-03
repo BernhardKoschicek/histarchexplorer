@@ -22,6 +22,8 @@
             .join(' ');
       });
 
+
+
     {% endif %}
 </script>
 
@@ -41,6 +43,15 @@
             Classes
         </button>
         <ul class="dropdown-menu p-2" style="min-width: 250px;" id="classSelect{{ tab_name }}">
+        </ul>
+    </div>
+
+    <div class="dropdown d-none" id="csDropdown{{ tab_name }}">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+            Projects
+        </button>
+        <ul class="dropdown-menu p-2" style="min-width: 250px;" id="csSelect{{ tab_name }}">
         </ul>
     </div>
 
