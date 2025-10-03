@@ -212,6 +212,43 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
     data['cs_ids'] = []
     #build id lists for case studies
     if shown_case_studies:
+        sql_get_cs_infos = """
+        SELECT
+            -- --- Name Extraction Logic (Three-Level Fallback) ---
+            COALESCE(
+                -- 1. Try the requested language (e.g., 'fr')
+                t.name ->> %(language)s,
+        
+                -- 2. Try the preferred/fallback language (e.g., 'en')
+                t.name ->> %(preferred_language)s,
+        
+                -- 3. Try any available language key (gets the value of the first key found)
+                t.name ->> (SELECT key FROM jsonb_each(t.name) LIMIT 1)
+            ) AS name,
+        
+            -- --- Description Extraction Logic (Three-Level Fallback) ---
+            COALESCE(
+                -- 1. Try the requested language (e.g., 'fr')
+                t.description ->> %(language)s,
+        
+                -- 2. Try the preferred/fallback language (e.g., 'en')
+                t.description ->> %(preferred_language)s,
+        
+                -- 3. Try any available language key
+                t.description ->> (SELECT key FROM jsonb_each(t.description) LIMIT 1)
+            ) AS description,
+            t.case_study_type_id AS cs_id
+        FROM
+            tng.entities AS t
+        WHERE
+            t.case_study_type_id IS NOT NULL
+        """
+
+        g.cursor.execute(sql_get_cs_infos, {'language': g.language, 'preferred_language': app.config.get('PREFERRED_LANGUAGE')})
+        cs_infos = g.cursor.fetchall()
+
+        print(cs_infos)
+
         sql_case_studies = """
             SELECT jsonb_agg(domain_id) as ids
             FROM model.link
@@ -222,7 +259,15 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
             g.cursor.execute(sql_case_studies, {'cs_id':case_study})
             results = g.cursor.fetchone()
             cs = {'id': case_study, 'ids': results}
+            for row in cs_infos:
+                if row.cs_id == cs['id']:
+                    if row.name:
+                        cs['name'] = row.name
+                    if row.description:
+                        cs['description'] = row.description
             data['cs_ids'].append(cs)
+
+
 
     data['totals'] = category_totals
     data['counts'] = categorized_counts
