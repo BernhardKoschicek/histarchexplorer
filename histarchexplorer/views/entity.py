@@ -383,7 +383,7 @@ def adapt_map_dict(
                 feature['properties']['main'] = True
             feature['properties']['class'] = system_class
             feature['properties']['label'] = name
-            feature['properties']['id'] = id_
+            feature['properties']['id'] = int(id_)
             output.append(feature)
 
         return output
