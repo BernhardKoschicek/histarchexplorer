@@ -313,11 +313,10 @@ def get_entity(id_: int, tab_name=None) -> str:
             pass
 
         case 'subunits':
-            data = get_browse_list_entities(id_)
-
+            subunit_data = get_browse_list_entities(id_)
             filtered_view_classes = {
                 key: tuple(list(d.keys())[0] for d in value)
-                for key, value in data['counts'].items()
+                for key, value in subunit_data['counts'].items()
             }
 
 
@@ -325,7 +324,7 @@ def get_entity(id_: int, tab_name=None) -> str:
                 f'tabs/browse.html',
                 subunits=True,
                 view_classes=filtered_view_classes,
-                data=data,
+                subunit_data=subunit_data,
                 active_tab=tab_name,
                 typetree_data=type_tree().json,
                 main_image_json=g.main_images,
