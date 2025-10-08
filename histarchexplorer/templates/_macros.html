@@ -8,6 +8,21 @@
 
 {% macro breadcrumbs(hierarchy, entity, show = True) %}
   {% if show %}
+    {% set system_class_map = {
+      'place': 'places',
+      'feature': 'places',
+      'stratigraphic unit': 'places',
+      'move': 'events',
+      'acquisition': 'events',
+      'modification': 'events',
+      'activity': 'events',
+      'group': 'actors',
+      'person': 'actors',
+      'event': 'events',
+      'artifact': 'items',
+      'source': 'sources',
+      'file': 'files'
+  } %}
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb" style="--bs-breadcrumb-divider: '';">
         {% for ancestor in hierarchy.root %}
@@ -15,7 +30,8 @@
             <a href="{{ url_for('entity', id_=ancestor.id) }}">{{ ancestor.name }}</a>
           </li>
         {% endfor %}
-        <li class="breadcrumb-item active" aria-current="page">
+        {% set active_class = system_class_map.get(entity.system_class.lower(), '') %}
+        <li class="breadcrumb-item active breadcrumb-{{ active_class }}" aria-current="page">
           {{ entity.title }}
         </li>
       </ol>

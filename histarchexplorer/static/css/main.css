@@ -13668,18 +13668,16 @@ nav[aria-label=breadcrumb] ol.breadcrumb li.breadcrumb-item:not(:last-child)::af
   content: "";
   position: absolute;
   top: 50%;
-  right: -20px;
-  width: 20px;
+  right: -10px;
+  width: 10px;
   height: 2px;
-  background-color: #990061;
+  background-color: black;
 }
 nav[aria-label=breadcrumb] ol.breadcrumb li.breadcrumb-item:hover {
   background: #990061;
   color: #fff;
 }
 nav[aria-label=breadcrumb] ol.breadcrumb li.breadcrumb-item.active {
-  background: #990061;
-  color: #fff;
   cursor: default;
 }
 
@@ -13694,6 +13692,30 @@ nav[aria-label=breadcrumb] ol.breadcrumb li.breadcrumb-item.active {
     padding: 0 20px;
     font-size: 11px;
   }
+}
+li.breadcrumb-item.active.breadcrumb-places {
+  background-color: var(--limegreen) !important;
+  color: #fff;
+}
+
+li.breadcrumb-item.active.breadcrumb-actors {
+  background-color: var(--pink) !important;
+  color: #fff;
+}
+
+li.breadcrumb-item.active.breadcrumb-events {
+  background-color: var(--blue) !important;
+  color: #fff;
+}
+
+li.breadcrumb-item.active.breadcrumb-items {
+  background-color: var(--light-orange) !important;
+  color: #fff;
+}
+
+li.breadcrumb-item.active.breadcrumb-sources {
+  background-color: var(--reddish-brown) !important;
+  color: #fff;
 }
 
 /*# sourceMappingURL=main.css.map */
