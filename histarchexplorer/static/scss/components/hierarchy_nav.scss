@@ -61,9 +61,25 @@
   align-items: center;
   justify-content: space-around;
   color: black;
+  position: relative;
+  margin-bottom: 1.5rem;
+
+  // vertical connector line
+  &:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 100%; // right below this button
+    left: 50%; // center horizontally
+    transform: translateX(-50%);
+    width: 1.5px;
+    height: 24px; // distance to next button
+    background-color: grey;
+    z-index: 0;
+  }
 
   button {
     transition: transform 0.2s ease-in-out;
+    z-index: 1;
 
     &:hover {
       transform: scale(1.2);

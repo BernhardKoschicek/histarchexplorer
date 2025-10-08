@@ -6,6 +6,7 @@
 <script> const entityName = entity.title</script>
 <script src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
 
+{{ ui.breadcrumbs(hierarchy, entity, hierarchy.root) }}
 
 <div class="col flex-column grid-muuri">
   <div class="item item-half hierarchy-item">
@@ -23,7 +24,7 @@
               {{ entity.name }}
             </a>
           </button>
-          <div class="hierarchy-line"></div>
+          <!--<div class="hierarchy-line"></div>-->
         </div>
       {% endfor %}
     {% endif %}
@@ -54,7 +55,7 @@
       </div>
     {% else %}
       <div
-        class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
+          class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
         <div class="entity-card__icon">
           {% if entity.system_class.lower() in ['feature', 'stratigraphic unit'] %}
             <img src="/static/images/entity_icons/place.png"
@@ -64,8 +65,8 @@
                  alt="{{ entity.system_class }}">
           {% else %}
             <img
-              src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
-              alt="{{ entity.system_class }}">
+                src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
+                alt="{{ entity.system_class }}">
           {% endif %}
         </div>
         <div class="hierarchy-card-label mb-0">{{ entity.title }}</div>
@@ -136,24 +137,7 @@
       <div class="item-content" data-type="description">
         <div class="muuri-description">
           <span class="tile-label">{{ _("description") | upper }}</span>
-          <p>{{ entity.description[CURRENT_LANGUAGE]  }}</p>
-        </div>
-      </div>
-    </div>
-  {% endif %}
-
-  <!-- Map Location -->
-  {% if entity.geometries or overview_map_geometry%}
-    <div class="item" data-type="map">
-      <div class="map-wrapper">
-        <div class="item-content item-content-full">
-          <div class="location">
-            <div id="muuri-map"></div>
-            <button id="expand-button"
-                    class="btn btn-light btn-sm">
-              <i class="bi bi-box-arrow-up-right"></i>
-            </button>
-          </div>
+          <p>{{ entity.description[CURRENT_LANGUAGE] }}</p>
         </div>
       </div>
     </div>
@@ -195,9 +179,26 @@
     </div>
   {% endif %}
 
+  <!-- Map Location -->
+  {% if entity.geometries or overview_map_geometry %}
+    <div class="item" data-type="map">
+      <div class="map-wrapper">
+        <div class="item-content item-content-full">
+          <div class="location">
+            <div id="muuri-map"></div>
+            <button id="expand-button"
+                    class="btn btn-light btn-sm">
+              <i class="bi bi-box-arrow-up-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
   <!-- Bibliography and External References -->
-<!-- todo: get also the references from the root entity -->
-<!--    This is just a model thing, Bernhard will include this in the API call, so nothing to do here -->
+  <!-- todo: get also the references from the root entity -->
+  <!--    This is just a model thing, Bernhard will include this in the API call, so nothing to do here -->
   {% if entity.references %}
     <div class="item item-5-6" data-type="reference">
       <div class="item-content">

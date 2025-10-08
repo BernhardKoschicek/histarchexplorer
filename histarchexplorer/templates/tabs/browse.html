@@ -1,5 +1,8 @@
-<script type="text/javascript" src="/static/js/mapfunctions.js"></script>
-
+{% if subunits %}
+  {% import '_macros.html' as ui %}
+  {{ ui.breadcrumbs(hierarchy, entity) }}
+  <script type="text/javascript" src="/static/js/mapfunctions.js"></script>
+{% endif %}
 <script>
     {% if subunits %}
       const typeTreeData = {{ typetree_data|tojson}}

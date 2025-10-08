@@ -328,6 +328,8 @@ def get_entity(id_: int, tab_name=None) -> str:
                 active_tab=tab_name,
                 typetree_data=type_tree().json,
                 main_image_json=g.main_images,
+                hierarchy=hierarchy,
+                entity=main_entity,
                 tab_name='subunits')
 
         case _ if tab_name not in ['feature']:

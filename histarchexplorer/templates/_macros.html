@@ -6,6 +6,24 @@
 {% endmacro %}
 
 
+{% macro breadcrumbs(hierarchy, entity, show = True) %}
+  {% if show %}
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb" style="--bs-breadcrumb-divider: '';">
+        {% for ancestor in hierarchy.root %}
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('entity', id_=ancestor.id) }}">{{ ancestor.name }}</a>
+          </li>
+        {% endfor %}
+        <li class="breadcrumb-item active" aria-current="page">
+          {{ entity.title }}
+        </li>
+      </ol>
+    </nav>
+  {% endif %}
+
+{% endmacro %}
+
 {% macro flash_messages() %}
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -60,11 +78,11 @@
 {% endmacro %}
 
 {% macro date_template_format(begin, end) %}
-    {% if begin and end %}
-        {{ begin }} - {{ end }}
-    {% elif begin %}
-        {{ begin }}
-    {% elif end %}
-        {{ end }}
-    {% endif %}
+  {% if begin and end %}
+    {{ begin }} - {{ end }}
+  {% elif begin %}
+    {{ begin }}
+  {% elif end %}
+    {{ end }}
+  {% endif %}
 {% endmacro %}

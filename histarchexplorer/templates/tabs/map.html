@@ -1,4 +1,9 @@
-<div id="mymap"></div>
+<div>
+  {% import '_macros.html' as ui %}
+  {{ ui.breadcrumbs(hierarchy, entity) }}
+  <div id="mymap"></div>
+</div>
+
 <script> const mapData = (JSON.parse({{ data|tojson }})).spatial</script>
 
 <script src="../../static/js/map.js"></script>
