@@ -105,9 +105,9 @@
     {% endif %}
 
 
-    <div class="attribute-area">
-      <!-- Attributes -->
-      {% if categorized_types %}
+    {% if categorized_types %}
+      <div class="attribute-area">
+        <!-- Attributes -->
         <span class="tile-label">{{ _('attributes') | upper }}</span>
         <div class="categorized-types">
           {% for label, value in categorized_types.items() %}
@@ -126,24 +126,25 @@
             {% endfor %}
           {% endfor %}
         </div>
-      {% endif %}
-    </div>
+      </div>
+    {% endif %}
   </div>
 
   <!-- Description -->
   {% if entity.description %}
-    <div class="item {% if entity.description[CURRENT_LANGUAGE] | length > 1500 %}item-middle{% endif %}">
+    <div
+      class="item {% if entity.description[CURRENT_LANGUAGE] | length > 1500 %}item-middle{% endif %}">
       <div class="item-content" data-type="description">
         <div class="muuri-description">
           <span class="tile-label">{{ _("description") | upper }}</span>
-          <p>{{ entity.description[CURRENT_LANGUAGE]  }}</p>
+          <p>{{ entity.description[CURRENT_LANGUAGE] }}</p>
         </div>
       </div>
     </div>
   {% endif %}
 
   <!-- Map Location -->
-  {% if entity.geometries or overview_map_geometry%}
+  {% if entity.geometries or overview_map_geometry %}
     <div class="item" data-type="map">
       <div class="map-wrapper">
         <div class="item-content item-content-full">
@@ -196,8 +197,8 @@
   {% endif %}
 
   <!-- Bibliography and External References -->
-<!-- todo: get also the references from the root entity -->
-<!--    This is just a model thing, Bernhard will include this in the API call, so nothing to do here -->
+  <!-- todo: get also the references from the root entity -->
+  <!--    This is just a model thing, Bernhard will include this in the API call, so nothing to do here -->
   {% if entity.references %}
     <div class="item item-5-6" data-type="reference">
       <div class="item-content">
@@ -211,8 +212,9 @@
                     <div class="reference-header">
                       {% if reference.system_class == "bibliography" %}
                         <i class="bi bi-book"></i>
-                        <a href="{{ url_for('entity_view', id_=reference.id) }}"
-                           class="reference-name">
+                        <a
+                          href="{{ url_for('entity_view', id_=reference.id) }}"
+                          class="reference-name">
                           {{ reference.title }}
                         </a>
                       {% elif reference.system_class  == "external_reference" %}

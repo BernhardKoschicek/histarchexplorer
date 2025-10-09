@@ -5,12 +5,10 @@ from typing import Any, Optional
 from flask import abort, g, render_template
 
 from histarchexplorer import app
-from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.entity import (
     check_if_place_hierarchy, get_first_geom)
-from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.presentation_view import (
-    EntityTypeModel, PresentationView, Relation)
+    EntityTypeModel, File, PresentationView, Relation)
 from histarchexplorer.utils.view_util import get_cite_button
 from histarchexplorer.views.entities import get_browse_list_entities
 from histarchexplorer.views.views import type_tree
@@ -30,55 +28,53 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
         entity_id=id_)
 
 
+def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
+    images = []
+    main_image = None
+    for image in files:
+        if image.main_image:
+            main_image = image
+        else:
+            images.append(image)
+
+    if not main_image and images:
+        main_image = images.pop(0)
+    initial_images = images[:2]
+    return main_image, initial_images
+
+
 @app.route('/get_entity/<int:id_>/<tab_name>')
 def get_entity(id_: int, tab_name=None) -> str:
     related_entities = {}
     catalogue_entities = []
-    main_image = None
-    initial_images = []
     feature = None
 
-    main_entity = PresentationView.from_api(id_)
-    categorized_types = get_categorized_types(main_entity.types)
+    entity = PresentationView.from_api(id_)
+    categorized_types = get_categorized_types(entity.types)
     hierarchy = {
-        'subs': get_sub_count(main_entity),
-        'root': get_hierarchy(main_entity)}
+        'subs': get_sub_count(entity),
+        'root': get_hierarchy(entity)}
 
-    overview_map_geometry = main_entity.geometry_json
+    overview_map_geometry = entity.geometry_json
     if not overview_map_geometry:
         overview_map_geometry = get_parent_geometry(hierarchy['root'])
     data: dict[str, Any] = {
-        'entity': main_entity.to_json(),
+        'entity': entity.to_json(),
         'overview_map': json.dumps(overview_map_geometry)}
+
+    main_image, initial_images = get_entity_images(entity.files)
     match tab_name:
         case 'feature':
-            # todo: core information about the feature are available in the
-            #  main entity
-            feature = Entity.get_entity(id_, Parser())
-
+            pass
         case 'map':
             map_data = {
                 'type': 'FeatureCollection',
-                'features': get_features_for_map(main_entity, hierarchy)}
+                'features': get_features_for_map(entity, hierarchy)}
             if not map_data['features']:
                 abort(404)
             data['spatial'] = map_data
-
-        case 'overview':
-            images = []
-            for image in main_entity.files:
-                if image.main_image:
-                    main_image = image
-                else:
-                    images.append(image)
-
-            if not main_image and images:
-                main_image = images.pop(0)
-            initial_images = images[:2]
-
         case 'media':
             pass
-
         case 'subunits':
             subunit_data = get_browse_list_entities(id_)
             filtered_view_classes = {
@@ -95,20 +91,22 @@ def get_entity(id_: int, tab_name=None) -> str:
                 main_image_json=g.main_images,
                 tab_name='subunits')
 
+        case 'overview':
+            pass
         case _ if tab_name not in ['feature']:
             abort(404)
 
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
-        entity=main_entity,
+        entity=entity,
         categorized_types=categorized_types,
         features=feature,
         main_image=main_image,
         initial_images=initial_images,
-        manifests=[img.iiif_manifest for img in main_entity.files],
+        manifests=[img.iiif_manifest for img in entity.files],
         related_entities=related_entities or {},
-        cite_button=get_cite_button(main_entity),
+        cite_button=get_cite_button(entity),
         catalogue_entities=catalogue_entities,
         hierarchy=hierarchy,
         overview_map_geometry=overview_map_geometry)
@@ -216,6 +214,8 @@ def get_categorized_types(
 
     divisions = defaultdict(list)
     for type_ in types:
+        if type_.is_standard:
+            continue
         label = type_.division['label'].replace(' ', '_')
         divisions[label].append(
             {'type': type_, 'icon': type_.division['icon']})
