@@ -14,6 +14,12 @@ def test_admin_page(client):
         rv = client.get(url_for('admin'), follow_redirects=True)
         assert b"TOOLS" in rv.data
 
+
+        #client.get(url_for('clear_cache'))
+        rv = client.get(url_for('clear_cache'), follow_redirects=True)
+        assert b"cache cleared" in rv.data
+
+
         client.get(url_for('reset'))
         rv = client.get(url_for('admin'), follow_redirects=True)
         assert b"reset database" in rv.data

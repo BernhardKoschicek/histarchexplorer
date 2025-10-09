@@ -52,10 +52,18 @@ def test_entity(client):
         assert rv.status_code == 200
         assert b"Mitterhof" in rv.data
 
-        rv = client.get(url_for('entities'))
+        # Test glb, wepb and mp4
+        rv = client.get(url_for('get_entity', id_=196952, tab_name='overview'))
         assert rv.status_code == 200
-        assert b"Name" in rv.data
+        assert b"Venus of Willendorf" in rv.data
 
+        # Test pdf
+        rv = client.get(url_for('get_entity', id_=203599, tab_name='overview'))
+        assert rv.status_code == 200
+        assert b"Reichartz" in rv.data
+
+        rv = client.get(url_for('entity_view', id_=50505, tab_name='wrong'))
+        assert rv.status_code == 404
 
         rv = client.get(url_for('get_entity', id_=50505, tab_name='wrong'))
         assert rv.status_code == 404

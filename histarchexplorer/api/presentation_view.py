@@ -17,25 +17,25 @@ class GeometryModel:
     type: str
     coordinates: Any
 
-    def swap_latlng(self) -> "GeometryModel":
-        def flip(coord):
-            return [coord[1], coord[0]]
-
-        if self.type == "Point":
-            new_coords = flip(self.coordinates)
-
-        elif self.type == "LineString":
-            new_coords = [flip(c) for c in self.coordinates]
-
-        elif self.type == "Polygon":
-            # Polygons are lists of linear rings (outer ring + holes)
-            new_coords = [[flip(c) for c in ring] for ring in self.coordinates]
-
-        else:
-            # Leave untouched if unknown geometry type
-            new_coords = self.coordinates
-
-        return GeometryModel(type=self.type, coordinates=new_coords)
+    # def swap_latlng(self) -> "GeometryModel":
+    #     def flip(coord):
+    #         return [coord[1], coord[0]]
+#
+    #     if self.type == "Point":
+    #         new_coords = flip(self.coordinates)
+#
+    #     elif self.type == "LineString":
+    #         new_coords = [flip(c) for c in self.coordinates]
+#
+    #     elif self.type == "Polygon":
+    #         # Polygons are lists of linear rings (outer ring + holes)
+    #         new_coords = [[flip(c) for c in ring] for ring in self.coordinates]
+#
+    #     else:
+    #         # Leave untouched if unknown geometry type
+    #         new_coords = self.coordinates
+#
+    #     return GeometryModel(type=self.type, coordinates=new_coords)
 
 
 @dataclass
@@ -53,39 +53,39 @@ class FeatureModel:
     geometry: GeometryModel
     properties: PropertyModel
 
-    def to_dict(self) -> dict:
-        return {
-            "type": "Feature",
-            "geometry": asdict(self.geometry),
-            "properties": asdict(self.properties)}
-
-    def to_json(self, **kwargs) -> str:
-        return json.dumps(self.to_dict(), **kwargs)
-
-    def swap_latlng(self) -> "FeatureModel":
-        return FeatureModel(
-            geometry=self.geometry.swap_latlng(),
-            properties=self.properties)
-
-    def change_to_map_libre_dict(self, main: Optional[bool] = False):
-        props = {
-            'id': self.properties.entityId,
-            'label': self.properties.title,
-            'class': self.properties.system_class}
-        if main:
-            props['main'] = True
-
-        return {
-            'type': 'Feature',
-            'geometry': {
-                'type': self.geometry.type,
-                'coordinates': self.geometry.coordinates,
-                'title': self.properties.title,
-                'description': self.properties.description,
-                'placeId': self.properties.entityId,
-                'locationId': self.properties.locationId,
-                'shapeType': self.properties.shapeType},
-            'properties': props}
+    # def to_dict(self) -> dict:
+    #     return {
+    #         "type": "Feature",
+    #         "geometry": asdict(self.geometry),
+    #         "properties": asdict(self.properties)}
+#
+    # def to_json(self, **kwargs) -> str:
+    #     return json.dumps(self.to_dict(), **kwargs)
+#
+    # def swap_latlng(self) -> "FeatureModel":
+    #     return FeatureModel(
+    #         geometry=self.geometry.swap_latlng(),
+    #         properties=self.properties)
+#
+    # def change_to_map_libre_dict(self, main: Optional[bool] = False):
+    #     props = {
+    #         'id': self.properties.entityId,
+    #         'label': self.properties.title,
+    #         'class': self.properties.system_class}
+    #     if main:
+    #         props['main'] = True
+#
+    #     return {
+    #         'type': 'Feature',
+    #         'geometry': {
+    #             'type': self.geometry.type,
+    #             'coordinates': self.geometry.coordinates,
+    #             'title': self.properties.title,
+    #             'description': self.properties.description,
+    #             'placeId': self.properties.entityId,
+    #             'locationId': self.properties.locationId,
+    #             'shapeType': self.properties.shapeType},
+    #         'properties': props}
 
 
 @dataclass
@@ -120,8 +120,8 @@ class EntityTypeModel:
     icon: Optional[str]
     division: Optional[dict[str, str]]
 
-    def to_json(self, *, indent: Optional[int] = 2) -> str:
-        return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
+    # def to_json(self, *, indent: Optional[int] = 2) -> str:
+    #     return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
 
 
 @dataclass
@@ -200,6 +200,7 @@ class Relation:
 class PresentationView:
     id: int
     system_class: str
+    view_class: str
     title: str
     description: dict[str, str]
     aliases: list[str]
@@ -288,9 +289,9 @@ class PresentationView:
         for system_class, relation_list in raw_relations.items():
             relations = []
             for rel in relation_list:
+                # todo: test if needed
                 if not isinstance(rel, dict):
                     continue
-
                 rel_geometries = PresentationView.parse_geometries(
                     rel.get("geometries"),
                     system_class)
@@ -381,6 +382,7 @@ class PresentationView:
         return cls(
             id=data["id"],
             system_class=data.get("systemClass", ""),
+            view_class=data.get("viewClass", ""),
             title=data.get("title", ""),
             description=get_description_translated(
                 data.get("description", "")),

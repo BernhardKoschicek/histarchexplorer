@@ -27,21 +27,6 @@
         </div>
       {% endfor %}
     {% endif %}
-    <!-- todo: can we move this in a .py file? Isn't this in VIEW_CLASSES? -->
-    {% set system_class_map = {
-                    'place': 'places',
-                    'feature': 'places',
-                    'stratigraphic unit': 'places',
-                    'move': 'events',
-                    'acquisition': 'events',
-                    'modification': 'events',
-                    'activity': 'events',
-                    'group': 'actors',
-                    'person': 'actors',
-                    'event': 'events',
-                    'artifact': 'items',
-                    'source': 'sources',
-                    'file': 'files'} %}
 
     {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
       <div class="entity-card__icon">
@@ -54,7 +39,7 @@
       </div>
     {% else %}
       <div
-        class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
+        class="main-entity-ellipse main-entity-ellipse--{{ entity.view_class }}s">
         <div class="entity-card__icon">
           {% if entity.system_class.lower() in ['feature', 'stratigraphic unit'] %}
             <img src="/static/images/entity_icons/place.png"

@@ -41,12 +41,12 @@ VIEW_CLASSES = {
     'files': ('file',)
 }
 
-# Commonly used standard entity types
-STANDARD_TYPES = [
-    'Source', 'Event', 'Actor function', 'Involvement', 'Bibliography',
-    'Edition', 'License', 'External reference',
-    'Source translation', 'Actor relation', 'Human remains', 'Artifact',
-    'Place', 'Feature', 'Stratigraphic unit']
+# # Commonly used standard entity types
+# STANDARD_TYPES = [
+#     'Source', 'Event', 'Actor function', 'Involvement', 'Bibliography',
+#     'Edition', 'License', 'External reference',
+#     'Source translation', 'Actor relation', 'Human remains', 'Artifact',
+#     'Place', 'Feature', 'Stratigraphic unit']
 
 # Categorization of entity types with icons
 TYPE_DIVISIONS = {
