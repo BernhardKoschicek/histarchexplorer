@@ -77,7 +77,7 @@ If you are working on frontend styles (SCSS), follow these steps.
 
 #### Install Node dependencies
 
-    cd histarchexplorer/histarchexplorer/static
+    cd histarchexplorer/static
     npm install --production=false
 
 This installs all required JavaScript and SCSS build dependencies (including sass).
@@ -99,7 +99,8 @@ If you have Git hooks installed, SCSS will rebuild automatically when:
 * pulling new commits (post-merge)
 
 If not yet set up:
-
+    
+    cd ../..
     bash .github/hooks/setup-hooks.sh
  
 #### Common Issues
