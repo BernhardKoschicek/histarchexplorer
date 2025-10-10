@@ -3,7 +3,7 @@ from flask import render_template, current_app
 import requests
 
 from histarchexplorer.api.parser import Parser
-from histarchexplorer.models.entity import Entity
+from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.utils.view_util import get_cite_button
 
 TYPE_TREE_API_URL = "https://thanados.openatlas.eu/api/0.4/type_tree/"
@@ -22,8 +22,7 @@ def vocabulary():
 
 @app.route("/vocabulary/<int:type_id>")
 def vocabulary_detail(type_id: int):
-    entity = Entity.get_entity(type_id, Parser())
-
+    entity = PresentationView.from_api(type, type_id)
     # BEFORE:
     # res = requests.get(current_app.config["VOCAB_TYPE_TREE_URL"])
 
