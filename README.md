@@ -71,6 +71,50 @@ cd histarchexplorer/histarchexplorer/static
 sass --watch scss/main.scss:css/main.css
 ```
 
+### 5. Development Setup
+
+If you are working on frontend styles (SCSS), follow these steps.
+
+#### Install Node dependencies
+
+    cd histarchexplorer/histarchexplorer/static
+    npm install --production=false
+
+This installs all required JavaScript and SCSS build dependencies (including sass).
+
+#### Build CSS once
+    
+    npm run build
+
+#### Watch for changes during development
+
+If you are actively editing SCSS files:
+
+    npm run dev
+
+#### Git hooks (optional, but recommended)
+
+If you have Git hooks installed, SCSS will rebuild automatically when:
+* switching branches (post-checkout)
+* pulling new commits (post-merge)
+
+If not yet set up:
+
+    bash .github/hooks/setup-hooks.sh
+ 
+#### Common Issues
+SCSS not compiling?
+Ensure you are in the correct folder:
+
+    cd histarchexplorer/histarchexplorer/static
+    npm install
+    npm run build
+
+#### Bootstrap deprecation warnings?
+
+These come from Bootstrap’s internal SCSS functions and are safe to ignore.
+They can be silenced with --quiet-deps in your build scripts (already configured).
+
 ### 5. Database setup
 Histarchexplorer requires an existing **OpenAtlas PostgreSQL database**. To install the additional structures for presentation:
 
