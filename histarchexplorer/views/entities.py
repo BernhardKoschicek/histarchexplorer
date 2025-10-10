@@ -1,7 +1,7 @@
 from flask import g, render_template
 
 from histarchexplorer import app
-from histarchexplorer.views.views import type_tree
+from histarchexplorer.views.views import type_tree_by_view
 
 
 def get_recursive_type_ids(id):
@@ -300,7 +300,7 @@ def return_entities(tab_name, id):
         entity_id=0,
         page_name="landing",
         active_tab=tab_name,
-        typetree_data=type_tree().json,
+        typetree_data=type_tree_by_view().json,
         main_image_json=g.main_images)
 
 

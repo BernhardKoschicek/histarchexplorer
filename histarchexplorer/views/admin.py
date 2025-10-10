@@ -14,7 +14,7 @@ from histarchexplorer.api.api_access import get_entities_count_by_case_study
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
-from histarchexplorer.views.views import type_tree
+from histarchexplorer.views.views import type_tree_by_view
 
 
 @app.route('/admin/')
@@ -50,7 +50,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
 
     case_study_children = find_children_by_id(
-        type_tree().get_json(),
+        type_tree_by_view().get_json(),
         initial_case_study_type_id)
 
 
@@ -331,7 +331,7 @@ def clear_cache():
 
 @app.route('/warm-cache')
 def warm_cache():
-    type_tree()
+    type_tree_by_view()
     flash(_('cache warmed'), 'success')
     return redirect(url_for('admin'))
 

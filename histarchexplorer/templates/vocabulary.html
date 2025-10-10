@@ -196,7 +196,7 @@
   <script>
     "use strict";
     const VOCAB_TABS = {{ vocab_tabs | tojson }};
-    const TYPE_TREE_URL = {{ type_tree_api_url | tojson }};
+    const TYPE_TREE  = {{ type_tree_ | tojson }}; // plain dict from backend
 
     function buildTree(flatData, topLevelOrder = null) {
       const nodesById = {};
@@ -274,36 +274,35 @@
       document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
       const tabBtn = document.getElementById('tab-' + tabKey);
       if (tabBtn) tabBtn.classList.add('active');
-
       document.querySelectorAll('.tree-container').forEach(div => div.classList.remove('active'));
       document.getElementById('tree-' + tabKey).classList.add('active');
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      fetch(TYPE_TREE_URL)
-        .then(res => res.json())
-        .then(payload => {
-          const typeTree = payload.typeTree || {};
-          VOCAB_TABS.forEach(tab => {
-            const order = Array.isArray(tab.roots) ? tab.roots : null;
-            const filtered = filterByCategoryAndRoots(typeTree, tab);
-            const treeData = buildTree(filtered, order);
-            const containerId = `tree-${tab.key}`;
-            const el = document.getElementById(containerId);
-            if (el) el.innerHTML = "";
-            new Treeview({ containerId, data: treeData });
-          });
-          setTimeout(() => {
-            VOCAB_TABS.forEach(tab => injectDetailIcons(`tree-${tab.key}`));
-          }, 5);
-        })
-        .catch(err => {
-          console.error("Failed to fetch/build tree data:", err);
-          VOCAB_TABS.forEach(tab => {
-            const el = document.getElementById(`tree-${tab.key}`);
-            if (el) el.innerHTML = `<div class="placeholder">Could not load ${tab.label}.</div>`;
-          });
+      try {
+        const payload  = TYPE_TREE;
+        const typeTree = (payload && payload.typeTree) ? payload.typeTree : payload || {};
+
+        VOCAB_TABS.forEach(tab => {
+          const order    = Array.isArray(tab.roots) ? tab.roots : null;
+          const filtered = filterByCategoryAndRoots(typeTree, tab);
+          const treeData = buildTree(filtered, order);
+          const containerId = `tree-${tab.key}`;
+          const el = document.getElementById(containerId);
+          if (el) el.innerHTML = "";
+          new Treeview({ containerId, data: treeData });
         });
+
+        setTimeout(() => {
+          VOCAB_TABS.forEach(tab => injectDetailIcons(`tree-${tab.key}`));
+        }, 5);
+      } catch (err) {
+        console.error("Failed to build tree data:", err);
+        VOCAB_TABS.forEach(tab => {
+          const el = document.getElementById(`tree-${tab.key}`);
+          if (el) el.innerHTML = `<div class="placeholder">Could not load ${tab.label}.</div>`;
+        });
+      }
     });
   </script>
 {% endblock %}
