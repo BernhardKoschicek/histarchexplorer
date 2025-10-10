@@ -55,7 +55,7 @@ tiles/
 
 
 # SCSS build output
-/static/css/main.css
+histarchexplorer/static/css/main.css
 /static/*.map
 /static/node_modules/
 /static/css/components/
