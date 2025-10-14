@@ -32,7 +32,7 @@
     {% set system_class_map = {
                     'place': 'places',
                     'feature': 'places',
-                    'stratigraphic unit': 'places',
+                    'stratigraphic_unit': 'places',
                     'move': 'events',
                     'acquisition': 'events',
                     'modification': 'events',
@@ -104,31 +104,6 @@
         </button>
       </div>
     {% endif %}
-
-
-    <div class="attribute-area">
-      <!-- Attributes -->
-      {% if categorized_types %}
-        <span class="tile-label">{{ _('attributes') | upper }}</span>
-        <div class="categorized-types">
-          {% for label, value in categorized_types.items() %}
-            <p class="tile-sub-label text-uppercase mt-3">
-              {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
-            {% for type in value %}
-              <div class="badge custom-badge text-wrap m-1">
-                <h6 class="m-0 text-center">
-                  {{ type.type.title }}
-                  {% if type.type.value and type.type.unit %}:
-                    {{ type.type.value }}
-                    {{ type.type.unit }}
-                  {% endif %}
-                </h6>
-              </div>
-            {% endfor %}
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
   </div>
 
   <!-- Description -->
@@ -192,6 +167,29 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if categorized_types %}
+    <div class="item-half item-attributes">
+      <span class="tile-label">{{ _('attributes') | upper }}</span>
+      <div class="categorized-types">
+        {% for label, value in categorized_types.items() %}
+          <p class="tile-sub-label text-uppercase mt-3">
+            {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
+          {% for type in value %}
+            <div class="badge custom-badge text-wrap m-1">
+              <h6 class="m-0 text-center">
+                {{ type.type.title }}
+                {% if type.type.value and type.type.unit %}:
+                  {{ type.type.value }}
+                  {{ type.type.unit }}
+                {% endif %}
+              </h6>
+            </div>
+          {% endfor %}
+        {% endfor %}
       </div>
     </div>
   {% endif %}

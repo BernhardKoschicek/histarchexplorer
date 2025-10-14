@@ -1,4 +1,5 @@
 nav[aria-label="breadcrumb"] {
+  font-family: var(--font-inter);
   width: calc(100% - var(--sidebar-width));
   display: flex;
   justify-content: flex-start;
@@ -15,10 +16,10 @@ nav[aria-label="breadcrumb"] {
 
     li.breadcrumb-item {
       background-color: #fff;
-      color: #252525;
+      color: #000000;
       border-radius: 5px;
       letter-spacing: 1px;
-     // text-transform: uppercase;
+      // text-transform: uppercase;
       position: relative;
       display: inline-flex;
       justify-content: center;
@@ -43,18 +44,22 @@ nav[aria-label="breadcrumb"] {
         position: absolute;
         top: 50%;
         right: -10px;
-        width: 10px;           // length of the line
-        height: 2px;           // thickness
+        width: 10px; // length of the line
+        height: 2px; // thickness
         background-color: black;
       }
 
       &:hover {
-        background: #990061;
+        background: #5b5658;
         color: #fff;
       }
 
+
       &.active {
         cursor: default;
+        span {
+          transform: skew(21deg);
+        }
       }
     }
   }
@@ -78,18 +83,22 @@ li.breadcrumb-item.active.breadcrumb-places {
   background-color: var(--limegreen) !important;
   color: #fff;
 }
+
 li.breadcrumb-item.active.breadcrumb-actors {
   background-color: var(--pink) !important;
   color: #fff;
 }
+
 li.breadcrumb-item.active.breadcrumb-events {
   background-color: var(--blue) !important;
   color: #fff;
 }
+
 li.breadcrumb-item.active.breadcrumb-items {
   background-color: var(--light-orange) !important;
   color: #fff;
 }
+
 li.breadcrumb-item.active.breadcrumb-sources {
   background-color: var(--reddish-brown) !important;
   color: #fff;

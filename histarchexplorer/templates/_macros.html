@@ -32,7 +32,7 @@
         {% endfor %}
         {% set active_class = system_class_map.get(entity.system_class.lower(), '') %}
         <li class="breadcrumb-item active breadcrumb-{{ active_class }}" aria-current="page">
-          {{ entity.title }}
+          <span>{{ entity.title }}</span>
         </li>
       </ol>
     </nav>
