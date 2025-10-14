@@ -58,8 +58,8 @@
 {% endmacro %}
 
 
-{% macro overview_image(image, manifests) %}
-  <div class="item-half">
+{% macro overview_image(image, manifests, full_width=False) %}
+  <div class="{{ 'item' if full_width else 'item-half' }}">
     <div class="item-content item-content-full">
       <div class="muuri-images">
         <div class="image position-relative">
