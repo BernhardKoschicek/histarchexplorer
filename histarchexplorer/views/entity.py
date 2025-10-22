@@ -5,6 +5,8 @@ from typing import Any, Optional
 from flask import abort, g, render_template
 
 from histarchexplorer import app
+from histarchexplorer.api.api_access import ApiAccess
+from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.entity import (
     check_if_place_hierarchy, get_first_geom)
 from histarchexplorer.api.presentation_view import (
@@ -49,7 +51,6 @@ def get_entity(id_: int, tab_name=None) -> str:
     hierarchy = {
         'subs': get_sub_count(entity),
         'root': get_hierarchy(entity)}
-
     overview_map_geometry = entity.geometry_json
     if not overview_map_geometry:
         if hierarchy.get('root'):
