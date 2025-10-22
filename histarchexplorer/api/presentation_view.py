@@ -409,7 +409,8 @@ class PresentationView:
             end=end_date)
 
     @staticmethod
-    def merge_references(references: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def merge_references(
+            references: list[dict[str, Any]]) -> list[dict[str, Any]]:
         merged = {}
         for ref in references:
             rid = ref["id"]
@@ -421,10 +422,9 @@ class PresentationView:
                 pages_set = {
                     p.strip()
                     for p in (existing_pages + "," + new_pages).split(",")
-                    if p.strip()
-                }
+                    if p.strip()}
                 merged[rid]["pages"] = ", ".join(sorted(
                     pages_set,
-                    key=lambda x: (not x.isdigit(), int(x) if x.isdigit() else x)
-                ))
+                    key=lambda x:
+                    (not x.isdigit(), int(x) if x.isdigit() else x)))
         return list(merged.values())
