@@ -1,6 +1,6 @@
 {% import '_macros.html' as ui %}
-<script src="../../static/js/overview.js"></script>
 
+<script src="../../static/js/overview.js"></script>
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
 <script> const overviewMap = JSON.parse(JSON.parse({{ data|tojson }}).overview_map)</script>
 <script> const entityName = entity.title</script>
@@ -154,9 +154,7 @@
   <!-- All initial images, split last one out -->
   {% if initial_images %}
     {% for depiction in initial_images %}
-      {% if not depiction.render_type == 'unknown' %}
       {{ ui.overview_image(depiction, manifests, True if loop.last else False) }}
-      {% endif %}
     {% endfor %}
   {% endif %}
 

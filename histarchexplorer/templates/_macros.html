@@ -32,9 +32,10 @@
     <div class="item-content item-content-full">
       <div class="muuri-images">
         <div class="image position-relative">
-
+          {# Todo: handle webp. If a webp has the same name as the 3d_model, use it as image for the model until it is loaded. Otherwise, webp will not be displayed #}
           {% if image.render_type == '3d_model' %}
-            <div class="model-wrapper" style="height: 300px; position: relative;">
+            <div class="model-wrapper"
+                 style="height: 300px; position: relative;">
               <div class="spinner"></div>
               <model-viewer
                 src="{{ image.url }}"
@@ -47,17 +48,18 @@
               </model-viewer>
             </div>
 
-          {% elif image.render_type in ['webp', 'image'] %}
-            {% if image.iiif_base_path and image.render_type == 'image'%}
-              <a href="{{ url_for('view_mirador') }}?urls={{ manifests | join(',') | urlencode }}"
-                 target="_blank"
-                 class="{{ base_classes }}"
-                 style="z-index: 10;">
+          {% elif image.render_type == 'image' %}
+            {% if image.iiif_base_path and image.render_type == 'image' %}
+              <a
+                href="{{ url_for('view_mirador') }}?urls={{ image.iiif_manifest | urlencode }}"
+                target="_blank"
+                class="{{ base_classes }}"
+                style="z-index: 10;">
                 <i class="bi bi-arrows-fullscreen"></i>
               </a>
-              <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ alt }}">
+              <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg"
+                   alt="{{ alt }}">
             {% else %}
-              {# Todo: What to do with webp? Own viewer? #}
               <img src="{{ image.url }}" alt="{{ alt }}">
             {% endif %}
 
@@ -68,11 +70,18 @@
                style="z-index: 10;">
               <i class="bi bi-filetype-pdf" style="{{ icon_style }}"></i>
             </a>
-            <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ alt }}">
+            <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg"
+                 alt="{{ alt }}">
+          {% elif image.render_type == 'svg' %}
+            <object type="image/svg+xml"
+                    data="{{ image.url }}"
+                    class="w-100 h-100 border-0"
+                    style="height:300px;">
+            </object>
 
           {% else %}
-            {# fallback for unknown or missing render_type #}
-            <img src="{{ image.url or '/static/img/placeholder.png' }}" alt="{{ alt }}">
+            <img src="{{ image.url or '/static/img/placeholder.png' }}"
+                 alt="{{ alt }}">
           {% endif %}
 
           {% if last %}
@@ -85,6 +94,7 @@
       </div>
     </div>
   </div>
+
 {% endmacro %}
 
 

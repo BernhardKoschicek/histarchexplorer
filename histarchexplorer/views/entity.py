@@ -5,12 +5,10 @@ from typing import Any, Optional
 from flask import abort, g, render_template
 
 from histarchexplorer import app
-from histarchexplorer.api.api_access import ApiAccess
-from histarchexplorer.api.parser import Parser
-from histarchexplorer.database.entity import (
-    check_if_place_hierarchy, get_first_geom)
 from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation)
+from histarchexplorer.database.entity import (
+    check_if_place_hierarchy, get_first_geom)
 from histarchexplorer.utils.view_util import get_cite_button
 from histarchexplorer.views.entities import get_browse_list_entities
 from histarchexplorer.views.views import type_tree
@@ -34,6 +32,8 @@ def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
     images = []
     main_image = None
     for image in files:
+        if image.render_type in ['unknown', 'webp']:
+            continue
         if image.main_image:
             main_image = image
         else:
@@ -80,6 +80,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         'overview_map': json.dumps(overview_map_geometry)}
 
     main_image, initial_images = get_entity_images(entity.files)
+
     match tab_name:
         case 'feature':  # pragma: no cover
             pass
@@ -143,9 +144,9 @@ def check_sidebar_elements(tab: str, id_: int) -> bool:
             return bool(get_first_geom(id_))
         case 'subunits':
             return bool(check_if_place_hierarchy(id_))
-        case 'overview':
+        case 'overview' | 'media':
             return True
-        case 'media' | _:
+        case _:
             return False
 
 

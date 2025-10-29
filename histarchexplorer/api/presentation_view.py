@@ -3,7 +3,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
 
 import requests
-from flask import g
+from flask import g, url_for
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
@@ -347,7 +347,9 @@ class PresentationView:
                     public=f["publicShareable"],
                     url=f.get("url"),
                     mime_type=f.get("mimetype"),
-                    iiif_manifest=f.get("IIIFManifest"),
+                    iiif_manifest=(
+                        f"{f.get('IIIFManifest')}"
+                        f"?url={url_for('index', _external=True)}entity/"),
                     iiif_base_path=f.get("IIIFBasePath"),
                     overlay=f.get('overlay'),
                     main_image=g.main_images.get(entity_id) == f["id"],
@@ -362,7 +364,8 @@ class PresentationView:
             params={
                 'place_hierarchy': 'true',
                 'remove_empty_values': 'true',
-                'centroid': 'true'},
+                'centroid': 'true',
+                'map_overlay': 'true'},
             headers=g.api_headers,
             proxies=PROXIES,
             timeout=30)
