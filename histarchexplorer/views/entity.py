@@ -26,9 +26,6 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
     hierarchy = {
         'subs': get_sub_count(entity),
         'root': get_hierarchy(entity)}
-    for p in hierarchy['root']:
-        print("---")
-        print(p)
     overview_map_geometry = entity.geometry_json
     if not overview_map_geometry:
         if hierarchy.get('root'):
