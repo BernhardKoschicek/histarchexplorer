@@ -1,4 +1,254 @@
 <div id="mymap"></div>
+
+
+<style>
+    .layer-control-ctrl {
+        position: relative;
+    }
+
+    .layer-toggle-btn {
+        background: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+        line-height: 1;
+        text-align: center;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .layer-panel {
+        position: absolute;
+        left: 0;
+        top: 0;
+        background: white;
+        padding: 8px;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        width: 240px;
+        max-height: 80vh;
+        overflow-y: auto;
+        font-size: 13px;
+        z-index: 2;
+    }
+
+    .layer-panel.hidden {
+        display: none;
+    }
+
+    .layer-header {
+        font-weight: bold;
+        margin: 6px 0;
+        cursor: pointer;
+    }
+
+    .layer-sub {
+        margin-left: 10px;
+    }
+
+    .geom-header {
+        font-style: italic;
+        cursor: pointer;
+        color: #333;
+        margin: 3px 0;
+    }
+
+    .geom-sub {
+        margin-left: 10px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .layer-sub input[type=color] {
+        width: 24px;
+        height: 18px;
+        border: none;
+        vertical-align: middle;
+        margin-left: 4px;
+    }
+
+    .layer-close-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: none;
+        border: none;
+        color: #444;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .layer-close-btn:hover {
+        color: #000;
+    }
+
+    .group-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 6px 0;
+        font-weight: bold;
+    }
+
+    .count {
+        font-weight: normal;
+        color: #666;
+        font-size: 12px;
+    }
+
+    .edit-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 0 4px;
+    }
+
+    .edit-btn:hover {
+        color: #000;
+    }
+
+    .edit-menu {
+        margin-left: 20px;
+        margin-top: 4px;
+    }
+
+    .edit-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 3px 0;
+    }
+
+    .edit-item .geom-label {
+        width: 80px;
+        font-size: 13px;
+    }
+
+    .symbol {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+    }
+
+    .group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 0;
+    }
+
+    .edit-btn {
+        background: none;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        line-height: 1;
+        margin-left: 8px;
+    }
+
+    .edit-btn:hover {
+        color: #000;
+    }
+
+    .edit-menu {
+        margin-left: 20px;
+        border-left: 1px solid #ccc;
+        padding-left: 6px;
+        margin-top: 2px;
+        transition: all 0.2s ease;
+    }
+
+    .edit-geom {
+        margin-left: 12px;
+        margin-bottom: 6px;
+    }
+
+    .geom-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+    }
+
+    .geom-header input[type="color"] {
+        margin-left: auto;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+    }
+
+    .layer-list {
+        margin-left: 20px;
+        margin-top: 4px;
+    }
+
+    .layer-item {
+        font-size: 0.9em;
+    }
+
+    .layer-item strong {
+        color: #b30000;
+    }
+
+    .layer-item strong::before {
+        content: "★ ";
+        color: #ff5555;
+    }
+
+    .layer-panel .geom-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+    }
+
+    .layer-panel .geom-toggle {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .layer-panel .geom-header input[type="color"] {
+        margin-left: auto;
+    }
+
+    .geom-header .style-btn .symbol {
+    pointer-events: none;
+    display: inline-block;
+}
+
+
+</style>
 <script> const mapData = (JSON.parse({{ data|tojson }})).spatial</script>
 
 <script src="../../static/js/map.js"></script>
+
+
+<!-- Style Edit Modal -->
+<div class="modal fade" id="styleEditModal" tabindex="-1" aria-labelledby="styleEditLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="styleEditLabel">Edit Style</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="styleEditForm">
+          <div id="styleEditFields"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="styleEditSave">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
