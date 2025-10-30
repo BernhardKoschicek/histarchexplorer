@@ -28,7 +28,7 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
         entity_id=id_)
 
 
-def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
+def get_entity_images(files: list[File]) -> tuple[File, list[File], list[File]]:
     images = []
     main_image = None
     for image in files:
@@ -42,7 +42,8 @@ def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
     if not main_image and images:
         main_image = images.pop(0)
     initial_images = images[:2]
-    return main_image, initial_images
+    images.append(main_image)
+    return main_image, initial_images, images
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
@@ -79,7 +80,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         'entity': entity.to_json(),
         'overview_map': json.dumps(overview_map_geometry)}
 
-    main_image, initial_images = get_entity_images(entity.files)
+    main_image, initial_images, images = get_entity_images(entity.files)
 
     match tab_name:
         case 'feature':  # pragma: no cover
@@ -101,9 +102,9 @@ def get_entity(id_: int, tab_name=None) -> str:
         data=json.dumps(data),
         entity=entity,
         categorized_types=get_categorized_types(entity.types),
+        images=images,
         main_image=main_image,
         initial_images=initial_images,
-        manifests=[img.iiif_manifest for img in entity.files],
         cite_button=get_cite_button(entity),
         hierarchy=hierarchy,
         overview_map_geometry=overview_map_geometry)
