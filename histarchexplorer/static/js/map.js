@@ -514,272 +514,226 @@ class LayerControl {
         };
     }
 
-_buildPanel(panel) {
-    const layerGroups = this._getLayerGroups();
-    const groupNames = Object.keys(layerGroups).sort((a, b) => a === 'this' ? -1 : b === 'this' ? 1 : 0);
+    _buildPanel(panel) {
+        const layerGroups = this._getLayerGroups();
+        const groupNames = Object.keys(layerGroups).sort((a, b) => a === 'this' ? -1 : b === 'this' ? 1 : 0);
 
-    // --- Geometry Groups ---
-    groupNames.forEach(groupName => {
-        const geometries = layerGroups[groupName];
-        const isThisGroup = groupName === 'this';
+        groupNames.forEach(groupName => {
+            const geometries = layerGroups[groupName];
+            const isThisGroup = groupName === 'this';
 
-        let totalCount = 0;
-        ["Polygon", "LineString", "Point"].forEach(geomType => {
-            totalCount += mapData.features.filter(f => f.properties?.class === groupName && f.geometry.type === geomType).length;
-        });
-        if (!isThisGroup && totalCount === 0) return;
+            let totalCount = 0;
+            ["Polygon", "LineString", "Point"].forEach(geomType => {
+                totalCount += mapData.features.filter(f => f.properties?.class === groupName && f.geometry.type === geomType).length;
+            });
+            if (!isThisGroup && totalCount === 0) return;
 
-        const groupDiv = document.createElement('div');
-        groupDiv.className = 'layer-group';
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'layer-group';
+            const visible = Object.values(geometries).flat().some(id => this._isVisible(id));
 
-        const visible = Object.values(geometries).flat().some(id => this._isVisible(id));
+            let label = groupName + 's';
+            label = label[0].toUpperCase() + label.slice(1);
+            if (isThisGroup) label = entity.title;
 
-        let label = groupName + 's';
-        label = label[0].toUpperCase() + label.slice(1);
-        if (isThisGroup) label = entity.title;
+            groupDiv.innerHTML = `
+        <div class="group-header">
+          <label>
+            <input type="checkbox" ${visible ? 'checked' : ''} data-group="${groupName}">
+            ${label.replace(/_/g, ' ')} <span class="count">(${totalCount})</span>
+          </label>
+          <button class="edit-btn" data-group="${groupName}">▶</button>
+        </div>
+        <div class="edit-menu hidden"></div>
+      `;
+            panel.appendChild(groupDiv);
 
-        groupDiv.innerHTML = `
-          <div class="group-header">
-            <label>
-              <input type="checkbox" ${visible ? 'checked' : ''} data-group="${groupName}">
-              ${label.replace(/_/g, ' ')} <span class="count">(${totalCount})</span>
+            const editMenu = groupDiv.querySelector('.edit-menu');
+
+            ["Polygon", "LineString", "Point"].forEach(geomType => {
+                const layers = geometries[geomType] || [];
+                const layerExists = layers.some(id => this.map.getLayer(id));
+                const featureCount = mapData.features.filter(f => f.properties?.class === groupName && f.geometry.type === geomType).length;
+                if (!isThisGroup && featureCount === 0) return;
+
+                let fillColor = '#888', outlineColor = '#000', width = 2, opacity = 1, radius = 8;
+
+                if (geomType === 'Polygon') {
+                    const fillLayerId = layers[0];
+                    const outlineLayerId = geometries['Outline']?.[0];
+                    if (fillLayerId && this.map.getLayer(fillLayerId)) {
+                        fillColor = this.map.getPaintProperty(fillLayerId, 'fill-color') ?? fillColor;
+                        opacity = this.map.getPaintProperty(fillLayerId, 'fill-opacity') ?? opacity;
+                    }
+                    if (outlineLayerId && this.map.getLayer(outlineLayerId)) {
+                        outlineColor = this.map.getPaintProperty(outlineLayerId, 'line-color') ?? outlineColor;
+                        width = this.map.getPaintProperty(outlineLayerId, 'line-width') ?? width;
+                    }
+                } else if (geomType === 'LineString') {
+                    const lineLayerId = layers[0];
+                    if (lineLayerId && this.map.getLayer(lineLayerId)) {
+                        fillColor = this.map.getPaintProperty(lineLayerId, 'line-color') ?? fillColor;
+                        width = this.map.getPaintProperty(lineLayerId, 'line-width') ?? width;
+                        opacity = this.map.getPaintProperty(lineLayerId, 'line-opacity') ?? opacity;
+                    }
+                } else if (geomType === 'Point') {
+                    const pointLayerId = layers[0];
+                    if (pointLayerId && this.map.getLayer(pointLayerId)) {
+                        fillColor = this.map.getPaintProperty(pointLayerId, 'circle-color') ?? fillColor;
+                        outlineColor = this.map.getPaintProperty(pointLayerId, 'circle-stroke-color') ?? outlineColor;
+                        radius = this.map.getPaintProperty(pointLayerId, 'circle-radius') ?? radius;
+                        width = this.map.getPaintProperty(pointLayerId, 'circle-stroke-width') ?? width;
+                        opacity = this.map.getPaintProperty(pointLayerId, 'circle-opacity') ?? opacity;
+                    }
+                }
+
+                const symbol = this._getSymbolForGeom(geomType, fillColor, outlineColor, width, opacity);
+                const geomDiv = document.createElement('div');
+                geomDiv.className = 'edit-geom';
+                geomDiv.innerHTML = `
+          <div class="geom-header d-flex justify-content-between align-items-center">
+            <label class="geom-toggle">
+              <input type="checkbox" ${layerExists ? 'checked' : ''} data-geom="${geomType}" data-group="${groupName}">
+              ${geomType}<span class="geom-count">(${featureCount})</span>
             </label>
-            <button class="edit-btn" data-group="${groupName}">▶</button>
+            <span class="symbol">${symbol}</span>
           </div>
-          <div class="edit-menu hidden"></div>
         `;
-        panel.appendChild(groupDiv);
-
-        const editMenu = groupDiv.querySelector('.edit-menu');
-
-        // Attach toggle button
-        const btn = groupDiv.querySelector('.edit-btn');
-        btn.addEventListener('click', () => {
-            const isOpen = !editMenu.classList.contains('hidden');
-            editMenu.classList.toggle('hidden');
-            btn.textContent = isOpen ? '▶' : '▼';
-        });
-
-        // Populate geometry items
-        ["Polygon", "LineString", "Point"].forEach(geomType => {
-            const layers = geometries[geomType] || [];
-            const layerExists = layers.some(id => this.map.getLayer(id));
-            const featureCount = mapData.features.filter(f => f.properties?.class === groupName && f.geometry.type === geomType).length;
-            if (!isThisGroup && featureCount === 0) return;
-
-            let fillColor = '#888', outlineColor = '#000', width = 2, opacity = 1, radius = 8;
-
-            if (geomType === 'Polygon') {
-                const fillLayerId = layers[0];
-                const outlineLayerId = geometries['Outline']?.[0];
-                if (fillLayerId && this.map.getLayer(fillLayerId)) {
-                    fillColor = this.map.getPaintProperty(fillLayerId, 'fill-color') ?? fillColor;
-                    opacity = this.map.getPaintProperty(fillLayerId, 'fill-opacity') ?? opacity;
-                }
-                if (outlineLayerId && this.map.getLayer(outlineLayerId)) {
-                    outlineColor = this.map.getPaintProperty(outlineLayerId, 'line-color') ?? outlineColor;
-                    width = this.map.getPaintProperty(outlineLayerId, 'line-width') ?? width;
-                }
-            } else if (geomType === 'LineString') {
-                const lineLayerId = layers[0];
-                if (lineLayerId && this.map.getLayer(lineLayerId)) {
-                    fillColor = this.map.getPaintProperty(lineLayerId, 'line-color') ?? fillColor;
-                    width = this.map.getPaintProperty(lineLayerId, 'line-width') ?? width;
-                    opacity = this.map.getPaintProperty(lineLayerId, 'line-opacity') ?? opacity;
-                }
-            } else if (geomType === 'Point') {
-                const pointLayerId = layers[0];
-                if (pointLayerId && this.map.getLayer(pointLayerId)) {
-                    fillColor = this.map.getPaintProperty(pointLayerId, 'circle-color') ?? fillColor;
-                    outlineColor = this.map.getPaintProperty(pointLayerId, 'circle-stroke-color') ?? outlineColor;
-                    radius = this.map.getPaintProperty(pointLayerId, 'circle-radius') ?? radius;
-                    width = this.map.getPaintProperty(pointLayerId, 'circle-stroke-width') ?? width;
-                    opacity = this.map.getPaintProperty(pointLayerId, 'circle-opacity') ?? opacity;
-                }
-            }
-
-            const symbol = this._getSymbolForGeom(geomType, fillColor, outlineColor, width, opacity);
-            const geomDiv = document.createElement('div');
-            geomDiv.className = 'edit-geom';
-            geomDiv.innerHTML = `
-              <div class="geom-header d-flex justify-content-between align-items-center">
-                <label class="geom-toggle">
-                  <input type="checkbox" ${layerExists ? 'checked' : ''} data-geom="${geomType}" data-group="${groupName}">
-                  ${geomType}<span class="geom-count">(${featureCount})</span>
-                </label>
-                <span class="symbol">${symbol}</span>
-              </div>
-            `;
-            editMenu.appendChild(geomDiv);
-        });
-    });
-
-    // --- Images Section ---
-    const imagesGroup = document.createElement('div');
-    imagesGroup.className = 'layer-group images';
-
-    imagesGroup.innerHTML = `
-      <div class="group-header">
-        <label>
-          <input type="checkbox" checked data-group="images">
-          Images
-        </label>
-        <button class="edit-btn" title="Show images">▶</button>
-      </div>
-      <div class="edit-menu hidden" id="legend-images"></div>
-    `;
-
-    panel.appendChild(imagesGroup);
-
-    // Attach toggle for images
-    const imagesHeaderBtn = imagesGroup.querySelector('.edit-btn');
-    const imagesMenu = imagesGroup.querySelector('.edit-menu');
-    imagesHeaderBtn.addEventListener('click', () => {
-        const isOpen = !imagesMenu.classList.contains('hidden');
-        imagesMenu.classList.toggle('hidden');
-        imagesHeaderBtn.textContent = isOpen ? '▶' : '▼';
-    });
-
-    // Panel-level checkbox handlers
-    panel.addEventListener('change', (e) => this._handleCheckboxChange(e));
-    panel.addEventListener('click', (e) => this._handleClick(e));
-}
-
-
-    // --- New: Add "Images" Section Dynamically ---
-addImageLegendEntry(img) {
-    if (!this.container) return;
-
-    let imageGroup = this.container.querySelector('.layer-group.images');
-
-    if (!imageGroup) {
-        imageGroup = document.createElement('div');
-        imageGroup.className = 'layer-group images';
-        imageGroup.innerHTML = `
-            <div class="group-header">
-                <label>
-                    <input type="checkbox" class="group-checkbox" checked data-group="images">
-                    Images
-                </label>
-                <button class="edit-btn">▶</button>
-            </div>
-            <div class="group-content hidden" style="margin-left:1rem;"></div>
-        `;
-        this.container.appendChild(imageGroup);
-
-        // Checkbox toggle for all children
-        const parentCheckbox = imageGroup.querySelector('.group-checkbox');
-        parentCheckbox.addEventListener('change', (e) => {
-            const checked = e.target.checked;
-            imageGroup.querySelectorAll('input[data-layer]').forEach(cb => {
-                cb.checked = checked;
-                const layerId = cb.dataset.layer;
-                if (this.map.getLayer(layerId)) {
-                    this.map.setLayoutProperty(layerId, 'visibility', checked ? 'visible' : 'none');
-                }
+                editMenu.appendChild(geomDiv);
             });
         });
 
-        // Arrow toggle
-        const editBtn = imageGroup.querySelector('.edit-btn');
-        const content = imageGroup.querySelector('.group-content');
-        editBtn.addEventListener('click', () => {
-            const isOpen = !content.classList.contains('hidden');
-            content.classList.toggle('hidden');
-            editBtn.textContent = isOpen ? '▶' : '▼';
+        const imagesSection = document.createElement('div');
+        imagesSection.className = 'legend-group';
+        imagesSection.innerHTML = `
+              <div class="legend-group-header">Images</div>
+              <div class="legend-group-content" id="legend-images"></div>
+            `;
+        panel.appendChild(imagesSection);
+
+        const imagesGroup = document.createElement('div');
+        imagesGroup.className = 'layer-group';
+
+        const imagesHeader = document.createElement('div');
+        imagesHeader.className = 'group-header';
+        imagesHeader.innerHTML = `
+          <label>
+            <input type="checkbox" checked data-group="images">
+            Images
+          </label>
+          <button class="edit-btn" title="Show images">▶</button>
+        `;
+
+        imagesGroup.appendChild(imagesHeader);
+
+        const imagesMenu = document.createElement('div');
+        imagesMenu.className = 'edit-menu hidden';
+        imagesMenu.id = 'legend-images'; // container for individual image entries
+        imagesGroup.appendChild(imagesMenu);
+
+        panel.appendChild(imagesGroup);
+
+// Event listener to toggle the collapsible menu
+        imagesHeader.querySelector('.edit-btn').addEventListener('click', () => {
+            const isOpen = !imagesMenu.classList.contains('hidden');
+            imagesMenu.classList.toggle('hidden');
+            imagesHeader.querySelector('.edit-btn').textContent = isOpen ? '▶' : '▼';
         });
+
+        panel.addEventListener('change', (e) => this._handleCheckboxChange(e));
+        panel.addEventListener('click', (e) => this._handleClick(e));
     }
 
-    const itemsContainer = imageGroup.querySelector('.group-content');
-    const layerId = `image_layer_${img.id}`;
-    const opacity = 0.9;
+    // --- New: Add "Images" Section Dynamically ---
+    addImageLegendEntry(img) {
+        if (!this.container) return;
+        let imageGroup = this.container.querySelector('.layer-group.images');
+        if (!imageGroup) {
+            imageGroup = document.createElement('div');
+            imageGroup.className = 'layer-group images';
+            imageGroup.innerHTML = `
+        <div class="group-header">
+          <label>
+            <input type="checkbox" class="group-checkbox" checked data-group="images">
+            Images
+          </label>
+        </div>
+        <div class="group-content" style="margin-left:1rem;"></div>
+      `;
+            this.container.appendChild(imageGroup);
 
-    const item = document.createElement('div');
-    item.className = 'legend-item d-flex align-items-center justify-content-between my-1';
-    item.innerHTML = `
-        <label class="d-flex align-items-center gap-2 flex-grow-1">
-            <input type="checkbox" checked data-layer="${layerId}">
-            <span>${img.name || 'Image ' + img.id}</span>
-        </label>
-        <input type="range" min="0" max="1" step="0.05" value="${opacity}" data-opacity="${layerId}" style="width:80px;">
+            const parentCheckbox = imageGroup.querySelector('.group-checkbox');
+            parentCheckbox.addEventListener('change', (e) => {
+                const checked = e.target.checked;
+                imageGroup.querySelectorAll('input[data-layer]').forEach(cb => {
+                    cb.checked = checked;
+                    const layerId = cb.dataset.layer;
+                    if (this.map.getLayer(layerId)) {
+                        this.map.setLayoutProperty(layerId, 'visibility', checked ? 'visible' : 'none');
+                    }
+                });
+            });
+        }
+
+        const itemsContainer = imageGroup.querySelector('.group-content');
+        const layerId = `image_layer_${img.id}`;
+        const opacity = 0.9;
+
+        const item = document.createElement('div');
+        item.className = 'legend-item d-flex align-items-center justify-content-between my-1';
+        item.innerHTML = `
+      <label class="d-flex align-items-center gap-2 flex-grow-1">
+        <input type="checkbox" checked data-layer="${layerId}">
+        <span>${img.name || 'Image ' + img.id}</span>
+      </label>
+      <input type="range" min="0" max="1" step="0.05" value="${opacity}" data-opacity="${layerId}" style="width:80px;">
     `;
-    itemsContainer.appendChild(item);
+        itemsContainer.appendChild(item);
 
-    const checkbox = item.querySelector('input[data-layer]');
-    checkbox.addEventListener('change', (e) => {
-        const visible = e.target.checked ? 'visible' : 'none';
-        if (this.map.getLayer(layerId)) this.map.setLayoutProperty(layerId, 'visibility', visible);
-    });
-
-    const slider = item.querySelector('input[data-opacity]');
-    slider.addEventListener('input', (e) => {
-        const val = parseFloat(e.target.value);
-        if (this.map.getLayer(layerId)) this.map.setPaintProperty(layerId, 'raster-opacity', val);
-    });
-}
-
-
-_handleCheckboxChange(e) {
-    const target = e.target;
-    if (target.type !== 'checkbox') return;
-
-    const group = target.dataset.group;
-    const geom = target.dataset.geom;
-    const layerGroups = this._getLayerGroups();
-
-    if (group === 'images') {
-        // Special case for Images group
-        const checked = target.checked;
-        this.container.querySelectorAll('input[data-layer]').forEach(cb => {
-            cb.checked = checked;
-            const layerId = cb.dataset.layer;
-            if (this.map.getLayer(layerId)) {
-                this.map.setLayoutProperty(layerId, 'visibility', checked ? 'visible' : 'none');
-            }
+        const checkbox = item.querySelector('input[data-layer]');
+        checkbox.addEventListener('change', (e) => {
+            const visible = e.target.checked ? 'visible' : 'none';
+            if (this.map.getLayer(layerId)) this.map.setLayoutProperty(layerId, 'visibility', visible);
         });
-        return;
+
+        const slider = item.querySelector('input[data-opacity]');
+        slider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (this.map.getLayer(layerId)) this.map.setPaintProperty(layerId, 'raster-opacity', val);
+        });
     }
 
-    if (group && !geom) {
-        // Parent checkbox toggled → toggle all children
-        ["Polygon", "LineString", "Point"].forEach(childGeom => {
-            const layersToToggle = (childGeom === 'Polygon')
-                ? [...(layerGroups[group]['Polygon'] || []), ...(layerGroups[group]['Outline'] || [])]
-                : layerGroups[group][childGeom] || [];
+    _handleCheckboxChange(e) {
+        const target = e.target;
+        if (target.type !== 'checkbox') return;
+        const group = target.dataset.group;
+        const geom = target.dataset.geom;
+        const layerGroups = this._getLayerGroups();
 
-            layersToToggle.forEach(id => {
+        if (group && !geom) {
+            ["Polygon", "LineString", "Point"].forEach(childGeom => {
+                const layers = (childGeom === 'Polygon')
+                    ? [...(layerGroups[group]['Polygon'] || []), ...(layerGroups[group]['Outline'] || [])]
+                    : layerGroups[group][childGeom];
+                layers.forEach(id => {
+                    if (this.map.getLayer(id)) {
+                        this.map.setLayoutProperty(id, 'visibility', target.checked ? 'visible' : 'none');
+                    }
+                });
+                const childCb = this.container.querySelector(`input[data-group="${group}"][data-geom="${childGeom}"]`);
+                if (childCb) childCb.checked = target.checked;
+            });
+        } else if (group && geom) {
+            const layers = (geom === 'Polygon')
+                ? [...(layerGroups[group]['Polygon'] || []), ...(layerGroups[group]['Outline'] || [])]
+                : layerGroups[group][geom];
+            layers.forEach(id => {
                 if (this.map.getLayer(id)) {
                     this.map.setLayoutProperty(id, 'visibility', target.checked ? 'visible' : 'none');
                 }
             });
-
-            const childCheckbox = this.container.querySelector(`input[data-group="${group}"][data-geom="${childGeom}"]`);
-            if (childCheckbox) childCheckbox.checked = target.checked;
-        });
-    } else if (group && geom) {
-        // Child checkbox toggled → toggle layer
-        const layersToToggle = (geom === 'Polygon')
-            ? [...(layerGroups[group]['Polygon'] || []), ...(layerGroups[group]['Outline'] || [])]
-            : layerGroups[group][geom] || [];
-
-        layersToToggle.forEach(id => {
-            if (this.map.getLayer(id)) {
-                this.map.setLayoutProperty(id, 'visibility', target.checked ? 'visible' : 'none');
-            }
-        });
-
-        // Update parent checkbox
-        const parentCheckbox = this.container.querySelector(`input[data-group="${group}"]:not([data-geom])`);
-        if (parentCheckbox) {
-            const childCheckboxes = Array.from(this.container.querySelectorAll(`input[data-group="${group}"][data-geom]`));
-            const allChecked = childCheckboxes.every(cb => cb.checked);
-            const noneChecked = childCheckboxes.every(cb => !cb.checked);
-            parentCheckbox.checked = allChecked;
-            parentCheckbox.indeterminate = !allChecked && !noneChecked;
         }
     }
-};
-
 
     _handleClick(e) {
         const btn = e.target.closest('.edit-btn');
