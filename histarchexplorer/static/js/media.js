@@ -1,5 +1,5 @@
 // ======== INITIALIZATION ========
-(() =>  {
+(() => {
   const container = document.querySelector(".grid-media");
   const filterBar = document.getElementById("media-filters");
   const data = window.entityData || entityData;
@@ -13,42 +13,48 @@
     return;
   }
 
-  const images = data.entity.files;
-  console.log("Found images:", images.length);
+  const files = data.entity.files;
+  console.log("Found media files:", files.length);
 
-  // Build media grid dynamically
-  images.forEach(image => {
-    const item = createMediaItem(image);
+  // --- Step 1: Create a map of webp posters by ID ---
+  const posterMap = {};
+  files
+    .filter(f => f.render_type === "webp" && f.title)
+    .forEach(f => {
+      posterMap[f.title] = f.url;
+    });
+
+  console.log("Poster map:", posterMap);
+
+  // --- Step 2: Filter out webp files from rendering ---
+  const visibleFiles = files.filter(f => f.render_type !== "webp");
+
+  // --- Step 3: Build media grid dynamically ---
+  visibleFiles.forEach(image => {
+    const item = createMediaItem(image, posterMap);
     item.dataset.renderType = image.render_type || "unknown";
     container.appendChild(item);
   });
 
-  // Initialize Muuri layout
+  // --- Step 4: Initialize Muuri layout ---
   window.mediaGrid = new Muuri(".grid-media", {
-    layout: { fillGaps: true }
+    layout: { fillGaps: true },
   });
 
   setTimeout(() => window.mediaGrid.refreshItems().layout(), 500);
 
-  // Setup filters
-  if (filterBar) {
-    initFilterBar(filterBar, images);
-  }
-
-  // Setup 3D model spinner handling
+  // --- Step 5: Initialize helpers ---
+  if (filterBar) initFilterBar(filterBar, visibleFiles);
   handleModelViewers();
-
-  // Setup Bootstrap popovers
   initPopovers();
-
-  // Setup “More images” button linking
   initMoreImagesButton();
 })();
 
 
 
+
 // ======== CREATE MEDIA ITEM ========
-function createMediaItem(image) {
+function createMediaItem(image, posterMap) {
   const alt = image.title || "Image";
 
   const item = document.createElement("div");
@@ -69,7 +75,7 @@ function createMediaItem(image) {
   // --- Media type switch ---
   switch (image.render_type) {
     case "3d_model":
-      imageDiv.appendChild(create3DModel(image, alt));
+      imageDiv.appendChild(create3DModel(image, alt, posterMap));
       break;
     case "video":
       imageDiv.appendChild(createVideo(image, alt));
@@ -126,19 +132,32 @@ function createMediaItem(image) {
 
 // ======== HELPERS FOR EACH MEDIA TYPE ========
 
-function create3DModel(image, alt) {
+function create3DModel(image, alt, posterMap = {}) {
   const wrapper = document.createElement("div");
   wrapper.className = "model-wrapper";
   wrapper.style = "height:300px;position:relative;";
+
+  // Match by same file ID
+  const poster = posterMap[image.title] || "";
   wrapper.innerHTML = `
     <div class="spinner"></div>
-    <model-viewer src="${image.url}" alt="${alt}" camera-controls
-      ar ar-modes="webxr scene-viewer quick-look"
-      shadow-intensity="1" autoplay
-      style="width:100%;height:100%;"></model-viewer>
+    <model-viewer
+      src="${image.url}"
+      alt="${alt}"
+      ${poster ? `poster="${poster}"` : ""}
+      camera-controls
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      shadow-intensity="1"
+      autoplay
+      style="width:100%;height:100%;">
+    </model-viewer>
   `;
+
   return wrapper;
 }
+
+
 
 function createVideo(image) {
   const wrapper = document.createElement("div");
