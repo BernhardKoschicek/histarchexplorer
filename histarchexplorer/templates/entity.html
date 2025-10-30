@@ -6,8 +6,7 @@
 
         const tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
         const entityId = {{ entity_id }};
-        const data = {{ data|tojson }};
-        console.log(data)
+        const entityData = {{ data|tojson }};
         {% if entity_id == 0 %}
             const typeTreeData = {{ typetree_data|tojson}};
             const viewClasses = {{ view_classes|tojson }};
@@ -17,7 +16,7 @@
                 return data.entities.filter(entity => validClasses.includes(entity.class));
             }
 
-            data.entities.forEach(entity => {
+            entityData.entities.forEach(entity => {
                 entity.beginDBP = calculateTimeBP(entity.begin);
                 entity.endDBP = calculateTimeBP(entity.end);
                 if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
