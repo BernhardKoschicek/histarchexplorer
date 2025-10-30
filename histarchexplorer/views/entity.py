@@ -276,3 +276,41 @@ def get_sub_count(main_entity: PresentationView) -> int:
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
         count += len(main_entity.relations.get(rel_type, []))
     return count
+
+
+def get_files_for_id(id:int) -> dict[str, list[str]]:
+    sql="""
+    
+    SELECT JSONB_AGG(
+           jsonb_build_object(
+               'id', a.id,
+               'name', a.name,
+               'description', a.description,
+               'bbox', a.bounding_box::JSONB
+           )
+       ) AS images
+    FROM (
+        SELECT e.id,
+               e.name,
+               e.description,
+               o.image_id,
+               o.bounding_box 
+        FROM model.entity e
+                 JOIN model.link l ON e.id = l.domain_id
+                 JOIN web.map_overlay o ON o.image_id = e.id
+        WHERE e.openatlas_class_name = 'file'
+          AND l.range_id = %(id)s
+          AND l.property_code = 'P67'
+    ) a;
+    """
+
+    g.cursor.execute(sql, {'id': id})
+    result = g.cursor.fetchone()
+    return result
+
+
+
+
+@app.route('/get_rastermaps/<int:id>')
+def get_rastermaps(id: int) -> str:
+    return json.dumps(get_files_for_id(id))
