@@ -25,7 +25,7 @@ def view_media(render_type: str, id_: int, origin_id: Optional[int] = None):
     back_url = None
     if origin_id:
         back_url = url_for('entity_view', tab_name='media', id_=origin_id)
-
+    # IIIF don't use manifest url, but get it per API call or existing data
     match render_type:
         case 'image':
             template = render_template(
@@ -38,11 +38,28 @@ def view_media(render_type: str, id_: int, origin_id: Optional[int] = None):
                 file_id=id_,
                 file_url=f"{app.config['API_URL']}display/{id_}",
                 back_url=back_url)
+        case 'video':
+            template = render_template(
+                'media/video.html',
+                file_id=id_,
+                file_url=f"{app.config['API_URL']}display/{id_}",
+                back_url=back_url)
+        case 'pdf':
+            return render_template(
+                "media/pdf.html",
+                file_id=id_,
+                file_url=f"{app.config['API_URL']}display/{id_}",
+                back_url=back_url)
+        case 'svg':
+            return render_template(
+                "media/svg.html",
+                file_id=id_,
+                file_url=f"{app.config['API_URL']}display/{id_}",
+                back_url=back_url)
         case _:
             template = f"Unsupported render type: {render_type}", 400
 
     return template
-
 
 # "video": {color: "#118ab2", icon: "bi-play-btn-fill"},
 # "pdf": {color: "#ef476f", icon: "bi-filetype-pdf"},
