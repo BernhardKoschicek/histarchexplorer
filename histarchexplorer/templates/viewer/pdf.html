@@ -10,14 +10,24 @@
           <div class="pdf-viewer-wrapper position-relative w-100"
                style="height: 90vh;">
             <iframe id="mainPdf"
-                    src="{{ file_url }}"
                     class="w-100 h-100 rounded shadow border-0"
                     style="background-color: #fff;"></iframe>
+
+            <!-- ✅ Toolbox -->
+            <div id="toolbox"
+                 class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+              <button class="btn btn-light btn-sm" id="btn-info"
+                      title="Show information">
+                <i class="bi bi-info-circle"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
   <script src="{{ url_for('static', filename='js/viewer/pdf.js') }}"></script>
+  <script
+    src="{{ url_for('static', filename='js/viewer/viewer_info.js') }}"></script>
 
 {% endblock %}

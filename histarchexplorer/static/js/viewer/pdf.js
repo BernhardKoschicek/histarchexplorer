@@ -17,6 +17,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     iframe.addEventListener("load", () => spinner?.remove());
     setTimeout(() => spinner?.remove(), 5000);
 
+    // Info button
+    document.getElementById("btn-info").addEventListener("click", () => {
+      createInfoOverlay(viewEntity, file_data);
+    });
+
   } catch (err) {
     console.error("PDF load error:", err);
     spinner?.remove();

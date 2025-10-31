@@ -47,6 +47,10 @@
                       title="Toggle Background">
                 <i class="bi bi-square-half"></i>
               </button>
+              <button class="btn btn-light btn-sm" id="btn-info"
+                      title="Show information">
+                <i class="bi bi-info-circle"></i>
+              </button>
               <button class="btn btn-light btn-sm" id="btn-download"
                       title="Download Model">
                 <i class="bi bi-download"></i>
@@ -60,5 +64,6 @@
 
   <script
     src="{{ url_for('static', filename='js/viewer/3d_model.js') }}"></script>
+<script src="{{ url_for('static', filename='js/viewer/viewer_info.js') }}"></script>
 
 {% endblock %}

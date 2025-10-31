@@ -41,6 +41,10 @@
                       title="Fullscreen">
                 <i class="bi bi-arrows-fullscreen"></i>
               </button>
+              <button class="btn btn-light btn-sm" id="btn-info"
+                      title="Show information">
+                <i class="bi bi-info-circle"></i>
+              </button>
               <button class="btn btn-light btn-sm" id="btn-download"
                       title="Download Video">
                 <i class="bi bi-download"></i>
@@ -54,4 +58,5 @@
 
   <script
     src="{{ url_for('static', filename='js/viewer/video.js') }}"></script>
+<script src="{{ url_for('static', filename='js/viewer/viewer_info.js') }}"></script>
 {% endblock %}

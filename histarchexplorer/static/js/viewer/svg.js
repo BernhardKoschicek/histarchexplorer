@@ -41,6 +41,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       a.click();
     });
 
+    // Info button
+    document.getElementById("btn-info").addEventListener("click", () => {
+      createInfoOverlay(viewEntity, file_data);
+    });
+
   } catch (err) {
     console.error("SVG load error:", err);
     spinner?.remove();

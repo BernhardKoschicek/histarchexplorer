@@ -64,6 +64,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       a.click();
     });
 
+    // Info button
+    document.getElementById("btn-info").addEventListener("click", () => {
+      createInfoOverlay(viewEntity, file_data);
+    });
+
+
   } catch (err) {
     console.error("Video load error:", err);
     const container = document.querySelector(".video-viewer-wrapper");

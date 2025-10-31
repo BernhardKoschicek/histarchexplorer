@@ -25,6 +25,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btnBg = document.getElementById("btn-bg");
     const btnDownload = document.getElementById("btn-download");
 
+    // Info button
+    document.getElementById("btn-info").addEventListener("click", () => {
+      createInfoOverlay(viewEntity, file_data);
+    });
+
     // Reset camera
     btnReset.addEventListener("click", () => {
       viewer.cameraOrbit = "0deg 75deg auto";

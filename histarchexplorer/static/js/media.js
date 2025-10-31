@@ -144,18 +144,9 @@ function createMediaItem(image, posterMap) {
   viewBtn.addEventListener("click", () => {
     const originId = window.entityData?.entity?.id;
     const type = image.render_type;
-    let url = `/view/${type}/${image.id}/${originId || ''}`;
+    let url = `/view/${type}/${image.id}`;
 
-    // If it's an IIIF image, attach the manifest URL
-    if (type === "image" && image.iiif_manifest) {
-      const encodedManifest = encodeURIComponent(image.iiif_manifest);
-      url += `?manifest=${encodedManifest}`;
-    }
-
-    window.open(
-      url,
-    //  "_blank"
-    );
+    window.open(url);
   });
 
   imageDiv.appendChild(viewBtn);
