@@ -130,8 +130,8 @@ function addLayers() {
             id: 'feature-polygon',
             type: 'fill',
             source: 'feature-data',
-            color: '#57C4C4',
-            opacity: 0.6,
+            color: '#ffffff',
+            opacity: 1,
             filterType: 'Polygon',
             systemClass: 'feature'
         },
@@ -340,7 +340,6 @@ function addLayers() {
     highlightFeatures();
 }
 
-
 const mapVectorLayers = ['feature-polygon', 'feature-points', 'feature-linestring', 'stratigraphic-unit-polygon', 'stratigraphic-unit-points', 'stratigraphic-unit-linestring', 'entity-polygon', 'entity-linestring', 'entity-points',
     'artifact-polygon', 'artifact-linestring', 'artifact-points', 'human-remains-polygon', 'human-remains-linestring', 'human-remains-points']
 
@@ -410,11 +409,11 @@ function showPopup(lngLat, featureNames) {
     document.querySelectorAll(".map-popup-hoverlink").forEach(button => {
         button.addEventListener("mouseenter", () => {
             const featureId = parseInt(button.getAttribute("data-id"));
-            highlightFeatures([featureId]); // Call the function with the feature ID
+            highlightFeatures([featureId]);
         });
 
         button.addEventListener("mouseleave", () => {
-            highlightFeatures(featureIds); // Optionally remove the highlight when mouse leaves
+            highlightFeatures(featureIds);
 
         });
     })
@@ -446,7 +445,6 @@ class LayerControl {
         panel.className = 'layer-panel';
         this.container.appendChild(panel);
 
-        // open by default
         panel.classList.remove('hidden');
         button.style.display = 'none';
 
@@ -469,7 +467,6 @@ class LayerControl {
         return this.container;
     }
 
-    // your predefined layer groups
     _getLayerGroups() {
         return {
             this: {
@@ -543,9 +540,7 @@ class LayerControl {
             groupDiv.className = 'layer-group';
             const visible = Object.values(geometries).flat().some(id => this._isVisible(id));
 
-
             label = label[0].toUpperCase() + label.slice(1);
-
 
             groupDiv.innerHTML = `
         <div class="group-header">
@@ -615,13 +610,13 @@ class LayerControl {
         `;
                 if (featureCount > 0) editMenu.appendChild(geomDiv);
             });
-                                Sortable.create(editMenu, {
-                        handle: '.geom-header', // Drag by geometry header
-                        animation: 150,
-                        onEnd: (evt) => {
-                            this._updateMapLayerOrder();
-                        }
-                    });
+            Sortable.create(editMenu, {
+                handle: '.geom-header label',
+                animation: 150,
+                onEnd: (evt) => {
+                    this._updateMapLayerOrder();
+                }
+            });
         });
 
         const imagesGroup = document.createElement('div');
@@ -645,130 +640,92 @@ class LayerControl {
 
         imagesGroup.appendChild(imagesHeader);
 
-// ✅ The real working legend container
         const imagesMenu = document.createElement('div');
         imagesMenu.className = 'edit-menu';
-        imagesMenu.id = 'legend-images'; // This is where addRasterMaps() appends items
+        imagesMenu.id = 'legend-images';
         imagesGroup.appendChild(imagesMenu);
 
-        panel.appendChild(imagesGroup);
+        Sortable.create(imagesMenu, {
+            handle: ' .image-legend-item label',
+            animation: 150,
+            onEnd: () => {
+                this._updateMapLayerOrder();
+            }
+        });
 
+        panel.appendChild(imagesGroup);
 
         imagesMenu.classList.add('hidden');
         imagesHeader.querySelector('.edit-btn').textContent = '▶';
 
-
         const toggleBtn = imagesHeader.querySelector('.edit-btn');
         toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // prevent event bubbling to parent groups
-            const imagesMenu = imagesHeader.nextElementSibling; // select the actual menu
+            e.stopPropagation();
+            const imagesMenu = imagesHeader.nextElementSibling;
             if (!imagesMenu) return;
             const isHidden = imagesMenu.classList.toggle('hidden');
             toggleBtn.textContent = isHidden ? '▶' : '▼';
         });
 
-
         panel.addEventListener('change', (e) => this._handleCheckboxChange(e));
         panel.addEventListener('click', (e) => this._handleClick(e));
 
         Sortable.create(panel, {
-            handle: '.group-header', // Drag by the header
+            handle: '.group-header label',
             animation: 150,
             onEnd: (evt) => {
                 this._updateMapLayerOrder();
             }
         });
-
     }
 
     _updateMapLayerOrder() {
-        const panel = this.container.querySelector('.layer-panel');
+        if (!this.map) return;
+
         const layerGroups = this._getLayerGroups();
+        const panel = this.container.querySelector('.layer-panel');
+        if (!panel) return;
 
-        // Iterate over groups in DOM order (top to bottom)
-        panel.querySelectorAll('.layer-group').forEach(groupDiv => {
-            const groupName = groupDiv.querySelector('input[type="checkbox"]').dataset.group;
-            const editMenu = groupDiv.querySelector('.edit-menu');
+        const orderedLayerIds = [];
 
-            // Collect child layers in DOM order
-            const layerIds = [];
-            editMenu.querySelectorAll('input[data-geom]').forEach(cb => {
-                const geom = cb.dataset.geom;
-                const layers = (geom === 'Polygon')
-                    ? [...(layerGroups[groupName]['Polygon'] || []), ...(layerGroups[groupName]['Outline'] || [])]
-                    : layerGroups[groupName][geom];
-                layerIds.push(...layers);
-            });
+        const groups = panel.querySelectorAll('.layer-group');
+        groups.forEach(group => {
+            const groupName = group.querySelector('.group-header input[type="checkbox"]')?.dataset.group;
+            if (!groupName) return;
 
-            // Move each layer on map from bottom to top
-            layerIds.forEach((layerId, idx) => {
-                if (this.map.getLayer(layerId)) {
-                    // Move layer above the next layer in array, or top if last
-                    const nextLayer = layerIds[idx + 1] || undefined;
-                    this.map.moveLayer(layerId, nextLayer);
-                }
-            });
-        });
-    }
-
-    // --- New: Add "Images" Section Dynamically ---
-    addImageLegendEntry(img) {
-        if (!this.container) return;
-        let imageGroup = this.container.querySelector('.layer-group.images');
-        if (!imageGroup) {
-            imageGroup = document.createElement('div');
-            imageGroup.className = 'layer-group images';
-            imageGroup.innerHTML = `
-        <div class="group-header">
-          <label>
-            <input type="checkbox" class="group-checkbox" checked data-group="images">
-            Images
-          </label>
-        </div>
-        <div class="group-content" style="margin-left:1rem;"></div>
-      `;
-            this.container.appendChild(imageGroup);
-
-            const parentCheckbox = imageGroup.querySelector('.group-checkbox');
-            parentCheckbox.addEventListener('change', (e) => {
-                const checked = e.target.checked;
-                imageGroup.querySelectorAll('input[data-layer]').forEach(cb => {
-                    cb.checked = checked;
-                    const layerId = cb.dataset.layer;
-                    if (this.map.getLayer(layerId)) {
-                        this.map.setLayoutProperty(layerId, 'visibility', checked ? 'visible' : 'none');
-                    }
+            if (groupName === 'images') {
+                const imageItems = group.querySelectorAll('[data-layer]');
+                imageItems.forEach(imgItem => {
+                    const layerId = imgItem.dataset.layer;
+                    if (layerId && this.map.getLayer(layerId)) orderedLayerIds.push(layerId);
                 });
+                return;
+            }
+
+            const geoms = group.querySelectorAll('.edit-geom');
+            geoms.forEach(geomDiv => {
+                const geom = geomDiv.querySelector('.geom-header input[type="checkbox"]')?.dataset.geom;
+                if (!geom || !layerGroups[groupName]) return;
+
+                let ids = [];
+                if (geom === 'Polygon') {
+                    const fillIds = layerGroups[groupName]['Polygon'] || [];
+                    const outlineIds = layerGroups[groupName]['Outline'] || [];
+                    ids = [...outlineIds, ...fillIds];
+                } else {
+                    ids = layerGroups[groupName][geom] || [];
+                }
+
+                ids.forEach(id => this.map.getLayer(id) && orderedLayerIds.push(id));
             });
+        });
+
+        console.log("Computed layer order (legend top → bottom):", orderedLayerIds);
+
+        for (let i = orderedLayerIds.length - 1; i >= 0; i--) {
+            const layerId = orderedLayerIds[i];
+            if (this.map.getLayer(layerId)) this.map.moveLayer(layerId);
         }
-
-        const itemsContainer = imageGroup.querySelector('.group-content');
-        const layerId = `image_layer_${img.id}`;
-        const opacity = 0.9;
-
-        const item = document.createElement('div');
-        item.className = 'legend-item d-flex align-items-center justify-content-between my-1';
-        item.innerHTML = `
-              <label class="d-flex align-items-center gap-2 flex-grow-1">
-                <input type="checkbox" checked data-layer="${layerId}">
-                <span>${img.name || 'Image ' + img.id}</span>
-              </label><br>
-              <input type="range" min="0" max="1" step="0.05" value="${opacity}" data-opacity="${layerId}" style="width:80px;">
-            `;
-        itemsContainer.appendChild(item);
-
-
-        const checkbox = item.querySelector('input[data-layer]');
-        checkbox.addEventListener('change', (e) => {
-            const visible = e.target.checked ? 'visible' : 'none';
-            if (this.map.getLayer(layerId)) this.map.setLayoutProperty(layerId, 'visibility', visible);
-        });
-
-        const slider = item.querySelector('input[data-opacity]');
-        slider.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            if (this.map.getLayer(layerId)) this.map.setPaintProperty(layerId, 'raster-opacity', val);
-        });
     }
 
     _handleCheckboxChange(e) {
@@ -787,7 +744,7 @@ class LayerControl {
                     this.map.setLayoutProperty(layerId, 'visibility', target.checked ? 'visible' : 'none');
                 }
             });
-            return; // stop further processing
+            return;
         }
 
         if (group && !geom) {
@@ -946,7 +903,6 @@ class LayerControl {
             });
         }
 
-        // Update legend symbol
         const symbolEl = this.container.querySelector(`.symbol[data-group="${group}"][data-geom="${geom}"]`);
         if (symbolEl) {
             if (geom === 'Point') symbolEl.innerHTML = this._getSymbolForGeom(geom, fillColor, outlineColor, radius, opacity);
@@ -1038,16 +994,14 @@ class LayerControl {
     }
 }
 
-
 function setSidebarContent(id, mode = 'toggle') {
     if (!rightSidebarcontent.map.opened) {
         toggleRightSidebar('map', 'open');
         rightSidebarcontent.map.opened = true
     }
-    const startTime = performance.now(); // Start timing
+    const startTime = performance.now();
     const contentDiv = document.getElementById('right-sidebar');
 
-    // Show a centered Bootstrap spinner
     contentDiv.innerHTML = `
         <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
             <div class="spinner-border text-secondary" role="status">
@@ -1072,7 +1026,6 @@ function setSidebarContent(id, mode = 'toggle') {
 
             contentDiv.innerHTML = updatedHtml;
 
-
         })
         .catch(error => {
             console.error("Error loading right sidebar content:", error);
@@ -1082,10 +1035,8 @@ function setSidebarContent(id, mode = 'toggle') {
 
 
 document.getElementById('tab-map').addEventListener('click', function (event) {
-    //console.log('map clicked')
     if (notYetClickedTabs.includes('map') && !onePointFeature) {
         setTimeout(() => {
-            //console.log('map clicked for the first time');
             notYetClickedTabs = notYetClickedTabs.filter(item => item !== 'map');
             map.fitBounds(bounds, {padding: 200});
         }, 300);
@@ -1116,7 +1067,6 @@ async function addImageToMap(map, img, maxSize = 2048) {
     if (coords.length === 2) {
         coordinates = getNormalizedCorners(coords);
     } else if (coords.length === 3) {
-        // Rotiertes Overlay (3 Punkte)
         const topLeft = [coords[0][1], coords[0][0]];
         const topRight = [coords[1][1], coords[1][0]];
         const bottomLeft = [coords[2][1], coords[2][0]];
@@ -1152,11 +1102,11 @@ async function addImageToMap(map, img, maxSize = 2048) {
         const currentCount = map.getStyle().layers.filter(l => l.id.startsWith('image_layer_')).length;
         imageCountElement.innerHTML = `(${currentCount})`;
         if (currentCount > 0) imagesHeader.classList.remove('d-none');
+        map.layerControl._updateMapLayerOrder()
     }
 }
 
 async function addRasterMaps(map, ids) {
-    // Wait until the LayerControl panel is ready
     await new Promise(resolve => {
         if (map._isStyleLoaded) return resolve();
         map.once('styledata', resolve);
@@ -1184,7 +1134,6 @@ async function addRasterMaps(map, ids) {
                 for (const img of images) {
                     await addImageToMap(map, img);
 
-                    // ✅ Add to legend
                     const layerId = `image_layer_${img.id}`;
                     const item = document.createElement('div');
                     item.className = 'image-legend-item';
@@ -1198,13 +1147,11 @@ async function addRasterMaps(map, ids) {
                 `;
                     legendContainer.appendChild(item);
 
-                    // Toggle visibility
                     item.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
                         const visible = e.target.checked ? 'visible' : 'none';
                         if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', visible);
                     });
 
-                    // Adjust opacity
                     item.querySelector('input[type="range"]').addEventListener('input', (e) => {
                         const opacity = parseFloat(e.target.value);
                         if (map.getLayer(layerId)) map.setPaintProperty(layerId, 'raster-opacity', opacity);
@@ -1217,12 +1164,10 @@ async function addRasterMaps(map, ids) {
     }
 }
 
-
 async function getIiifImageUrl(manifestUrl, maxSize = 2048) {
     const response = await fetch(manifestUrl);
     const manifest = await response.json();
 
-    // Try to locate the image resource in the IIIF manifest
     const canvas = manifest.sequences?.[0]?.canvases?.[0];
     const resource = canvas?.images?.[0]?.resource;
     const serviceId = resource?.service?.['@id'] || resource?.['@id'];
@@ -1232,17 +1177,13 @@ async function getIiifImageUrl(manifestUrl, maxSize = 2048) {
         return null;
     }
 
-    // Detect original file extension from @id or service URL
     const sourceUrl = resource?.['@id'] || '';
     const extMatch = sourceUrl.match(/\.(png|jpg|jpeg|tif|gif)$/i);
     const ext = extMatch ? extMatch[1].toLowerCase() : 'jpg';
 
-    // Use png if available to preserve transparency
     const format = ext === 'png' ? 'png' : 'jpg';
 
-    // Construct IIIF URL with max size constraint and proper format
     const iiifUrl = `${serviceId}/full/!${maxSize},${maxSize}/0/default.${format}`;
-
 
     return iiifUrl;
 }
@@ -1259,7 +1200,6 @@ function getNormalizedCorners(coords) {
     const minLon = Math.min(lon1, lon2);
     const maxLon = Math.max(lon1, lon2);
 
-    // Top-left, top-right, bottom-right, bottom-left (for MapLibre)
     return [
         [minLon, maxLat],
         [maxLon, maxLat],
