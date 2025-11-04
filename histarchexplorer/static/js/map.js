@@ -434,11 +434,12 @@ class LayerControl {
     onAdd(map) {
         this.map = map;
         this.container = document.createElement('div');
-        this.container.className = 'maplibregl-ctrl layer-control-ctrl';
+        this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group layer-control-ctrl';
 
         const button = document.createElement('button');
         button.className = 'layer-toggle-btn';
-        button.innerHTML = '🗺️';
+        button.title = 'Layer Control';
+        button.innerHTML = '<i class="bi bi-layers"></i>️';
         this.container.appendChild(button);
 
         const panel = document.createElement('div');
