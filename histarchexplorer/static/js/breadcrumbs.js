@@ -20,29 +20,28 @@ function renderAllBreadcrumbs(entityData, show = true) {
     "file": "files"
   };
 
-  // build the breadcrumb markup once
+  // Build breadcrumb nav
   const nav = document.createElement("nav");
   nav.setAttribute("aria-label", "breadcrumb");
   const ol = document.createElement("ol");
   ol.className = "breadcrumb";
   ol.style.setProperty("--bs-breadcrumb-divider", "''");
 
+  // Ancestors: now actual links
   hierarchy.root.forEach(ancestor => {
     const li = document.createElement("li");
     li.className = "breadcrumb-item";
 
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn btn-link p-0 text-decoration-none";
-    btn.textContent = ancestor.name;
-    btn.addEventListener("click", () => {
-      if (typeof loadEntityView === "function") loadEntityView(ancestor.id);
-    });
+    const a = document.createElement("a");
+    a.href = `/entity/${ancestor.id}`;
+    a.className = "text-decoration-none";
+    a.textContent = ancestor.name;
 
-    li.appendChild(btn);
+    li.appendChild(a);
     ol.appendChild(li);
   });
 
+  // Active entity
   const activeClass = systemClassMap[entity.system_class?.toLowerCase()] || "";
   const activeLi = document.createElement("li");
   activeLi.className = `breadcrumb-item active breadcrumb-${activeClass}`;
@@ -52,19 +51,19 @@ function renderAllBreadcrumbs(entityData, show = true) {
 
   nav.appendChild(ol);
 
-  // insert into every .breadcrumbs element found on the page
+  // Insert into every .breadcrumbs container
   document.querySelectorAll(".breadcrumbs").forEach(container => {
     container.innerHTML = "";
     container.appendChild(nav.cloneNode(true));
   });
 }
 
-// automatically render on load
+// Auto render
 document.addEventListener("DOMContentLoaded", () => {
   if (window.entityData) renderAllBreadcrumbs(window.entityData);
 });
 
-// optionally re-render when tabs are shown
+// Re-render on tab change
 document.addEventListener("shown.bs.tab", () => {
   if (window.entityData) renderAllBreadcrumbs(window.entityData);
 });

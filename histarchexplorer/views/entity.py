@@ -88,7 +88,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         return render_template(
             f'tabs/browse.html',
             subunits=True,
-            view_classes=filtered_view_classes,
+            filtered_view_classes=filtered_view_classes,
             subunit_data=subunit_data,
             active_tab=tab_name,
             typetree_data=type_tree().json,
