@@ -42,7 +42,6 @@ function pickDescription(descObj) {
 function renderCite(citeButton) {
   const wrap = document.getElementById("js-cite-button");
   if (!wrap || !citeButton) return;
-
   wrap.innerHTML = citeButton.button_html || citeButton.html || "";
   if (citeButton.modal_html) {
     const modalHost = h("div", { html: citeButton.modal_html });
@@ -144,11 +143,9 @@ function renderDescription(entity) {
   const el = document.getElementById("js-description");
   if (!el) return;
   const text = pickDescription(entity?.description);
-  if (!text) return;
-  el.innerHTML = `<p>${text}</p>`;
+  if (text) el.innerHTML = text;
   relayout(10);
 }
-
 function renderMapTile(entity) {
   const tile = document.getElementById("tile-map");
   if (!tile) return;
@@ -303,16 +300,85 @@ function startOverview() {
     return;
   }
 
-  // Create tile shells
-  const infoTile = h("div", { class: "item main-info-tile" }, [
-    h("div", { class: "item-content" }, [
-      h("div", { id: "js-cite-button" }),
-      h("div", { id: "js-hierarchy-buttons", class: "mt-2" }),
-      h("div", { id: "js-entity-card", class: "mt-3" }),
-      h("div", { id: "js-description", class: "mt-3 flex-grow-1 overflow-auto small" })
-    ]),
-  ]);
-  grid.appendChild(infoTile);
+// --- 1. MAIN INFO TILE (cite, old-styled entity card, description) ---
+const infoTile = h("div", { class: "item hierarchy-item" }, [
+  // cite button wrapper (old class name, so CSS keeps working)
+  h("div", { class: "cite-wrapper", id: "js-cite-button" }),
+
+  // entity card area (matches old HTML structure)
+  (() => {
+    const sysMap = {
+      place: "places",
+      feature: "places",
+      stratigraphic_unit: "places",
+      move: "events",
+      acquisition: "events",
+      modification: "events",
+      activity: "events",
+      group: "actors",
+      person: "actors",
+      event: "events",
+      artifact: "items",
+      source: "sources",
+      file: "files",
+    };
+    const sc = (entity.system_class || "").toLowerCase();
+    const section = sysMap[sc] || "";
+
+    // person/group uses their image; else the ellipse with system icon
+    const isPersonOrGroup = ["group", "person"].includes(sc);
+    const cardInner = isPersonOrGroup
+      ? `
+        <div class="entity-card__icon">
+          ${mainImage?.url ? `<img src="${mainImage.url}" alt="${entity.title}"/>` : ""}
+        </div>
+        <div class="hierarchy-card-label" data-system-class="${sc}">${entity.title || ""}</div>
+        <div class="entity-date"><p>${dateTemplate(entity.start, entity.end)}</p></div>
+      `
+      : `
+        <div class="main-entity-ellipse main-entity-ellipse--${section}">
+          <div class="entity-card__icon">
+            ${
+              ["feature", "stratigraphic unit"].includes(sc)
+                ? `<img src="/static/images/entity_icons/place.png" alt="${entity.system_class}">`
+                : ["move", "acquisition", "modification", "activity"].includes(sc)
+                  ? `<img src="/static/images/entity_icons/event.png" alt="${entity.system_class}">`
+                  : `<img src="/static/images/entity_icons/${sc}.png" alt="${entity.system_class}">`
+            }
+          </div>
+
+          <div class="hierarchy-card-label mb-0">${entity.title || ""}</div>
+          <div class="entity-type mb-0">
+            ${
+              (entity.types || [])
+                .filter(t => t?.is_standard)
+                .map(t => `<p>${(t.title || "").toUpperCase()}</p>`)
+                .join("")
+            }
+          </div>
+          <div class="entity-date">
+            ${
+              (entity.start || entity.end)
+                ? `<p>${dateTemplate(entity.start, entity.end)}</p>`
+                : ""
+            }
+          </div>
+        </div>
+      `;
+
+    return h("div", { class: "old-entity-card", html: cardInner });
+  })(),
+
+  // description block with old classes
+  h("div", { class: "item-content", "data-type": "description" }, [
+    h("div", { class: "muuri-description" }, [
+      h("span", { class: "tile-label", text: "DESCRIPTION" }),
+      h("p", { id: "js-description" })
+    ])
+  ]),
+]);
+grid.appendChild(infoTile);
+
 
   const mapTile = h("div", { class: "item", id: "tile-map", hidden: true }, [
     h("div", { class: "item-content item-content-full" }, [

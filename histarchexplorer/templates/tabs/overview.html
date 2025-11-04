@@ -17,7 +17,12 @@
       }
 
       window.overviewGrid = new Muuri(".grid-muuri", {
-        layout: {fillGaps: true},
+        layout: {
+          fillGaps: true,
+          horizontal: false,
+          alignRight: false,
+          alignBottom: false
+        },
         dragEnabled: false,
         layoutDuration: 0
       });

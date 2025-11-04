@@ -30,6 +30,7 @@ from histarchexplorer.views import (
 from histarchexplorer.utils import view_util
 from histarchexplorer.api.api_access import ApiAccess
 
+
 def connect() -> connection:
     try:
         connection_ = psycopg2.connect(
@@ -140,8 +141,23 @@ def inject_globals() -> dict[str, Any]:
         'available_languages': g.available_languages,
         'preferred_language': g.preferred_langauge,
         'current_language': g.language,
-        'view_classes' : g.view_classes,
-        'admin_fields': g.admin_fields}
+        'view_classes': g.view_classes,
+        'admin_fields': g.admin_fields,
+        'system_class_map': {
+            "place": "places",
+            "feature": "places",
+            "stratigraphic_unit": "places",
+            "move": "events",
+            "acquisition": "events",
+            "modification": "events",
+            "activity": "events",
+            "group": "actors",
+            "person": "actors",
+            "event": "events",
+            "artifact": "items",
+            "source": "sources",
+            "file": "files"
+        }}
 
 
 @app.after_request

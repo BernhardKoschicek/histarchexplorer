@@ -4,22 +4,6 @@ function renderAllBreadcrumbs(entityData, show = true) {
   const entity = entityData.entity;
   const hierarchy = entityData.hierarchy;
 
-  const systemClassMap = {
-    "place": "places",
-    "feature": "places",
-    "stratigraphic_unit": "places",
-    "move": "events",
-    "acquisition": "events",
-    "modification": "events",
-    "activity": "events",
-    "group": "actors",
-    "person": "actors",
-    "event": "events",
-    "artifact": "items",
-    "source": "sources",
-    "file": "files"
-  };
-
   // Build breadcrumb nav
   const nav = document.createElement("nav");
   nav.setAttribute("aria-label", "breadcrumb");
