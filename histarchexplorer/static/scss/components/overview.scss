@@ -236,3 +236,32 @@ body.dark .entity-date p {
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
 }
+
+
+/* ------------------------------------------------------------
+   OVERVIEW MEDIA BUTTON
+------------------------------------------------------------ */
+/* Caption under media tile (overview) */
+.ov-caption {
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+/* "View all X files" button below caption */
+.btn-more-files {
+  margin-top: 0.25rem;
+  background: #f8f9fa;
+  color: #333;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+  transition: all 0.2s ease;
+}
+.btn-more-files i { font-size: 1rem; }
+.btn-more-files:hover {
+  background: #e9ecef;
+  border-color: rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}

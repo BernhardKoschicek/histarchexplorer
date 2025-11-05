@@ -1,34 +1,69 @@
 /* ============================================================
-   MEDIA GRID (Muuri-based) — Clean, isolated SCSS
+   MEDIA GRID — Modernized & Sectioned SCSS
+   Structure:
+     1. Theme Variables
+     2. Global Layout
+     3. Media Grid Layout
+     4. Media Items (Tiles)
+     5. Media Content (Images, Videos, Models)
+     6. Filter Bar
+     7. Dark Mode
+     8. Responsive Breakpoints
    ============================================================ */
 
-.grid-media {
-  position: relative; /* Muuri needs this */
-  min-height: 300px;
-  margin: 0 auto;
-  width: 100%;
+
+/* ------------------------------------------------------------
+   1. THEME VARIABLES
+------------------------------------------------------------ */
+:root {
+  --media-bg-light: #ffffff;
+  --media-bg-dark: #1e1e1e;
+  --media-border-light: #dddddd;
+  --media-border-dark: #333333;
+  --media-shadow: rgba(0, 0, 0, 0.08);
+  --media-shadow-hover: rgba(0, 0, 0, 0.15);
+  --media-text-muted: #666;
+  --media-text-muted-dark: #ccc;
+  --media-gap: 0.6rem; /* breathing space between tiles */
 }
 
-/* Muuri item */
+
+/* ------------------------------------------------------------
+   2. GLOBAL LAYOUT
+------------------------------------------------------------ */
+.grid-media {
+  position: relative; /* Muuri requires this */
+  min-height: 300px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+
+/* ------------------------------------------------------------
+   3. MEDIA GRID LAYOUT
+------------------------------------------------------------ */
 .grid-media .item-media {
-  position: absolute;
+  position: absolute; /* required for Muuri layout */
   width: calc(25% - 1.25rem);
   min-width: 260px;
-  margin: 0.6rem;
-  background: #fff;
-  border: 1px solid #ddd;
+  margin: var(--media-gap);
+  background: var(--media-bg-light);
+  border: 1px solid var(--media-border-light);
   border-radius: 0.5rem;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px var(--media-shadow);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .grid-media .item-media:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 12px var(--media-shadow-hover);
 }
 
-/* Media content */
+
+/* ------------------------------------------------------------
+   4. MEDIA ITEMS (Tiles)
+------------------------------------------------------------ */
 .grid-media .item-content {
   padding: 0;
 }
@@ -52,7 +87,10 @@
   border-radius: 0.5rem 0.5rem 0 0;
 }
 
-/* Model + video wrappers */
+
+/* ------------------------------------------------------------
+   5. MEDIA CONTENT (Images, Videos, Models)
+------------------------------------------------------------ */
 .grid-media .model-wrapper,
 .grid-media .video-wrapper {
   height: 300px;
@@ -61,10 +99,9 @@
   overflow: hidden;
 }
 
-/* Popover + captions */
 .grid-media .text-muted {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--media-text-muted);
 }
 
 .grid-media .btn-light {
@@ -77,7 +114,10 @@
   opacity: 1;
 }
 
-/* Filter bar */
+
+/* ------------------------------------------------------------
+   6. FILTER BAR
+------------------------------------------------------------ */
 #media-filters {
   display: flex;
   flex-wrap: wrap;
@@ -86,136 +126,51 @@
   margin-bottom: 1rem;
 }
 
-/* Dark theme */
+#media-filters .btn-filter {
+  border: none;
+  background: transparent;
+  font-size: 2rem;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+#media-filters .btn-filter.active,
+#media-filters .btn-filter:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+
+/* ------------------------------------------------------------
+   7. DARK MODE
+------------------------------------------------------------ */
 body.dark .grid-media .item-media {
-  background: #1e1e1e;
-  border-color: #333;
+  background: var(--media-bg-dark);
+  border-color: var(--media-border-dark);
 }
 
 body.dark .grid-media .text-muted {
-  color: #ccc;
+  color: var(--media-text-muted-dark);
 }
 
-/* Responsive */
+
+/* ------------------------------------------------------------
+   8. RESPONSIVE BREAKPOINTS
+------------------------------------------------------------ */
 @media (max-width: 1400px) {
   .grid-media .item-media {
-    width: calc(33.333% - 1rem);
+    width: calc(33.333% - 1.25rem);
   }
 }
 
 @media (max-width: 992px) {
   .grid-media .item-media {
-    width: calc(50% - 1rem);
+    width: calc(50% - 1.25rem);
   }
 }
 
 @media (max-width: 576px) {
   .grid-media .item-media {
-    width: 100%;
+    width: calc(100% - 1.25rem);
   }
-}
-
-
-.video-wrapper video {
-  object-fit: cover;
-  background: #000;
-}
-
-.video-wrapper {
-  border-radius: 0.5rem;
-}
-
-.btn-filter {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#media-filters i {
-  cursor: pointer;
-}
-
-
-.image .btn-light.position-absolute.top-0.end-0 {
-  z-index: 20;
-  opacity: 0.60;
-  transition: opacity 0.15s;
-}
-
-.image .btn-light.position-absolute.top-0.end-0:hover {
-  opacity: 0.85;
-}
-
-#toolbox .btn {
-  width: 40px;
-  height: 40px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  opacity: 0.9;
-  transition: all 0.2s ease;
-}
-
-#toolbox .btn:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-#toolbox .btn.active {
-  background-color: #0d6efd;
-  color: #fff;
-}
-
-.svg-viewer-wrapper {
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  background-color: #f8f9fa;
-}
-
-.model-viewer-wrapper {
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
-
-
-.pdf-viewer-wrapper {
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-}
-
-
-.video-viewer-wrapper {
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  background-color: #000;
-}
-
-
-#iiif-viewer {
-  position: relative;
-  width: 100%;
-  height: calc(100vh - 70px);
-  background-color: #111;
-  overflow: hidden;
-}
-
-#iiif-viewer > div {
-  position: absolute !important;
-  inset: 0;
-}
-
-
-.modal-body {
-  max-height: 70vh;
-  overflow-y: auto;
-}
-.modal-title {
-  font-size: 1.4rem;
-  font-weight: 600;
 }

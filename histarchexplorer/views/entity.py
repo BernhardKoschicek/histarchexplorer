@@ -1,5 +1,4 @@
 import json
-import time
 from collections import defaultdict
 from dataclasses import asdict
 from typing import Any, Optional
@@ -72,7 +71,7 @@ def get_entity_images(files: list[File]) -> tuple[
 
     if not main_image and images:
         main_image = images.pop(0)
-    initial_images = images[:2]
+    initial_images = images[:g.additional_files_for_overview]
     images.append(main_image)
     return main_image, initial_images, images
 
@@ -94,7 +93,6 @@ def get_entity(id_: int, tab_name=None) -> str:
             typetree_data=type_tree().json,
             main_image_json=g.main_images,
             tab_name='subunits')
-
 
     match tab_name:
         case 'feature':  # pragma: no cover

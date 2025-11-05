@@ -106,6 +106,7 @@ def before_request() -> None:
     g.preferred_langauge = app.config['PREFERRED_LANGUAGE']
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
+    g.additional_files_for_overview = app.config['ADD_FILES_FOR_OVERVIEW']
 
     g.api_headers = {}
     if app.config['API_TOKEN']:
@@ -143,6 +144,7 @@ def inject_globals() -> dict[str, Any]:
         'current_language': g.language,
         'view_classes': g.view_classes,
         'admin_fields': g.admin_fields,
+        'additional_files_for_overview': g.additional_files_for_overview,
         'system_class_map': {
             "place": "places",
             "feature": "places",

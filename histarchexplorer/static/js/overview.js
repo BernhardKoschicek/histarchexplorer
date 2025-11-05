@@ -26,6 +26,7 @@ const h = (tag, opts = {}, children = []) => {
 function capitalizeWords(s) {
   return (s || '').replace(/\b\w/g, c => c.toUpperCase());
 }
+
 function pickDescription(descObj) {
   if (!descObj) return null;
   const preferred = ['en', 'de'];
@@ -43,7 +44,7 @@ function renderCite(citeButton) {
   if (!wrap || !citeButton) return;
   wrap.innerHTML = citeButton.button_html || citeButton.html || "";
   if (citeButton.modal_html) {
-    const modalHost = h("div", { html: citeButton.modal_html });
+    const modalHost = h("div", {html: citeButton.modal_html});
     document.body.appendChild(modalHost);
   }
   relayout(50);
@@ -68,7 +69,7 @@ function wireCitationCopy() {
       observer.disconnect();
     }
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.body, {childList: true, subtree: true});
 }
 
 function renderHierarchyButtons() {
@@ -82,7 +83,7 @@ function renderHierarchyButtons() {
       class: "btn btn-outline-secondary rounded-pill px-3",
       title: "Show subentities",
     },
-    [h("i", { class: "bi bi-diagram-3 me-1" }), h("span", { text: "Subentities" })]
+    [h("i", {class: "bi bi-diagram-3 me-1"}), h("span", {text: "Subentities"})]
   );
   host.appendChild(btn);
   relayout(10);
@@ -145,6 +146,7 @@ function renderDescription(entity) {
   if (text) el.innerHTML = text;
   relayout(10);
 }
+
 function renderMapTile(entity) {
   const tile = document.getElementById("tile-map");
   if (!tile) return;
@@ -153,89 +155,6 @@ function renderMapTile(entity) {
   relayout(10);
 }
 
-function imgEl(src, alt = "") {
-  const img = new Image();
-  img.src = src;
-  img.alt = alt;
-  img.className = "img-fluid rounded";
-  img.addEventListener("load", () => relayout(50));
-  return img;
-}
-
-function renderModelViewer(url, alt = "") {
-  const wrapper = h(
-    "div",
-    { class: "model-wrapper", style: "height:300px;position:relative;" },
-    [
-      h("div", { class: "spinner" }),
-      h("model-viewer", {
-        src: url,
-        alt,
-        "camera-controls": "",
-        ar: "",
-        "ar-modes": "webxr scene-viewer quick-look",
-        style: "width:100%;height:100%;",
-        "shadow-intensity": "1",
-        autoplay: "",
-      }),
-    ]
-  );
-  wrapper.querySelector("model-viewer").addEventListener("poster-dismissed", () => {
-    const spinner = wrapper.querySelector(".spinner");
-    if (spinner) spinner.style.display = "none";
-    relayout(50);
-  });
-  return wrapper;
-}
-
-function renderFileBlock(file, host) {
-  switch (file.render_type) {
-    case "3d_model":
-      host.appendChild(renderModelViewer(file.url, file.title || "3D Model"));
-      break;
-    case "video":
-      host.appendChild(
-        h("video", { controls: "", class: "w-100 rounded", src: file.url })
-      );
-      break;
-    case "pdf":
-      host.appendChild(
-        h("a", {
-          href: file.url,
-          target: "_blank",
-          class: "btn btn-outline-secondary",
-          text: file.title || "Open PDF",
-        })
-      );
-      break;
-    default:
-      host.appendChild(imgEl(file.url, file.title || "Image"));
-  }
-}
-
-function renderMainImage(mainImage) {
-  const tile = document.getElementById("tile-main-image");
-  if (!tile || !mainImage) return;
-  const host = document.getElementById("js-main-image");
-  host.innerHTML = "";
-  renderFileBlock(mainImage, host);
-  tile.hidden = false;
-  relayout(10);
-}
-
-function renderInitialImages(files) {
-  const tile = document.getElementById("tile-initial-images");
-  if (!tile || !Array.isArray(files) || !files.length) return;
-  const host = document.getElementById("js-initial-images");
-  host.innerHTML = "";
-  files.forEach((f) => {
-    const box = h("div", { class: "flex-grow-1", style: "min-width:220px;max-width:48%;" });
-    renderFileBlock(f, box);
-    host.appendChild(box);
-  });
-  tile.hidden = false;
-  relayout(10);
-}
 
 function renderAttributes(categorizedTypes) {
   const tile = document.getElementById("tile-attributes");
@@ -243,13 +162,16 @@ function renderAttributes(categorizedTypes) {
   if (!tile || !host || !categorizedTypes || !Object.keys(categorizedTypes).length) return;
   host.innerHTML = "";
   Object.entries(categorizedTypes).forEach(([bucket, items]) => {
-    const label = h("p", { class: "tile-sub-label text-uppercase mt-3", html: `${(items?.[0]?.icon || "")} ${capitalizeWords(bucket.replaceAll("_", " "))}` });
+    const label = h("p", {
+      class: "tile-sub-label text-uppercase mt-3",
+      html: `${(items?.[0]?.icon || "")} ${capitalizeWords(bucket.replaceAll("_", " "))}`
+    });
     host.appendChild(label);
     items.forEach((entry) => {
       const t = entry.type || {};
       const vu = t.value && t.unit ? `: ${t.value} ${t.unit}` : "";
-      const badge = h("div", { class: "badge custom-badge text-wrap m-1" },
-        h("h6", { class: "m-0 text-center", text: `${t.title || ""}${vu}` })
+      const badge = h("div", {class: "badge custom-badge text-wrap m-1"},
+        h("h6", {class: "m-0 text-center", text: `${t.title || ""}${vu}`})
       );
       host.appendChild(badge);
     });
@@ -270,9 +192,15 @@ function renderReferences(entity) {
     const name = isBibl
       ? `<a href="/entity/${ref.id}" class="reference-name">${ref.title || ""}</a>`
       : `<a href="${ref.title}" class="reference-name">${(ref.title || "").split("/").slice(0, 3).join("/")}</a>`;
-    const li = h("li", {}, h("div", { class: "reference-content" }, [
-      h("div", { class: "reference-header", html: `<i class="bi ${icon}"></i> ${name}` }),
-      h("p", { class: "reference-description", text: `${ref.citation || ""} ${ref.pages || ""}`.trim() })
+    const li = h("li", {}, h("div", {class: "reference-content"}, [
+      h("div", {
+        class: "reference-header",
+        html: `<i class="bi ${icon}"></i> ${name}`
+      }),
+      h("p", {
+        class: "reference-description",
+        text: `${ref.citation || ""} ${ref.pages || ""}`.trim()
+      })
     ]));
     list.appendChild(li);
   });
@@ -293,115 +221,131 @@ function startOverview() {
   const mainImage = entity.main_image || root.mainImage;
   const initialImages = entity.initial_images || root.initialImage;
 
-const grid = document.querySelector(".grid-overview, .grid-muuri");
+  const grid = document.querySelector(".grid-overview, .grid-muuri");
   if (!grid) {
     console.error("Grid container missing!");
     return;
   }
 
 // --- 1. MAIN INFO TILE (cite, old-styled entity card, description) ---
-const infoTile = h("div", { class: "item hierarchy-item" }, [
-  // cite button wrapper (old class name, so CSS keeps working)
-  h("div", { class: "cite-wrapper", id: "js-cite-button" }),
+  const infoTile = h("div", {class: "item hierarchy-item"}, [
+    // cite button wrapper (old class name, so CSS keeps working)
+    h("div", {class: "cite-wrapper", id: "js-cite-button"}),
 
-  // entity card area (matches old HTML structure)
-  (() => {
-    const sysMap = {
-      place: "places",
-      feature: "places",
-      stratigraphic_unit: "places",
-      move: "events",
-      acquisition: "events",
-      modification: "events",
-      activity: "events",
-      group: "actors",
-      person: "actors",
-      event: "events",
-      artifact: "items",
-      source: "sources",
-      file: "files",
-    };
-    const sc = (entity.system_class || "").toLowerCase();
-    const section = sysMap[sc] || "";
+    // entity card area (matches old HTML structure)
+    (() => {
+      const sysMap = {
+        place: "places",
+        feature: "places",
+        stratigraphic_unit: "places",
+        move: "events",
+        acquisition: "events",
+        modification: "events",
+        activity: "events",
+        group: "actors",
+        person: "actors",
+        event: "events",
+        artifact: "items",
+        source: "sources",
+        file: "files",
+      };
+      const sc = (entity.system_class || "").toLowerCase();
+      const section = sysMap[sc] || "";
 
-    // person/group uses their image; else the ellipse with system icon
-    const isPersonOrGroup = ["group", "person"].includes(sc);
-    const cardInner = isPersonOrGroup
-      ? `
+      // person/group uses their image; else the ellipse with system icon
+      const isPersonOrGroup = ["group", "person"].includes(sc);
+      const cardInner = isPersonOrGroup
+        ? `
         <div class="entity-card__icon">
           ${mainImage?.url ? `<img src="${mainImage.url}" alt="${entity.title}"/>` : ""}
         </div>
         <div class="hierarchy-card-label" data-system-class="${sc}">${entity.title || ""}</div>
         <div class="entity-date"><p>${dateTemplate(entity.start, entity.end)}</p></div>
       `
-      : `
+        : `
         <div class="main-entity-ellipse main-entity-ellipse--${section}">
           <div class="entity-card__icon">
             ${
-              ["feature", "stratigraphic unit"].includes(sc)
-                ? `<img src="/static/images/entity_icons/place.png" alt="${entity.system_class}">`
-                : ["move", "acquisition", "modification", "activity"].includes(sc)
-                  ? `<img src="/static/images/entity_icons/event.png" alt="${entity.system_class}">`
-                  : `<img src="/static/images/entity_icons/${sc}.png" alt="${entity.system_class}">`
-            }
+          ["feature", "stratigraphic unit"].includes(sc)
+            ? `<img src="/static/images/entity_icons/place.png" alt="${entity.system_class}">`
+            : ["move", "acquisition", "modification", "activity"].includes(sc)
+              ? `<img src="/static/images/entity_icons/event.png" alt="${entity.system_class}">`
+              : `<img src="/static/images/entity_icons/${sc}.png" alt="${entity.system_class}">`
+        }
           </div>
 
           <div class="hierarchy-card-label mb-0">${entity.title || ""}</div>
           <div class="entity-type mb-0">
             ${
-              (entity.types || [])
-                .filter(t => t?.is_standard)
-                .map(t => `<p>${(t.title || "").toUpperCase()}</p>`)
-                .join("")
-            }
+          (entity.types || [])
+            .filter(t => t?.is_standard)
+            .map(t => `<p>${(t.title || "").toUpperCase()}</p>`)
+            .join("")
+        }
           </div>
           <div class="entity-date">
             ${
-              (entity.start || entity.end)
-                ? `<p>${dateTemplate(entity.start, entity.end)}</p>`
-                : ""
-            }
+          (entity.start || entity.end)
+            ? `<p>${dateTemplate(entity.start, entity.end)}</p>`
+            : ""
+        }
           </div>
         </div>
       `;
 
-    return h("div", { class: "old-entity-card", html: cardInner });
-  })(),
+      return h("div", {class: "old-entity-card", html: cardInner});
+    })(),
 
-  // description block with old classes
-  h("div", { class: "item-content", "data-type": "description" }, [
-    h("div", { class: "muuri-description" }, [
-      h("span", { class: "tile-label", text: "DESCRIPTION" }),
-      h("p", { id: "js-description" })
-    ])
-  ]),
-]);
-grid.appendChild(infoTile);
+    // description block with old classes
+    h("div", {class: "item-content", "data-type": "description"}, [
+      h("div", {class: "muuri-description"}, [
+        h("span", {class: "tile-label", text: "DESCRIPTION"}),
+        h("p", {id: "js-description"})
+      ])
+    ]),
+  ]);
+  grid.appendChild(infoTile);
 
 
-  const mapTile = h("div", { class: "item", id: "tile-map", hidden: true }, [
-    h("div", { class: "item-content item-content-full" }, [
-      h("div", { id: "muuri-map", style: "height:300px;" }),
+  const mapTile = h("div", {class: "item", id: "tile-map", hidden: true}, [
+    h("div", {class: "item-content item-content-full"}, [
+      h("div", {id: "muuri-map", style: "height:300px;"}),
     ]),
   ]);
-  const imageTile = h("div", { class: "item", id: "tile-main-image", hidden: true }, [
-    h("div", { class: "item-content item-content-full" }, [
-      h("div", { id: "js-main-image" }),
+  const imageTile = h("div", {
+    class: "item",
+    id: "tile-main-image",
+    hidden: true
+  }, [
+    h("div", {class: "item-content item-content-full"}, [
+      h("div", {id: "js-main-image"}),
     ]),
   ]);
-  const galleryTile = h("div", { class: "item", id: "tile-initial-images", hidden: true }, [
-    h("div", { class: "item-content item-content-full" }, [
-      h("div", { id: "js-initial-images", class: "d-flex flex-wrap gap-2" }),
+  const galleryTile = h("div", {
+    class: "item",
+    id: "tile-initial-images",
+    hidden: true
+  }, [
+    h("div", {class: "item-content item-content-full"}, [
+      h("div", {id: "js-initial-images", class: "d-flex flex-wrap gap-2"}),
     ]),
   ]);
-  const attrTile = h("div", { class: "item", id: "tile-attributes", hidden: true }, [
-    h("div", { class: "item-content" }, [
-      h("div", { id: "js-attributes" }),
+  const attrTile = h("div", {
+    class: "item",
+    id: "tile-attributes",
+    hidden: true
+  }, [
+    h("div", {class: "item-content"}, [
+      h("div", {id: "js-attributes"}),
     ]),
   ]);
-  const refTile = h("div", { class: "item", id: "tile-references", hidden: true }, [
-    h("div", { class: "item-content" }, [
-      h("ul", { id: "js-references", class: "no-bullets" }),
+  const refTile = h("div", {
+    class: "item",
+    id: "tile-references",
+    hidden: true
+  }, [
+    h("div", {class: "item-content"}, [
+      h("ul", {id: "js-references", class: "no-bullets"}),
     ]),
   ]);
 
@@ -414,12 +358,16 @@ grid.appendChild(infoTile);
   renderEntityCard(entity, mainImage);
   renderDescription(entity);
   renderMapTile(entity);
-  renderMainImage(mainImage);
-  renderInitialImages(initialImages);
   renderAttributes(categorizedTypes);
   renderReferences(entity);
+  const files = [];
+  if (mainImage) files.push(mainImage);
+  if (Array.isArray(initialImages)) files.push(...initialImages);
+  renderOverviewMediaTiles(files, additionalFilesOverview);
+
 
 }
+
 if (document.readyState === "loading")
   document.addEventListener("DOMContentLoaded", startOverview);
 else requestAnimationFrame(startOverview);
