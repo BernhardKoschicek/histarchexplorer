@@ -3,8 +3,7 @@
 // ============================================================
 
 function relayout(delay = 0) {
-  if (!window.overviewGrid) return;
-  setTimeout(() => window.overviewGrid.refreshItems().layout(), delay);
+
 }
 
 // Utility helpers ------------------------------------------------------------
@@ -294,7 +293,7 @@ function startOverview() {
   const mainImage = entity.main_image || root.mainImage;
   const initialImages = entity.initial_images || root.initialImage;
 
-  const grid = document.querySelector(".grid-muuri");
+const grid = document.querySelector(".grid-overview, .grid-muuri");
   if (!grid) {
     console.error("Grid container missing!");
     return;
@@ -420,10 +419,7 @@ grid.appendChild(infoTile);
   renderAttributes(categorizedTypes);
   renderReferences(entity);
 
-  // Layout
-  if (window.overviewGrid) window.overviewGrid.refreshItems().layout();
 }
-
 if (document.readyState === "loading")
   document.addEventListener("DOMContentLoaded", startOverview);
 else requestAnimationFrame(startOverview);

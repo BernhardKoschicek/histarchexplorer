@@ -46,9 +46,16 @@ const renderTypeStyles = {
   });
 
   // --- Step 4: Initialize Muuri layout ---
-  window.mediaGrid = new Muuri(".grid-media", {
-    layout: {fillGaps: true},
-  });
+window.mediaGrid = new Muuri(".grid-media", {
+  layout: {
+    fillGaps: true,
+    horizontal: false,
+    rounding: true
+  },
+  dragEnabled: false,
+  layoutDuration: 300,
+  layoutEasing: "ease-out"
+});
 
   setTimeout(() => window.mediaGrid.refreshItems().layout(), 500);
 
@@ -59,6 +66,30 @@ const renderTypeStyles = {
   initMoreImagesButton();
 })();
 
+// ======== POST-LAYOUT BEAUTIFICATION ========
+function styleAndSortMediaTiles() {
+  if (!window.mediaGrid) return;
+
+  // Color borders by render type
+  document.querySelectorAll(".item-media").forEach(el => {
+    const type = el.dataset.renderType || "unknown";
+    const color = renderTypeStyles[type]?.color || "#ccc";
+    el.style.border = `2px solid ${color}`;
+    el.style.borderRadius = "0.5rem";
+  });
+
+  // Group/sort tiles by render_type
+  window.mediaGrid.sort((a, b) => {
+    const typeA = a.getElement().dataset.renderType || "";
+    const typeB = b.getElement().dataset.renderType || "";
+    return typeA.localeCompare(typeB);
+  });
+
+  window.mediaGrid.refreshItems().layout();
+}
+
+// Run once Muuri is ready
+setTimeout(styleAndSortMediaTiles, 500);
 
 // ======== CREATE MEDIA ITEM ========
 function createMediaItem(image, posterMap) {

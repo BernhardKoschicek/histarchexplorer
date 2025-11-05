@@ -9,28 +9,4 @@
   <script
     src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (typeof Muuri === "undefined") {
-        console.warn("⚠️ Muuri not loaded!");
-        return;
-      }
-
-      window.overviewGrid = new Muuri(".grid-muuri", {
-        layout: {
-          fillGaps: true,
-          horizontal: false,
-          alignRight: false,
-          alignBottom: false
-        },
-        dragEnabled: false,
-        layoutDuration: 0
-      });
-
-      window.relayout = (delay = 0) => {
-        if (!window.overviewGrid) return;
-        setTimeout(() => window.overviewGrid.refreshItems().layout(), delay);
-      };
-    });
-  </script>
 {% endblock %}

@@ -56,6 +56,7 @@ body.dark {
 /* ------------------------------------------------------------
    3. GRID LAYOUT
 ------------------------------------------------------------ */
+.grid-overview,
 .grid-muuri {
   display: grid;
   grid-template-columns: 28vw repeat(auto-fit, minmax(350px, 1fr));
@@ -66,47 +67,46 @@ body.dark {
 }
 
 @media (max-width: 992px) {
+  .grid-overview,
   .grid-muuri {
     grid-template-columns: 1fr;
   }
 }
 
-/* Left main entity card column */
-.hierarchy-item {
-  grid-row: span 2;
-  height: 100vh;
-  min-width: 360px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-}
-
-/* Generic tile styling */
-.item {
+/* Scoped tile styling */
+.grid-overview .item,
+.grid-muuri .item {
   background: var(--color-tile-light);
   border-radius: 10px;
   box-shadow: 0 4px 12px var(--color-shadow);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-body.dark .item {
+body.dark .grid-overview .item,
+body.dark .grid-muuri .item {
   background: var(--color-tile-dark);
 }
 
-.item:hover {
+.grid-overview .item:hover,
+.grid-muuri .item:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
 }
 
-.item-content {
+.grid-overview .item-content,
+.grid-muuri .item-content {
   padding: 1rem;
   width: 100%;
   height: auto;
 }
 
-.item-content-full {
-  padding: 0;
+.grid-overview .hierarchy-item,
+.grid-muuri .hierarchy-item {
+  grid-row: span 2;
+  height: 100vh;
+  min-width: 360px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ------------------------------------------------------------
