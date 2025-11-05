@@ -211,174 +211,178 @@ function renderReferences(entity) {
 // ---------------------------------------------------------------------------
 // BOOTSTRAP
 // ---------------------------------------------------------------------------
-function startOverview() {
+// ============================================================
+//  OVERVIEW.JS — async SPA-safe version using window.entityData
+// ============================================================
 
-    const root = window.entityData || {};
-    const entity = root.entity || {};
-    const categorizedTypes = root.categorizedTypes || {};
-    const citeButton = root.citeButton || {};
-    const mainImage = entity.main_image || root.mainImage;
-    const initialImages = entity.initial_images || root.initialImage;
+(async function initOverview() {
+  // --- Wait until DOM is ready ---
+  if (document.readyState === "loading") {
+    await new Promise(resolve => document.addEventListener("DOMContentLoaded", resolve));
+  }
 
-    const grid = document.querySelector(".grid-overview");
-    if (!grid) {
-        console.error("Grid container missing!");
-        return;
-    }
+  // --- Wait for entityData Promise ---
+  const data = await window.entityData;
+  if (!data) {
+    console.error("❌ entityData failed to load for overview");
+    return;
+  }
 
-// --- 1. MAIN INFO TILE (cite, old-styled entity card, description) ---
-    const infoTile = h("div", {class: "item hierarchy-item"}, [
-        // cite button wrapper (old class name, so CSS keeps working)
-        h("div", {class: "cite-wrapper", id: "js-cite-button"}),
+  console.log("✅ Overview tab: entityData ready", data);
 
-        // entity card area (matches old HTML structure)
-        (() => {
-            const sysMap = {
-                place: "places",
-                feature: "places",
-                stratigraphic_unit: "places",
-                move: "events",
-                acquisition: "events",
-                modification: "events",
-                activity: "events",
-                group: "actors",
-                person: "actors",
-                event: "events",
-                artifact: "items",
-                source: "sources",
-                file: "files",
-            };
-            const sc = (entity.system_class || "").toLowerCase();
-            const section = sysMap[sc] || "";
+  const entity = data.entity || {};
+  const categorizedTypes = data.categorizedTypes || {};
+  const citeButton = data.citeButton || {};
+  const mainImage = entity.main_image || data.mainImage;
+  const initialImages = entity.initial_images || data.initialImage;
+  const additionalFilesOverview = data.additionalFilesOverview || 0;
 
-            // person/group uses their image; else the ellipse with system icon
-            const isPersonOrGroup = ["group", "person"].includes(sc);
-            const cardInner = isPersonOrGroup
-                ? `
+  const grid = document.querySelector(".grid-overview");
+  if (!grid) {
+    console.error("Grid container missing!");
+    return;
+  }
+
+  // === Helper DOM builder ===
+  const h = (tag, opts = {}, children = []) => {
+    const el = document.createElement(tag);
+    Object.entries(opts).forEach(([k, v]) => {
+      if (k === "class") el.className = v;
+      else if (k === "html") el.innerHTML = v;
+      else if (k === "text") el.textContent = v;
+      else if (k.startsWith("on") && typeof v === "function")
+        el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v);
+    });
+    (Array.isArray(children) ? children : [children])
+      .filter(Boolean)
+      .forEach(c => el.appendChild(c));
+    return el;
+  };
+
+  // === MAIN INFO TILE (Cite + entity card + description) ===
+  const infoTile = h("div", { class: "item hierarchy-item" }, [
+    h("div", { class: "cite-wrapper", id: "js-cite-button" }),
+    (() => {
+      const sysMap = {
+        place: "places",
+        feature: "places",
+        stratigraphic_unit: "places",
+        move: "events",
+        acquisition: "events",
+        modification: "events",
+        activity: "events",
+        group: "actors",
+        person: "actors",
+        event: "events",
+        artifact: "items",
+        source: "sources",
+        file: "files",
+      };
+      const sc = (entity.system_class || "").toLowerCase();
+      const section = sysMap[sc] || "";
+      const isPersonOrGroup = ["group", "person"].includes(sc);
+      const cardInner = isPersonOrGroup
+        ? `
         <div class="entity-card__icon">
           ${mainImage?.url ? `<img src="${mainImage.url}" alt="${entity.title}"/>` : ""}
         </div>
         <div class="hierarchy-card-label" data-system-class="${sc}">${entity.title || ""}</div>
         <div class="entity-date"><p>${dateTemplate(entity.start, entity.end)}</p></div>
       `
-                : `
+        : `
         <div class="main-entity-ellipse main-entity-ellipse--${section}">
           <div class="entity-card__icon">
             ${
-                    ["feature", "stratigraphic unit"].includes(sc)
-                        ? `<img src="/static/images/entity_icons/place.png" alt="${entity.system_class}">`
-                        : ["move", "acquisition", "modification", "activity"].includes(sc)
-                            ? `<img src="/static/images/entity_icons/event.png" alt="${entity.system_class}">`
-                            : `<img src="/static/images/entity_icons/${sc}.png" alt="${entity.system_class}">`
-                }
+              ["feature", "stratigraphic unit"].includes(sc)
+                ? `<img src="/static/images/entity_icons/place.png" alt="${entity.system_class}">`
+                : ["move", "acquisition", "modification", "activity"].includes(sc)
+                  ? `<img src="/static/images/entity_icons/event.png" alt="${entity.system_class}">`
+                  : `<img src="/static/images/entity_icons/${sc}.png" alt="${entity.system_class}">`
+            }
           </div>
-
           <div class="hierarchy-card-label mb-0">${entity.title || ""}</div>
           <div class="entity-type mb-0">
             ${
-                    (entity.types || [])
-                        .filter(t => t?.is_standard)
-                        .map(t => `<p>${(t.title || "").toUpperCase()}</p>`)
-                        .join("")
-                }
+              (entity.types || [])
+                .filter(t => t?.is_standard)
+                .map(t => `<p>${(t.title || "").toUpperCase()}</p>`)
+                .join("")
+            }
           </div>
           <div class="entity-date">
             ${
-                    (entity.start || entity.end)
-                        ? `<p>${dateTemplate(entity.start, entity.end)}</p>`
-                        : ""
-                }
+              (entity.start || entity.end)
+                ? `<p>${dateTemplate(entity.start, entity.end)}</p>`
+                : ""
+            }
           </div>
         </div>
       `;
+      return h("div", { class: "old-entity-card", html: cardInner });
+    })(),
+    h("div", { class: "item-content", "data-type": "description" }, [
+      h("div", { class: "muuri-description" }, [
+        h("span", { class: "tile-label", text: "DESCRIPTION" }),
+        h("p", { id: "js-description" }),
+      ]),
+    ]),
+  ]);
+  grid.appendChild(infoTile);
 
-            return h("div", {class: "old-entity-card", html: cardInner});
-        })(),
+  // === SECONDARY TILES ===
+  const imageTile = h("div", { class: "item", id: "tile-main-image", hidden: true }, [
+    h("div", { class: "item-content item-content-full" }, [
+      h("div", { id: "js-main-image" }),
+    ]),
+  ]);
+  const galleryTile = h("div", { class: "item item-half", id: "tile-initial-images", hidden: true }, [
+    h("div", { class: "item-content item-content-full" }, [
+      h("div", { id: "js-initial-images", class: "d-flex flex-wrap gap-2" }),
+    ]),
+  ]);
+  const attrTile = h("div", { class: "item item-half", id: "tile-attributes", hidden: true }, [
+    h("div", { class: "item-content" }, [h("div", { id: "js-attributes" })]),
+  ]);
+  const mapTile = h("div", { class: "item", id: "tile-map", hidden: true }, [
+    h("div", { class: "item-content item-content-full" }, [
+      h("div", { id: "muuri-map", style: "height:300px;" }),
+    ]),
+  ]);
+  const refTile = h("div", { class: "item item-wide", id: "tile-references", hidden: true }, [
+    h("div", { class: "item-content" }, [
+      h("ul", { id: "js-references", class: "no-bullets" }),
+    ]),
+  ]);
 
-        // description block with old classes
-        h("div", {class: "item-content", "data-type": "description"}, [
-            h("div", {class: "muuri-description"}, [
-                h("span", {class: "tile-label", text: "DESCRIPTION"}),
-                h("p", {id: "js-description"})
-            ])
-        ]),
-    ]);
-    grid.appendChild(infoTile);
+  grid.append(mapTile, imageTile, galleryTile, attrTile, refTile);
 
+  // === RENDER DATA ===
+  if (typeof renderCite === "function") renderCite(citeButton);
+  if (typeof wireCitationCopy === "function") wireCitationCopy();
+  if (typeof renderHierarchyButtons === "function") renderHierarchyButtons();
+  if (typeof renderEntityCard === "function") renderEntityCard(entity, mainImage);
+  if (typeof renderDescription === "function") renderDescription(entity);
+  if (typeof renderMapTile === "function") renderMapTile(entity);
+  if (typeof renderAttributes === "function") renderAttributes(categorizedTypes);
+  if (typeof renderReferences === "function") renderReferences(entity);
 
-    const imageTile = h("div", {
-        class: "item",
-        id: "tile-main-image",
-        hidden: true
-    }, [
-        h("div", {class: "item-content item-content-full"}, [
-            h("div", {id: "js-main-image"}),
-        ]),
-    ]);
-    const galleryTile = h("div", {
-        class: "item item-half",
-        id: "tile-initial-images",
-        hidden: true
-    }, [
-        h("div", {class: "item-content item-content-full"}, [
-            h("div", {id: "js-initial-images", class: "d-flex flex-wrap gap-2"}),
-        ]),
-    ]);
-    const attrTile = h("div", {
-        class: "item item-half",
-        id: "tile-attributes",
-        hidden: true
-    }, [
-        h("div", {class: "item-content"}, [
-            h("div", {id: "js-attributes"}),
-        ]),
-    ]);
-    const mapTile = h("div", {class: "item", id: "tile-map", hidden: true}, [
-        h("div", {class: "item-content item-content-full"}, [
-            h("div", {id: "muuri-map", style: "height:300px;"}),
-        ]),
-    ]);
-    const refTile = h("div", {
-        class: "item item-wide",
-        id: "tile-references",
-        hidden: true
-    }, [
-        h("div", {class: "item-content"}, [
-            h("ul", {id: "js-references", class: "no-bullets"}),
-        ]),
-    ]);
-
-    grid.append(mapTile, imageTile, galleryTile, attrTile, refTile);
-
-    // Render content
-    renderCite(citeButton);
-    wireCitationCopy();
-    renderHierarchyButtons();
-    renderEntityCard(entity, mainImage);
-    renderDescription(entity);
-    renderMapTile(entity);
-    renderAttributes(categorizedTypes);
-    renderReferences(entity);
-    const files = [];
-    if (mainImage) files.push(mainImage);
-    if (Array.isArray(initialImages)) files.push(...initialImages);
+  // === MEDIA OVERVIEW ===
+  const files = [];
+  if (mainImage) files.push(mainImage);
+  if (Array.isArray(initialImages)) files.push(...initialImages);
+  if (typeof renderOverviewMediaTiles === "function") {
     renderOverviewMediaTiles(files, additionalFilesOverview);
+  }
 
-    window.mediaGrid = new Muuri(".grid-overview", {
-        layout: {
-            fillGaps: true,
-            horizontal: false,
-            rounding: true
-        },
-        layoutDuration: 200,
-        layoutEasing: "ease-out",
-        dragEnabled: false
+  // === MUURI GRID INIT ===
+  window.mediaGrid = new Muuri(".grid-overview", {
+    layout: { fillGaps: true, horizontal: false, rounding: true },
+    layoutDuration: 200,
+    layoutEasing: "ease-out",
+    dragEnabled: false,
+  });
 
-    });
+  setTimeout(() => window.mediaGrid.refreshItems().layout(), 500);
+})();
 
-    setTimeout(() => window.mediaGrid.refreshItems().layout(), 500);
-}
-
-if (document.readyState === "loading")
-    document.addEventListener("DOMContentLoaded", startOverview);
-else requestAnimationFrame(startOverview);

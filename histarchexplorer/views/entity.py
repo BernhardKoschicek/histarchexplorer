@@ -21,37 +21,10 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
     sidebar_elements = app.config['SIDEBAR_OPTIONS']
     if tab_name not in {item['route'] for item in sidebar_elements}:
         abort(404)
-    entity = PresentationView.from_api(id_)
-    hierarchy = {
-        'subs': get_sub_count(entity),
-        'root': get_hierarchy(entity)}
-    overview_map_geometry = entity.geometry_json
-    if not overview_map_geometry:
-        if hierarchy.get('root'):
-            overview_map_geometry = get_parent_geometry(hierarchy['root'])
-        else:
-            overview_map_geometry = {
-                'type': 'FeatureCollection',
-                'features': get_features_for_map(entity)}
-    main_image, initial_images, images = get_entity_images(entity.files)
-    data: dict[str, Any] = {
-        'entity': asdict(entity),
-        'spatial': {
-            'type': 'FeatureCollection',
-            'features': get_features_for_map(entity, hierarchy)},
-        'hierarchy': hierarchy,
-        'overviewMap': overview_map_geometry,
-        'categorizedTypes': get_categorized_types(entity.types),
-        'citeButton': get_cite_button(entity),
-        'mainImage': main_image,
-        'initialImage': initial_images,
-        'images': images}
-
     return render_template(
         'entity.html',
         sidebar_elements=build_sidebar(id_, sidebar_elements),
-        categorized_types=get_categorized_types(entity.types),
-        data=data,
+        data=entity_data(id_),
         page_name="landing",
         active_tab=tab_name,
         entity_id=id_)
@@ -226,9 +199,7 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     match main_entity.system_class:
         case 'feature':
             if 'place' in main_entity.relations and main_entity.relations[
-                'place']:  # nur wenn dict key place hat und liste nicht leer
-                # Bernhard: Wann passiert es, dass ein feature keinen Place
-                # hat? Das darf nicht vorkommen.
+                'place']:
                 root.append(main_entity.relations['place'][0])
         case 'stratigraphic_unit':
             for feature in main_entity.relations.get('feature', []):
@@ -237,7 +208,6 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
                         root.append(feature)
             if 'place' in main_entity.relations and main_entity.relations[
                 'place']:
-                # Bernhard: Kann mir bitte jemand sagen, wann das vorkommt?
                 root.append(main_entity.relations['place'][0])
         case 'artifact' | 'human_remains':
             stratigraphic_unit_id = None
@@ -259,14 +229,6 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
 
 def get_sub_count(main_entity: PresentationView) -> int:
     count = 0
-    # It was not wished to show all subunits, only direct ones
-    # sub_relations_map = {
-    #    'place': ['feature', 'stratigraphic_unit', 'artifact',
-    #              'human_remains'],
-    #    'feature': ['stratigraphic_unit', 'artifact', 'human_remains'],
-    #    'stratigraphic_unit': ['artifact', 'human_remains'],
-    #    'artifact': ['artifact'],
-    #    'human_remains': ['human_remains']}
     sub_relations_map = {
         'place': ['feature'],
         'feature': ['stratigraphic_unit'],
@@ -312,3 +274,36 @@ def get_files_for_id(id: int) -> dict[str, list[str]]:
 @app.route('/get_rastermaps/<int:id>')
 def get_rastermaps(id: int) -> str:
     return json.dumps(get_files_for_id(id))
+
+
+@app.route('/presentation-view/<int:id_>')
+def presentation_view(id_: int) -> dict[str, Any]:
+    return asdict(PresentationView.from_api(id_))
+
+@app.route('/entity-data/<int:id_>')
+def entity_data(id_: int) -> dict[str, Any]:
+    entity = PresentationView.from_api(id_)
+    hierarchy = {
+        'subs': get_sub_count(entity),
+        'root': get_hierarchy(entity)}
+    overview_map_geometry = entity.geometry_json
+    if not overview_map_geometry:
+        if hierarchy.get('root'):
+            overview_map_geometry = get_parent_geometry(hierarchy['root'])
+        else:
+            overview_map_geometry = {
+                'type': 'FeatureCollection',
+                'features': get_features_for_map(entity)}
+    main_image, initial_images, images = get_entity_images(entity.files)
+    return {
+        'entity': asdict(entity),
+        'spatial': {
+            'type': 'FeatureCollection',
+            'features': get_features_for_map(entity, hierarchy)},
+        'hierarchy': hierarchy,
+        'overviewMap': overview_map_geometry,
+        'categorizedTypes': get_categorized_types(entity.types),
+        'citeButton': get_cite_button(entity),
+        'mainImage': main_image,
+        'initialImage': initial_images,
+        'images': images}

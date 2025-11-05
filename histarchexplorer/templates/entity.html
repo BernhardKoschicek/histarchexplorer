@@ -9,7 +9,8 @@
 
     const tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
     const entityId = {{ entity_id }};
-    window.entityData = {{ data|tojson }};
+    window.entityData = {{ data | tojson }};
+    window.entityData = fetchEntityData({{ entity_id }});
     {% if entity_id == 0 %}
       const data = entityData;
       const typeTreeData = {{ typetree_data|tojson}};

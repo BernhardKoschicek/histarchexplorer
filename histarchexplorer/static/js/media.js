@@ -11,11 +11,22 @@ const renderTypeStyles = {
 
 
 // ======== INITIALIZATION ========
-(() => {
+(async function initMedia() {
+  // Wait until both DOM and data are ready
+  if (document.readyState === "loading") {
+    await new Promise(resolve => document.addEventListener("DOMContentLoaded", resolve));
+  }
+
+  const data = await window.entityData;
+  if (!data) {
+    console.error("❌ entityData failed to load");
+    return;
+  }
+
+  console.log("✅ Media tab: entityData ready", data);
+
   const container = document.querySelector(".grid-media");
   const filterBar = document.getElementById("media-filters");
-  const data = window.entityData || entityData;
-
   if (!container) {
     console.warn("No .grid-media container found");
     return;
@@ -27,39 +38,28 @@ const renderTypeStyles = {
 
   const files = data.entity.files;
 
-  // --- Step 1: Create a map of webp posters by ID ---
   const posterMap = {};
   files
     .filter(f => f.render_type === "webp" && f.title)
-    .forEach(f => {
-      posterMap[f.title] = f.url;
-    });
+    .forEach(f => { posterMap[f.title] = f.url; });
 
-  // --- Step 2: Filter out webp files from rendering ---
   const visibleFiles = files.filter(f => f.render_type !== "webp");
 
-  // --- Step 3: Build media grid dynamically ---
   visibleFiles.forEach(image => {
     const item = createMediaItem(image, posterMap);
     item.dataset.renderType = image.render_type || "unknown";
     container.appendChild(item);
   });
 
-  // --- Step 4: Initialize Muuri layout ---
-window.mediaGrid = new Muuri(".grid-media", {
-  layout: {
-    fillGaps: true,
-    horizontal: false,
-    rounding: true
-  },
-  dragEnabled: false,
-  layoutDuration: 300,
-  layoutEasing: "ease-out"
-});
+  window.mediaGrid = new Muuri(".grid-media", {
+    layout: { fillGaps: true, horizontal: false, rounding: true },
+    dragEnabled: false,
+    layoutDuration: 300,
+    layoutEasing: "ease-out"
+  });
 
   setTimeout(() => window.mediaGrid.refreshItems().layout(), 500);
 
-  // --- Step 5: Initialize helpers ---
   if (filterBar) initFilterBar(filterBar, visibleFiles);
   handleModelViewers();
   initPopovers();
