@@ -296,21 +296,3 @@ document.addEventListener("DOMContentLoaded", () => {
     if (data) renderAllBreadcrumbs(data);
   });
 });
-
-(async function initializeEntity() {
-  // Wait until the entity data is fetched
-  const data = await window.entityData;
-  if (!data) {
-    console.error("❌ Failed to load entityData.");
-    return;
-  }
-
-  // Make it globally available
-  window.entityResolved = data;
-  console.log("✅ entityData loaded globally", data);
-
-  // Continue normal initialization logic that depends on entity data
-  renderAllBreadcrumbs(data);
-  // You could dispatch a custom event so other modules can hook in:
-  document.dispatchEvent(new CustomEvent("entityReady", { detail: data }));
-})();
