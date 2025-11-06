@@ -10,7 +10,8 @@ from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation)
 from histarchexplorer.database.entity import (
     check_if_place_hierarchy, get_first_geom)
-from histarchexplorer.utils.view_util import get_cite_button
+from histarchexplorer.utils.view_util import get_cite_button, \
+    get_refresh_button
 from histarchexplorer.views.entities import get_browse_list_entities
 from histarchexplorer.views.views import type_tree
 
@@ -79,7 +80,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         case _ if tab_name not in ['feature']:
             abort(404)
 
-    return render_template(f'tabs/{tab_name}.html')
+    return render_template(f'tabs/{tab_name}.html', id_=id_)
 
 
 def get_features_for_map(
@@ -304,6 +305,7 @@ def entity_data(id_: int) -> dict[str, Any]:
         'overviewMap': overview_map_geometry,
         'categorizedTypes': get_categorized_types(entity.types),
         'citeButton': get_cite_button(entity),
+        'refreshButton': get_refresh_button(entity.id) or "",
         'mainImage': main_image,
         'initialImage': initial_images,
         'images': images}
