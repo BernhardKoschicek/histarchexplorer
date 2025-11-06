@@ -162,12 +162,25 @@ function createVideo(file) {
 
 function createImage(file, alt) {
   const img = document.createElement("img");
-  img.src = file.iiif_base_path
+
+  // Primary and fallback URLs
+  const primary = file.iiif_base_path
     ? `${file.iiif_base_path}/full/400,/0/default.jpg`
     : file.url;
+  const fallback = file.url || "/static/img/placeholder.png";
+
+  img.src = primary;
   img.alt = alt;
+
+  // Catch network or server errors (e.g. 404 / 500)
+  img.addEventListener("error", () => {
+    console.warn(`⚠️ IIIF image failed, falling back to ${fallback}`);
+    if (img.src !== fallback) img.src = fallback;
+  });
+
   return img;
 }
+
 
 function createPDF(file, alt) {
   const wrapper = document.createElement("div");
