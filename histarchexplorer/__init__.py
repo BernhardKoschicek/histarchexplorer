@@ -18,10 +18,6 @@ app.config.from_object('config.default')
 app.config.from_object('config.admin_fields')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
-
-app.config['CACHE_TYPE'] = 'FileSystemCache'
-app.config['CACHE_DIR'] = '/var/tmp/flask-cache'
-app.config['CACHE_DEFAULT_TIMEOUT'] = 3600
 cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position

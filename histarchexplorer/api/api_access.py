@@ -41,6 +41,17 @@ class ApiAccess:
             headers=g.api_headers,
             timeout=20).json()
 
+    @staticmethod
+    def get_by_system_class(
+            class_: str,
+            parser: Parser) -> list[dict[str, Any]]:
+        req = requests.get(
+            f"{app.config['API_URL']}system_class/{class_}",
+            params=parser.__dict__,
+            proxies=PROXIES,
+            timeout=60).json()
+        return req['results']
+
     # @staticmethod
     # def get_entity(id_: int, parser: Parser) -> dict[str, Any]:
     #     req = requests.get(

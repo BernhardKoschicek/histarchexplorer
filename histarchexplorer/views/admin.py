@@ -10,7 +10,9 @@ from flask_login import current_user, login_required
 from werkzeug import Response
 
 from histarchexplorer import app, cache
-from histarchexplorer.api.api_access import get_entities_count_by_case_study
+from histarchexplorer.api.api_access import ApiAccess, \
+    get_entities_count_by_case_study
+from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
@@ -318,14 +320,16 @@ def make_reset():
         env=env,
         check=True)
 
-@app.route('/clear-cache')
+@app.route('/admin/clear-cache')
+@login_required
 def clear_cache():
     cache.clear()
     flash(_('cache cleared'), 'success')
     return redirect(url_for('admin'))
 
 
-@app.route('/warm-cache')
+@app.route('/admin/warm-cache')
+@login_required
 def warm_cache():
     type_tree()
     flash(_('cache warmed'), 'success')
@@ -334,3 +338,28 @@ def warm_cache():
 def check_manager_user() -> None:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
+
+
+@app.route("/admin/warm-entity-cache", methods=["GET"])
+@login_required
+def trigger_cache_warmup():
+    """Trigger external cache warm-up process."""
+    entities = ApiAccess.get_by_system_class(
+        'all',
+        Parser(type_id=g.case_study_ids, limit=0, show=['none'], format='lpx'))
+    ids = []
+    for entity in entities:
+        ids.append(entity['features'][0]['@id'].rsplit('/', 1)[-1])
+    with open(app.config['ROOT_PATH'] / 'cache_ids.txt', mode='w') as file:
+        for id_ in ids:
+            file.write(f"{id_}\n")
+    try:
+        subprocess.Popen(
+            ["python3", "warm_entity_cache.py"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL)
+        return jsonify({
+            "status": "started",
+            "message": "Cache warmup started in background."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
