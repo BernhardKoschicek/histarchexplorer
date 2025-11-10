@@ -30,6 +30,7 @@ API_TOKEN = ''
 CACHE_DIR = '/var/tmp/flask-cache'
 CACHE_TYPE = 'FileSystemCache'
 CACHE_DEFAULT_TIMEOUT = 3600
+CACHE_THRESHOLD = 200000
 
 # Data handling
 CLASSES_TO_SKIP = {  # Entity classes excluded from processing
