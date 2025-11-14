@@ -1,7 +1,6 @@
 from typing import Any
 
 import psycopg2.extras
-import redis
 from flask import Flask, Response, g, request, session, url_for
 from flask_babel import Babel
 from flask_caching import Cache
