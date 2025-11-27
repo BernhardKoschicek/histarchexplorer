@@ -1,149 +1,172 @@
 {% extends "layout.html" %}
 {% block content %}
   <div class="page-wrapper">
-    <div class="scrollable-container">
-      <div class="container my-4">
 
-        {% macro best_label(obj) %}
-          {{ obj.display.label }}
-        {% endmacro %}
+    <div class="about-page">
+      <div class="scrollable-container">
+        <div class="container my-4">
 
-        <h1 class="h3 mb-4">{{ best_label(active.name) }}</h1>
+          {% macro best_label(obj) %}
+            {{ obj.display.label }}
+          {% endmacro %}
 
-        <div class="row">
-          <div class="col-lg-9">
+          <h1 class="h3 about-title">{{ best_label(active.name) }}</h1>
 
-            {% if active.image %}
-              <div class="mb-3">
-                <img src="{{ active.image }}"
-                     alt="{{ best_label(active.name) }}" class="img-fluid"
-                     style="max-height:140px;">
-              </div>
-            {% endif %}
+          <div class="row">
+            <div class="col-9">
 
-            {% set desc = best_label(active.description) %}
-            {% if desc %}
-              <p style="white-space:pre-wrap;">{{ desc }}</p>
-            {% endif %}
-
-
-          </div>
-
-          <div class="col-lg-3">
-
-            {# Prepare containers (Flask-compatible trick) #}
-            {% set ns = namespace(people=[], institutions=[]) %}
-
-            {% for link in active.links %}
-              {% set target = config_entities_mapped.get(link.end_id) %}
-              {% if target %}
-                {% set role = best_label(link.role) %}
-                {% if target.class_name == 'person' %}
-                  {% set _ = ns.people.append({'entity': target, 'role': role}) %}
-                {% elif target.class_name == 'institution' %}
-                  {% set _ = ns.institutions.append({'entity': target, 'role': role}) %}
-                {% endif %}
+              {% if active.image %}
+                <div class="mb-3">
+                  <img src="{{ active.image }}"
+                       alt="{{ best_label(active.name) }}" class="img-fluid"
+                       style="max-height:140px;">
+                </div>
               {% endif %}
-            {% endfor %}
 
-            {% if ns.people %}
-              <h5 class="mt-4">People</h5>
-              <ul class="list-unstyled">
-                {% for person in ns.people %}
-                  <li class="mb-2 d-flex">
-                    {% if person.entity.image %}
-                      <img src="{{ person.entity.image }}"
-                           class="rounded me-2"
-                           alt="{{ best_label(person.entity.name) }}"
-                           style="width:32px;height:32px;object-fit:cover;">
-                    {% endif %}
-                    <div>
-                      {{ best_label(person.entity.name) }}
-                      {% if person.role %}
-                        <div class="text-muted small">{{ person.role }}</div>
+              {% set desc = best_label(active.description) %}
+              {% if desc %}
+                <p style="white-space:pre-wrap;">{{ desc }}</p>
+              {% endif %}
+
+
+            </div>
+
+            <div class="col-3 about-sidebar">
+
+              {# Prepare containers (Flask-compatible trick) #}
+              {% set ns = namespace(people=[], institutions=[]) %}
+
+              {% for link in active.links %}
+                {% set target = config_entities_mapped.get(link.end_id) %}
+                {% if target %}
+                  {% set role = best_label(link.role) %}
+                  {% if target.class_name == 'person' %}
+                    {% set _ = ns.people.append({'entity': target, 'role': role}) %}
+                  {% elif target.class_name == 'institution' %}
+                    {% set _ = ns.institutions.append({'entity': target, 'role': role}) %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+
+              {% if people %}
+                <h5 class="about-section-title">{{ _('persons') }}</h5>
+                <ul class="list-unstyled">
+                  {% for person in people %}
+                    <li class="about-person">
+                      {% if person.entity.image %}
+                        <img src="{{ person.entity.image }}"
+                             class="about-avatar"
+                             alt="{{ best_label(person.entity.name) }}"
+                             style="width:32px;height:32px;object-fit:cover;">
                       {% endif %}
-                    </div>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% endif %}
 
-            {% if ns.institutions %}
-              <h5 class="mt-4">Institutions</h5>
-              <ul class="list-unstyled">
-                {% for inst in ns.institutions %}
-                  <li class="mb-2 d-flex">
-                    {% if inst.entity.image %}
-                      <img src="{{ inst.entity.image }}"
-                           class="me-2"
-                           alt="{{ best_label(inst.entity.name) }} logo"
-                           style="width:40px;height:40px;object-fit:contain;">
-                    {% endif %}
-                    <div>
-                      {{ best_label(inst.entity.name) }}
-                      {% if inst.role %}
-                        <div class="text-muted small">{{ inst.role }}</div>
+                      <div>
+                        {{ best_label(person.entity.name) }}
+                        {% if person.roles %}
+                          {% for r in person.roles %}
+                            <div class="text-muted small">{{ r }}</div>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+
+              <hr class="my-3">
+              {% if ns.institutions %}
+                <h5 class="about-section-title">{{ _('institutions') }}</h5>
+                <ul class="list-unstyled">
+                  {% for institution in institutions %}
+                    <li class="about-person">
+                      {% if institution.entity.image %}
+                        <img src="{{ institution.entity.image }}"
+                             class="about-avatar"
+                             alt="{{ best_label(institution.entity.name) }}"
+                             style="width:32px;height:32px;object-fit:cover;">
                       {% endif %}
-                    </div>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% endif %}
 
-            {% if active.website %}
-              <p>
+                      <div>
+                        {{ best_label(institution.entity.name) }}
+                        {% if institution.roles %}
+                          {% for r in institution.roles %}
+                            <div class="text-muted small">{{ r }}</div>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              <hr class="my-3">
+
+              {% if active.website %}
+                {% set short = active.website
+                   | replace("https://", "")
+                   | replace("http://", "")
+                   | replace("www.", "") %}
+
                 <a href="{{ active.website }}"
-                   class="btn btn-outline-primary btn-sm" target="_blank">{{ active.website }}</a>
-              </p>
+                   target="_blank"
+                   rel="noopener"
+                   class="about-website-pill">
+                  {{ short }}
+                  <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </a>
+              {% endif %}
+
+
+            </div>
+          </div>
+
+
+          {% if sub_projects %}
+            <hr class="my-5">
+            <h4 class="mb-3">Projects</h4>
+
+            <div class="row g-3">
+              {% for p in sub_projects %}
+                <div class="col-md-6 col-xl-4">
+                  <a href="{{ url_for('about', id_=p.id) }}"
+                     class="text-decoration-none text-dark">
+                    <div class="about-project-card">
+                      {% if p.image %}
+                        <img src="{{ p.image }}"
+                             class="about-project-img"
+                             alt="{{ best_label(p.name) }} logo"
+                             style="max-height:120px;object-fit:contain;">
+                      {% endif %}
+                      <div class="about-project-body">
+                        <h5
+                          class="about-project-title">{{ best_label(p.name) }}</h5>
+                        {% set d = best_label(p.description) %}
+                        {% if d %}
+                          <p
+                            class="about-project-text">{{ d|truncate(180) }}</p>
+                        {% endif %}
+                      </div>
+                      <div class="about-project-footer">
+                        Details →
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="row">
+            {% set imprint = best_label(main_project.imprint) %}
+            {% if imprint %}
+              <h5 class="mt-4">Imprint</h5>
+              <p style="white-space:pre-wrap;">{{ imprint }}</p>
+            {% endif %}
+
+            {% set legal = best_label(main_project.legal_notice) %}
+            {% if legal %}
+              <h5 class="mt-4">Legal Notice</h5>
+              <p style="white-space:pre-wrap;">{{ legal }}</p>
             {% endif %}
           </div>
-        </div>
-
-
-        {% if sub_projects %}
-          <hr class="my-5">
-          <h4 class="mb-3">Projects</h4>
-
-          <div class="row g-3">
-            {% for p in sub_projects %}
-              <div class="col-md-6 col-xl-4">
-                <a href="{{ url_for('about', id_=p.id) }}"
-                   class="text-decoration-none text-dark">
-                  <div class="card h-100">
-                    {% if p.image %}
-                      <img src="{{ p.image }}"
-                           class="card-img-top"
-                           alt="{{ best_label(p.name) }} logo"
-                           style="max-height:120px;object-fit:contain;">
-                    {% endif %}
-                    <div class="card-body">
-                      <h5 class="card-title">{{ best_label(p.name) }}</h5>
-                      {% set d = best_label(p.description) %}
-                      {% if d %}
-                        <p class="card-text small">{{ d|truncate(180) }}</p>
-                      {% endif %}
-                    </div>
-                    <div class="card-footer text-end small">
-                      Details →
-                    </div>
-                  </div>
-                </a>
-              </div>
-            {% endfor %}
-          </div>
-        {% endif %}
-        <div class="row">
-          {% set imprint = best_label(main_project.imprint) %}
-          {% if imprint %}
-            <h5 class="mt-4">Imprint</h5>
-            <p style="white-space:pre-wrap;">{{ imprint }}</p>
-          {% endif %}
-
-          {% set legal = best_label(main_project.legal_notice) %}
-          {% if legal %}
-            <h5 class="mt-4">Legal Notice</h5>
-            <p style="white-space:pre-wrap;">{{ legal }}</p>
-          {% endif %}
         </div>
       </div>
     </div>
