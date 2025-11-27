@@ -337,7 +337,7 @@ class PresentationView:
     def parse_file(entity_id: int, raw_file: dict) -> list[File]:
         files = []
         for f in raw_file:
-            if not f["publicShareable"]:
+            if not f["publicShareable"] or not f.get("license"):
                 continue
             files.append(File(
                 id=f["id"],
