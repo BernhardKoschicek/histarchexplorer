@@ -11,7 +11,7 @@
         <h1 class="h3 mb-4">{{ best_label(active.name) }}</h1>
 
         <div class="row">
-          <div class="col-lg-8">
+          <div class="col-lg-9">
 
             {% if active.image %}
               <div class="mb-3">
@@ -26,27 +26,10 @@
               <p style="white-space:pre-wrap;">{{ desc }}</p>
             {% endif %}
 
-            {% if active.website %}
-              <p>
-                <a href="{{ active.website }}"
-                   class="btn btn-outline-primary btn-sm" target="_blank">Website</a>
-              </p>
-            {% endif %}
 
-            {% set imprint = best_label(active.imprint) %}
-            {% if imprint %}
-              <h5 class="mt-4">Imprint</h5>
-              <p style="white-space:pre-wrap;">{{ imprint }}</p>
-            {% endif %}
-
-            {% set legal = best_label(active.legal_notice) %}
-            {% if legal %}
-              <h5 class="mt-4">Legal Notice</h5>
-              <p style="white-space:pre-wrap;">{{ legal }}</p>
-            {% endif %}
           </div>
 
-          <div class="col-lg-4">
+          <div class="col-lg-3">
 
             {# Prepare containers (Flask-compatible trick) #}
             {% set ns = namespace(people=[], institutions=[]) %}
@@ -66,16 +49,18 @@
             {% if ns.people %}
               <h5 class="mt-4">People</h5>
               <ul class="list-unstyled">
-                {% for p in ns.people %}
+                {% for person in ns.people %}
                   <li class="mb-2 d-flex">
-                    {% if p.entity.image %}
-                      <img src="{{ p.entity.image }}" class="rounded me-2"
+                    {% if person.entity.image %}
+                      <img src="{{ person.entity.image }}"
+                           class="rounded me-2"
+                           alt="{{ best_label(person.entity.name) }}"
                            style="width:32px;height:32px;object-fit:cover;">
                     {% endif %}
                     <div>
-                      {{ best_label(p.entity.name) }}
-                      {% if p.role %}
-                        <div class="text-muted small">{{ p.role }}</div>
+                      {{ best_label(person.entity.name) }}
+                      {% if person.role %}
+                        <div class="text-muted small">{{ person.role }}</div>
                       {% endif %}
                     </div>
                   </li>
@@ -89,7 +74,9 @@
                 {% for inst in ns.institutions %}
                   <li class="mb-2 d-flex">
                     {% if inst.entity.image %}
-                      <img src="{{ inst.entity.image }}" class="me-2"
+                      <img src="{{ inst.entity.image }}"
+                           class="me-2"
+                           alt="{{ best_label(inst.entity.name) }} logo"
                            style="width:40px;height:40px;object-fit:contain;">
                     {% endif %}
                     <div>
@@ -103,6 +90,12 @@
               </ul>
             {% endif %}
 
+            {% if active.website %}
+              <p>
+                <a href="{{ active.website }}"
+                   class="btn btn-outline-primary btn-sm" target="_blank">{{ active.website }}</a>
+              </p>
+            {% endif %}
           </div>
         </div>
 
@@ -118,7 +111,9 @@
                    class="text-decoration-none text-dark">
                   <div class="card h-100">
                     {% if p.image %}
-                      <img src="{{ p.image }}" class="card-img-top"
+                      <img src="{{ p.image }}"
+                           class="card-img-top"
+                           alt="{{ best_label(p.name) }} logo"
                            style="max-height:120px;object-fit:contain;">
                     {% endif %}
                     <div class="card-body">
@@ -137,6 +132,19 @@
             {% endfor %}
           </div>
         {% endif %}
+        <div class="row">
+          {% set imprint = best_label(main_project.imprint) %}
+          {% if imprint %}
+            <h5 class="mt-4">Imprint</h5>
+            <p style="white-space:pre-wrap;">{{ imprint }}</p>
+          {% endif %}
+
+          {% set legal = best_label(main_project.legal_notice) %}
+          {% if legal %}
+            <h5 class="mt-4">Legal Notice</h5>
+            <p style="white-space:pre-wrap;">{{ legal }}</p>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
