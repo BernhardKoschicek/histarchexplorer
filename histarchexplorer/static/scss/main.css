@@ -128,12 +128,19 @@ body {
   margin-right: 1.5rem;
 }
 .navbar-brand #logo {
+  width: 100%;
   max-width: 260px;
+  height: auto;
 }
 @media (max-width: 576px) {
   .navbar-brand {
     margin-right: 0;
     margin-left: 0;
+  }
+}
+@media (max-width: 420px) {
+  .navbar-brand #logo {
+    max-width: 200px;
   }
 }
 
@@ -779,6 +786,11 @@ body {
   #expand-button {
     margin-top: 0px;
   }
+}
+#expand-button #tile-references,
+#expand-button #tile-references .item-content {
+  padding-left: 0 !important;
+  padding-inline-start: 0 !important;
 }
 #expand-button i {
   font-size: 1.2rem;
