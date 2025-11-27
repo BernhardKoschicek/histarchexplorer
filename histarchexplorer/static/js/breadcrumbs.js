@@ -11,6 +11,16 @@ function renderAllBreadcrumbs(entityData, show = true) {
   ol.className = "breadcrumb";
   ol.style.setProperty("--bs-breadcrumb-divider", "''");
 
+  const li = document.createElement("li");
+    li.className = "breadcrumb-item head-breadcrumb";
+
+    const a = document.createElement("a");
+    a.className = "text-decoration-none";
+    a.textContent = (entity.system_class).toUpperCase().replace('_', ' ') + ':';
+
+    li.appendChild(a);
+    ol.appendChild(li);
+
   // Ancestors: now actual links
   hierarchy.root.forEach(ancestor => {
     const li = document.createElement("li");
