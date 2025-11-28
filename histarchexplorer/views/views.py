@@ -1,14 +1,12 @@
 from typing import Optional
 
-import requests
 from flask import (
     g, jsonify, redirect, render_template, request, session, url_for)
 from flask_login import login_required
 from werkzeug import Response
 
 from histarchexplorer import app, cache
-from histarchexplorer.api.api_access import ApiAccess, \
-    get_entities_count_by_case_study
+from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.utils.cerberos import get_view_class_count
@@ -34,7 +32,6 @@ def set_language(language: Optional[str] = None) -> Response:
     return redirect(request.referrer)
 
 
-
 @app.route('/type-tree')
 def type_tree():
     return jsonify(ApiAccess.get_type_tree())
@@ -47,8 +44,7 @@ def get_files_of_entities():
 
 @app.route('/entities-count')
 def get_entities_count_by_case_study():
-    return jsonify(get_entities_count_by_case_study())
-
+    return jsonify(ApiAccess.get_entities_count_by_case_studies())
 
 
 @app.route("/refresh-cache/<int:id_>", methods=["POST"])

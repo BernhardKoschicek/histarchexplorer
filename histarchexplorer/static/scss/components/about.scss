@@ -1,75 +1,266 @@
-.team-card {
-  padding: 1.5rem;
-  border-radius: 10px;
-  background: var(--card-bg);
-  color: black;
-
-  .col-lg-4 {
-    padding-top: 2rem;
+/* Wrapper for everything: keeps all styles inside this namespace */
+.page-wrapper .about-page,
+.page-wrapper {
+  // Main content spacing
+  .about-header {
+    margin-bottom: 2rem;
   }
 
-  &__member {
-    font-size: 1.8em;
-    padding-top: 0.5rem;
+  /* ---------- TYPOGRAPHY ---------- */
+  .about-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #222;
   }
 
-  p {
-    margin-bottom: 0;
+  .about-section-title {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #555;
+  }
+
+  .about-description {
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: #333;
+  }
+
+  /* ---------- SIDEBAR BOXES (people & institutions) ---------- */
+  .about-sidebar {
+    background: #fafafa;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .about-sidebar + .about-sidebar {
+    margin-top: 1.5rem;
+  }
+
+  /* ---------- ENTRY: people / institutions ---------- */
+  .about-person,
+  .about-institution {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid #ececec;
+  }
+
+  .about-person:last-child,
+  .about-institution:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .about-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 0.75rem;
+    border: 1px solid #ddd;
+  }
+
+  .about-icon {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    margin-right: 0.75rem;
+  }
+
+  .about-name {
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 0.1rem;
+  }
+
+  .about-role {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0;
+  }
+
+  /* ---------- PROJECT CARDS ---------- */
+  .about-project-card {
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+
+  .about-project-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    border-color: #d4d4d4;
+  }
+
+  .about-project-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    image-rendering: auto;
+    display: block;
+  }
+
+  .about-project-img-wrapper {
+    width: 100%;
+    height: clamp(120px, 14vw, 160px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f7f7f7;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    overflow: hidden;
+  }
+
+  .about-project-body {
+    padding: 1rem 1rem 0.5rem;
+  }
+
+  .about-project-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 0.5rem;
+  }
+
+  .about-project-text {
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .about-project-footer {
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    text-align: right;
+    background: #fafafa;
+    color: #555;
+    border-top: 1px solid #e5e5e5;
+  }
+
+  /* ---------- LINKS ---------- */
+  .about-link {
+    font-size: 0.9rem;
+    word-break: break-all;
+  }
+
+  /* ---------- SUBTLE HR ---------- */
+  .about-divider {
+    margin: 3rem 0;
+    border-color: #e8e8e8;
   }
 }
 
-.legal-card {
-  padding: 1rem;
-  border-radius: 10px;
+.about-website-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #f3f6ff;
+  color: #0d6efd;
+  border: 1px solid #cddaff;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.9rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 1rem;
+    margin-left: 0.3rem;
+  }
+
+  &:hover {
+    background: #e5edff;
+    border-color: #b4c9ff;
+    color: #0a58ca;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
 }
 
-.sponsor-container {
-  padding-top: 1rem;
+html[data-bs-theme="dark"],
+body.dark {
 
-  .row {
-    > .col-md-3 {
-      img {
-        max-width: 100%;
-        height: auto;
-        transition: transform 0.3s ease;
+  .about-sidebar {
+    background: var(--about-bg);
+    border-color: var(--about-border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.45);
+  }
 
-        &:hover {
-          transform: scale(0.9);
-        }
-      }
-    }
+  .about-person,
+  .about-institution {
+    border-bottom-color: var(--about-border-soft);
+  }
 
-    > div {
-      padding: 1.5rem;
-      text-align: left;
-      position: relative;
-      overflow: hidden;
+  .about-name {
+    color: var(--about-text);
+  }
 
-      &::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        right: 0;
-        width: 1px;
-        height: calc(100% - 4rem);
-        background-color: grey;
-      }
+  .about-role {
+    color: var(--about-text-muted);
+  }
 
-      &:nth-child(4n)::before {
-        display: none;
-      }
+  .about-avatar {
+    border-color: var(--about-border-soft);
+  }
 
-      @media (max-width: 767px) {
-        &::before {
-          display: none;
-        }
-        border-bottom: 1px solid grey;
+  .about-icon {
+    filter: brightness(0.85);
+  }
 
-        &:last-child {
-          border-bottom: none;
-        }
-      }
+  /* PROJECT CARDS */
+  .about-project-card {
+    background: var(--about-bg);
+    border-color: var(--about-border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.55);
+  }
+
+  .about-project-card:hover {
+    border-color: var(--about-border-soft);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  }
+
+  .about-project-img-wrapper {
+    background: var(--about-bg-soft);
+    border-bottom-color: var(--about-border-soft);
+  }
+
+  .about-project-title {
+    color: var(--about-text);
+  }
+
+  .about-project-text {
+    color: var(--about-text-muted);
+  }
+
+  .about-project-footer {
+    background: var(--about-bg-soft);
+    color: var(--about-text-muted);
+    border-top-color: var(--about-border-soft);
+  }
+
+  .about-website-pill {
+    background: #283046;
+    border-color: #3c4458;
+    color: #d5dfff;
+
+    &:hover {
+      background: #303a52;
+      border-color: #4a5570;
+      color: #e6ecff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.45);
     }
   }
 }

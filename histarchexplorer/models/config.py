@@ -109,15 +109,14 @@ class ConfigEntity:
                 case_study=entry.case_study_type_id,
                 main_project=(entry.class_name == 'main-project'),
                 links=[l_ for l_ in g.config_links if l_.start_id == entry.id]
-            ))
+                ))
 
         return entities
 
     @classmethod
     def group_by_class_name(
             cls,
-            entities: list['ConfigEntity']) \
-            -> dict[str, list['ConfigEntity']]:
+            entities: list['ConfigEntity']) -> dict[str, list['ConfigEntity']]:
         grouped = {}
         for entity in entities:
             grouped.setdefault(entity.class_name, []).append(entity)
@@ -172,7 +171,7 @@ def localize(data: dict[str, str] | None) -> str | None:
 
 def add_display(data: dict[str, Any] | None) -> dict[str, Any]:
     if not data:
-        return {'display': {'language': None, 'label': None}}
+        return {'display': {'language': None, 'label': ''}}
 
     result = data.copy()
     label = localize(data)

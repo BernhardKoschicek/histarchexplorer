@@ -23,6 +23,10 @@ class ApiAccess:
             proxies=PROXIES,
             timeout=30).json()
 
+    @staticmethod
+    def get_entities_count_by_case_studies() -> dict[str, Any]:
+        parser = Parser(type_id=g.case_study_ids)
+        return ApiAccess.get_system_class_count(parser)
 
     @staticmethod
     @cache.memoize()
@@ -109,6 +113,3 @@ class ApiAccess:
     #         timeout=30).json()
 
 
-def get_entities_count_by_case_study() -> dict[str, Any]:
-    parser = Parser(type_id=g.case_study_ids)
-    return ApiAccess.get_system_class_count(parser)
