@@ -121,7 +121,7 @@
             <div class="row g-3">
               {% for p in sub_projects %}
                 <div class="col-md-6 col-xl-4">
-                  <a href="{{ url_for('about', id_=p.id) }}"
+                  <a href="{{ url_for('about', slug=slugify(p.acronym)) }}"
                      class="text-decoration-none text-dark">
                     <div class="about-project-card">
                       {% if p.image %}
