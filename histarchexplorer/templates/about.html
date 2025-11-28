@@ -25,7 +25,7 @@
 
               {% set desc = best_label(active.description) %}
               {% if desc %}
-                <p style="white-space:pre-wrap;">{{ desc }}</p>
+                <p style="white-space:pre-wrap;">{{ desc | safe }}</p>
               {% endif %}
 
             </div>
@@ -37,13 +37,12 @@
                 <ul class="list-unstyled">
                   {% for person in people %}
                     <li class="about-person">
-                    {# Todo: delete "or True" if placeholder are unwanted #}
+                      {# Todo: delete "or True" if placeholder are unwanted #}
                       {% if person.entity.image or True %}
                         <img src="{{ person.entity.image
                         or url_for('static', filename='images/team/cool_chick1.jpg') }}"
                              class="about-avatar"
-                             alt="{{ best_label(person.entity.name) }}"
-                             style="width:32px;height:32px;object-fit:cover;">
+                             alt="{{ best_label(person.entity.name) }}">
                       {% endif %}
                       <div>
                         {{ best_label(person.entity.name) }}
@@ -56,10 +55,10 @@
                     </li>
                   {% endfor %}
                 </ul>
-              <hr class="my-3">
+                <hr class="my-3">
               {% endif %}
 
-              {% if institutions %}
+{#              {% if institutions %}
                 <h5 class="about-section-title">{{ _('institutions') }}</h5>
                 <ul class="list-unstyled">
                   {% for institution in institutions %}
@@ -67,8 +66,7 @@
                       {% if institution.entity.image %}
                         <img src="{{ institution.entity.image }}"
                              class="about-avatar"
-                             alt="{{ best_label(institution.entity.name) }}"
-                             style="width:32px;height:32px;object-fit:cover;">
+                             alt="{{ best_label(institution.entity.name) }}">
                       {% endif %}
 
                       <div>
@@ -83,8 +81,26 @@
                   {% endfor %}
                 </ul>
                 <hr class="my-3">
-              {% endif %}
+              {% endif %}#}
 
+              {% if institutions_by_role %}
+                {% for role, institutions in institutions_by_role.items() %}
+                  <h5 class="about-section-title">{{ role }}</h5>
+                  <ul class="list-unstyled">
+                    {% for inst in institutions %}
+                      <li class="about-person">
+                        {% if inst.image %}
+                          <img src="{{ inst.image }}"
+                               class="about-avatar"
+                               alt="{{ best_label(inst.name) }}">
+                        {% endif %}
+                        {{ best_label(inst.name) }}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endfor %}
+                <hr class="my-3">
+              {% endif %}
               {% if active.website %}
 
                 <a href="{{ active.website }}"
@@ -98,7 +114,7 @@
             </div>
           </div>
 
-          {% if sub_projects %}
+          {% if sub_projects and active.class_id == 5 %}
             <hr class="my-5">
             <h4 class="mb-3">Projects</h4>
 
@@ -135,16 +151,20 @@
             </div>
           {% endif %}
           <div class="row">
-            {% set imprint = best_label(main_project.imprint) %}
-            {% if imprint %}
-              <h5 class="mt-4">Imprint</h5>
-              <p style="white-space:pre-wrap;">{{ imprint }}</p>
+            {% if active.imprint %}
+              {% set imprint = best_label(main_project.imprint) %}
+              {% if imprint %}
+                <h5 class="mt-4">Imprint</h5>
+                <p style="white-space:pre-wrap;">{{ imprint }}</p>
+              {% endif %}
             {% endif %}
 
-            {% set legal = best_label(main_project.legal_notice) %}
-            {% if legal %}
-              <h5 class="mt-4">Legal Notice</h5>
-              <p style="white-space:pre-wrap;">{{ legal }}</p>
+            {% if active.legal_notice %}
+              {% set legal = best_label(main_project.legal_notice) %}
+              {% if legal %}
+                <h5 class="mt-4">Legal Notice</h5>
+                <p style="white-space:pre-wrap;">{{ legal }}</p>
+              {% endif %}
             {% endif %}
           </div>
         </div>

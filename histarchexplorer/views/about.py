@@ -26,9 +26,11 @@ def about(id_: Optional[int] = None):
     people_map = {}
     institutions_map = {}
 
+    # NEW
+    institutions_by_role = {}
+
     for link in active.links:
-        target = next((
-            e for e in g.config_entities if e.id == link.end_id), None)
+        target = next((e for e in g.config_entities if e.id == link.end_id), None)
         if not target:
             continue
 
@@ -47,6 +49,10 @@ def about(id_: Optional[int] = None):
                 institutions_map[target.id] = {"entity": target, "roles": []}
             if role:
                 institutions_map[target.id]["roles"].append(role)
+            if role:
+                if role not in institutions_by_role:
+                    institutions_by_role[role] = []
+                institutions_by_role[role].append(target)
 
     return render_template(
         "about.html",
@@ -55,4 +61,5 @@ def about(id_: Optional[int] = None):
         sub_projects=project_choices or sub_projects,
         config_entities_mapped=config_entities_mapped,
         people=list(people_map.values()),
-        institutions=list(institutions_map.values()))
+       # institutions=list(institutions_map.values()),
+        institutions_by_role=institutions_by_role)

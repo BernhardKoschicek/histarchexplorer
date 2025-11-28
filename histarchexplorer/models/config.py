@@ -171,7 +171,7 @@ def localize(data: dict[str, str] | None) -> str | None:
 
 def add_display(data: dict[str, Any] | None) -> dict[str, Any]:
     if not data:
-        return {'display': {'language': None, 'label': None}}
+        return {'display': {'language': None, 'label': ''}}
 
     result = data.copy()
     label = localize(data)
