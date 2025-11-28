@@ -2,12 +2,12 @@ from typing import Any
 
 from flask import g
 
-from histarchexplorer.api.api_access import get_entities_count_by_case_study
+from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.database.settings import get_shown_classes
 
 
 def get_view_class_count() -> dict[str, Any]:
-    entities_count = get_entities_count_by_case_study()
+    entities_count = ApiAccess.get_entities_count_by_case_studies()
 
     for key in entities_count.copy():
         if key not in get_shown_classes():
