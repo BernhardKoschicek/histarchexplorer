@@ -145,6 +145,14 @@ ADMIN_FIELDS = {
         ],
     'nav-institutions': [
         {
+            'key': 'acronym',
+            'label': 'acronym',
+            'type': 'text',
+            'translatable': False,
+            'required': True,
+            'col_class': 'col-md-2'
+            },
+        {
             'key': 'name',
             'label': 'name',
             'type': 'text',
@@ -157,7 +165,7 @@ ADMIN_FIELDS = {
             'label': 'description',
             'type': 'textarea',
             'translatable': True,
-            'col_class': 'col-md-8'
+            'col_class': 'col-md-12'
             },
         {
             'key': 'address',
@@ -165,14 +173,14 @@ ADMIN_FIELDS = {
             'type': 'textarea',
             'translatable': True,
             'required': True,
-            'col_class': 'col-lg col-md-12'
+            'col_class': 'col-6'
             },
         {
             'key': 'image',
             'label': 'Image URL',
             'type': 'text',
             'placeholder': 'Please provide a logo with 68px height',
-            'col_class': 'col-lg col-md-12',
+            'col_class': 'col-6',
             'display_image': True
             },
         {
@@ -180,14 +188,14 @@ ADMIN_FIELDS = {
             'label': 'e-mail',
             'type': 'email',
             'placeholder': 'someone@somemail.com',
-            'col_class': 'col-lg col-md-12'
+            'col_class': 'col-4'
             },
         {
             'key': 'website',
             'label': 'website',
             'type': 'url',
             'placeholder': 'https://someurl.com',
-            'col_class': 'col-lg col-md-12'
+            'col_class': 'col-4'
             },
         ],
     'nav-attributes': [

@@ -114,14 +114,14 @@ def add_entry() -> Response:
         'category': request.form.get('category', ''),
         'name': request.form.get('name', ''),
         'acronym': request.form.get('acronym', ''),
-        'email': request.form.get('mail', ''),
+        'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
-        'orcid_id': request.form.get('orcid', ''),
+        'orcid_id': request.form.get('orcid_id', ''),
         'image': request.form.get('image', ''),
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', ''),
+        'legal_notice': request.form.get('legal_notice', ''),
         'case_study': int(case_study_str)
         if case_study_str and case_study_str.isdigit() else 0}
     current_tab = 'nav-' + form_data['category']
@@ -170,7 +170,7 @@ def edit_entry() -> Response:
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', ''),
+        'legal_notice': request.form.get('legal_notice', ''),
         'case_study': case_study}
     try:
         Admin.edit_entry(form_data)
