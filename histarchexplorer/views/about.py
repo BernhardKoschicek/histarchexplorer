@@ -1,21 +1,10 @@
-import re
 from typing import Optional
-from unicodedata import normalize
 
 from flask import g, redirect, render_template, url_for
 
 from histarchexplorer import app
 from histarchexplorer.models.config import ConfigEntity
-from histarchexplorer.utils.view_util import get_view_class_count
-
-
-def slugify(value: str) -> str:
-    if not value:
-        return ""
-    value = normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
-    value = value.lower()
-    value = re.sub(r"[^a-z0-9]+", "-", value)
-    return value.strip("-")
+from histarchexplorer.utils.view_util import get_view_class_count, slugify
 
 
 @app.route('/about', strict_slashes=False)

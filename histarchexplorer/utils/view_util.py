@@ -1,5 +1,7 @@
 import datetime
+import re
 from typing import Any, Optional
+from unicodedata import normalize
 from urllib.parse import urlsplit
 
 from flask import g, render_template, url_for
@@ -108,3 +110,12 @@ def get_view_class_count(type_id: Optional[int] = None) -> dict[str, Any]:
                 return_classes[view_class]['count'] += value
 
     return return_classes
+
+
+def slugify(value: str) -> str:
+    if not value:
+        return ""
+    value = normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+    value = value.lower()
+    value = re.sub(r"[^a-z0-9]+", "-", value)
+    return value.strip("-")
