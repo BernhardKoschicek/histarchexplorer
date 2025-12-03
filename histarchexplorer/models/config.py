@@ -1,3 +1,4 @@
+import html
 from dataclasses import dataclass
 from typing import Any
 
@@ -74,6 +75,7 @@ class Properties:
 class ConfigEntity:
     id: int
     name: dict[str, str | dict[str, str]]
+    acronym: str
     description: dict[str, str | dict[str, str]]
     website: str
     legal_notice: dict[str, str | dict[str, str]]
@@ -96,6 +98,7 @@ class ConfigEntity:
             entities.append(ConfigEntity(
                 id=entry.id,
                 name=add_display(entry.name),
+                acronym=entry.acronym,
                 description=add_display(entry.description),
                 website=entry.website,
                 legal_notice=add_display(entry.legal_notice),
@@ -175,6 +178,8 @@ def add_display(data: dict[str, Any] | None) -> dict[str, Any]:
 
     result = data.copy()
     label = localize(data)
+    if isinstance(label, str):
+        label = html.unescape(label)
 
     for lang, value in data.items():
         if value == label:

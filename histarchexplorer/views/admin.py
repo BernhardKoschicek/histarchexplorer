@@ -113,14 +113,15 @@ def add_entry() -> Response:
     form_data = {
         'category': request.form.get('category', ''),
         'name': request.form.get('name', ''),
-        'email': request.form.get('mail', ''),
+        'acronym': request.form.get('acronym', ''),
+        'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
-        'orcid_id': request.form.get('orcid', ''),
+        'orcid_id': request.form.get('orcid_id', ''),
         'image': request.form.get('image', ''),
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', ''),
+        'legal_notice': request.form.get('legal_notice', ''),
         'case_study': int(case_study_str)
         if case_study_str and case_study_str.isdigit() else 0}
     current_tab = 'nav-' + form_data['category']
@@ -157,17 +158,19 @@ def edit_entry() -> Response:
     check_manager_user()
     case_study_raw = request.form.get('case_study')
     case_study = int(case_study_raw) if case_study_raw else None
+    print(request.form)
     form_data = {
         'config_id': request.form.get('config_id', type=int),
         'name': request.form.get('name', ''),
-        'email': request.form.get('mail', ''),
+        'acronym': request.form.get('acronym', ''),
+        'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
-        'orcid_id': request.form.get('orcid', ''),
+        'orcid_id': request.form.get('orcid_id', ''),
         'image': request.form.get('image', ''),
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', ''),
+        'legal_notice': request.form.get('legal_notice', ''),
         'case_study': case_study}
     try:
         Admin.edit_entry(form_data)
@@ -372,10 +375,13 @@ def refresh_system_cache():
     cache.delete_memoized(ApiAccess.get_type_tree)
     cache.delete_memoized(ApiAccess.get_files_of_entities)
     cache.delete_memoized(ApiAccess.get_system_class_count)
+    cache.delete_memoized(ApiAccess.get_entities_count_by_case_studies)
 
     ApiAccess.get_type_tree()
     ApiAccess.get_files_of_entities()
     ApiAccess.get_entities_count_by_case_studies()
+    for case_study in g.case_study_ids:
+        ApiAccess.get_entities_count_by_case_studies(case_study)
 
     flash(_('system cache refreshed'), 'success')
     return redirect(url_for('admin'))

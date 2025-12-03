@@ -1,32 +1,44 @@
 from typing import Optional
 
-from flask import g, render_template
+from flask import g, redirect, render_template, url_for
 
 from histarchexplorer import app
 from histarchexplorer.models.config import ConfigEntity
+from histarchexplorer.utils.view_util import get_view_class_count, slugify
 
 
 @app.route('/about', strict_slashes=False)
-@app.route('/about/<int:id_>')
-def about(id_: Optional[int] = None):
+@app.route('/about/<slug>')
+def about(slug: Optional[str] = None):
+
     grouped = ConfigEntity.group_by_class_name(g.config_entities)
     main_project = grouped.get('main-project', [None])[0]
     sub_projects = grouped.get('project', [])
 
     config_entities_mapped = {e.id: e for e in g.config_entities}
 
-    active = main_project
+    projects_by_slug = {}
+    for p in [main_project] + sub_projects:
+        s = slugify(p.acronym)
+        projects_by_slug[s] = p
+
+    if slug:
+        active = projects_by_slug.get(slug)
+        if not active:
+            return redirect(url_for('about'))
+    else:
+        active = main_project
+
     project_choices = []
-    if id_:
-        active = config_entities_mapped[id_]
+    if slug:
         for p in [main_project] + sub_projects:
-            if p.id != id_:
+            if p is not active:
                 project_choices.append(p)
+    else:
+        project_choices = sub_projects
 
     people_map = {}
     institutions_map = {}
-
-    # NEW
     institutions_by_role = {}
 
     for link in active.links:
@@ -49,11 +61,7 @@ def about(id_: Optional[int] = None):
                 institutions_map[target.id] = {"entity": target, "roles": []}
             if role:
                 institutions_map[target.id]["roles"].append(role)
-            if role:
-                if role not in institutions_by_role:
-                    institutions_by_role[role] = []
-                institutions_by_role[role].append(target)
-
+                institutions_by_role.setdefault(role, []).append(target)
     return render_template(
         "about.html",
         active=active,
@@ -61,5 +69,6 @@ def about(id_: Optional[int] = None):
         sub_projects=project_choices or sub_projects,
         config_entities_mapped=config_entities_mapped,
         people=list(people_map.values()),
-       # institutions=list(institutions_map.values()),
-        institutions_by_role=institutions_by_role)
+        institutions_by_role=institutions_by_role,
+        slugify=slugify,
+        view_class_count=get_view_class_count(active.case_study))

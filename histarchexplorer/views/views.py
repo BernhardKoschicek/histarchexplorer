@@ -5,11 +5,11 @@ from flask import (
 from flask_login import login_required
 from werkzeug import Response
 
-from histarchexplorer import app, cache
+from histarchexplorer import ConfigEntity, app, cache
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
-from histarchexplorer.utils.cerberos import get_view_class_count
+from histarchexplorer.utils.view_util import get_view_class_count, slugify
 
 
 @app.route('/')
@@ -18,12 +18,43 @@ def index() -> str:
     map_ = None
     if index_map := map_data['map']:
         map_ = get_map_tilestring(index_map).tilestring
-    view_classes = get_view_class_count()
+
+    grouped = ConfigEntity.group_by_class_name(g.config_entities)
+    main_project = grouped.get('main-project', [None])[0]
+    sub_projects = grouped.get('project', [])
+
+    projects = [main_project] + sub_projects if main_project else sub_projects
+
+    project_cards = []
+    for p in projects:
+        slug = slugify(p.acronym)
+
+        # ensure description is safe + truncated server-side
+        desc_label = p.description.get("display", {}).get("label") \
+            if p.description['display']['label'] else ""
+        if desc_label:
+            short_desc = desc_label[:200] + "…" if len(desc_label) > 120 \
+                else desc_label
+        else:
+            short_desc = ""
+
+        project_cards.append({
+            "id": p.id,
+            "name": p.name['display']['label'],
+            "acronym": p.acronym,
+            "slug": slug,
+            "image": p.image,
+            "description": short_desc})
+
+    # This is just for the carousal
+    project_cards = project_cards[:12]
+
     return render_template(
         'index.html',
         map=map_,
         map_data=map_data,
-        view_classes=view_classes)
+        view_class_count=get_view_class_count(),
+        project_cards=project_cards)
 
 
 @app.route('/language=<language>')

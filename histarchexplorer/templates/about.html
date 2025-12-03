@@ -1,5 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
+  {% set icons = {
+  'places': 'bi-geo-alt',
+  'features': 'bi-layers',
+  'items': 'bi-box',
+  'events': 'bi-calendar-event',
+  'sources': 'bi-book',
+  'files': 'bi-file-earmark'
+} %}
+
   <div class="page-wrapper">
 
     <div class="about-page">
@@ -9,34 +18,59 @@
           {% macro best_label(obj) %}
             {{ obj.display.label }}
           {% endmacro %}
+          <div class="row">
+            <div class="col">
+              <h1 class="h3 about-title">{{ best_label(active.name) }}</h1>
 
-          <h1 class="h3 about-title">{{ best_label(active.name) }}</h1>
+            </div>
+            <div class="col-3 ">
+              {% if active.website %}
+                <a href="{{ active.website }}"
+                   target="_blank"
+                   rel="noopener"
+                   class="about-website-pill">
+                  {{ active.website | domain }}
+                  <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </a>
+              {% endif %}
+            </div>
+
+          </div>
 
           <div class="row">
             <div class="col-9">
-
               {% if active.image %}
-                <div class="mb-3">
+                <div class="mb-3 p-5">
                   <img src="{{ active.image }}"
                        alt="{{ best_label(active.name) }}" class="img-fluid"
                        style="max-height:140px;">
                 </div>
               {% endif %}
-
               {% set desc = best_label(active.description) %}
               {% if desc %}
-                <p style="white-space:pre-wrap;">{{ desc | safe }}</p>
+                <p>{{ active.description.display.label | safe }}</p>
               {% endif %}
-
             </div>
-
-            <div class="col-3 about-sidebar">
-
+            <button class="btn btn-outline-secondary d-lg-none mb-3"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#aboutSidebar">
+              {{ _('Show details') }}
+            </button>
+            <div class="col-3 about-sidebar collapse show" id="aboutSidebar">
+              {% if active.acronym %}
+                <h5 class="about-section-title">{{ active.acronym }}</h5>
+                <hr class="my-3">
+              {% endif %}
               {% if people %}
-                <h5 class="about-section-title">{{ _('persons') }}</h5>
+                <h5
+                  class="about-section-title">{{ _('persons') | capitalize }}</h5>
                 <ul class="list-unstyled">
                   {% for person in people %}
-                    <li class="about-person">
+                    <li class="about-person"
+                        data-id="{{ person.entity.id }}"
+                        data-type="person"
+                        data-bs-toggle="modal"
+                        data-bs-target="#entityModal">
                       {# Todo: delete "or True" if placeholder are unwanted #}
                       {% if person.entity.image or True %}
                         <img src="{{ person.entity.image
@@ -58,37 +92,17 @@
                 <hr class="my-3">
               {% endif %}
 
-{#              {% if institutions %}
-                <h5 class="about-section-title">{{ _('institutions') }}</h5>
-                <ul class="list-unstyled">
-                  {% for institution in institutions %}
-                    <li class="about-person">
-                      {% if institution.entity.image %}
-                        <img src="{{ institution.entity.image }}"
-                             class="about-avatar"
-                             alt="{{ best_label(institution.entity.name) }}">
-                      {% endif %}
-
-                      <div>
-                        {{ best_label(institution.entity.name) }}
-                        {% if institution.roles %}
-                          {% for r in institution.roles %}
-                            <div class="text-muted small">{{ r }}</div>
-                          {% endfor %}
-                        {% endif %}
-                      </div>
-                    </li>
-                  {% endfor %}
-                </ul>
-                <hr class="my-3">
-              {% endif %}#}
-
               {% if institutions_by_role %}
                 {% for role, institutions in institutions_by_role.items() %}
-                  <h5 class="about-section-title">{{ role }}</h5>
+                  <h5 class="about-section-title">{{ role | capitalize }}</h5>
                   <ul class="list-unstyled">
                     {% for inst in institutions %}
-                      <li class="about-person">
+                      <li class="about-person"
+                          data-id="{{ inst.id }}"
+                          data-type="institution"
+                          data-bs-toggle="modal"
+                          data-bs-target="#entityModal">
+
                         {% if inst.image %}
                           <img src="{{ inst.image }}"
                                class="about-avatar"
@@ -101,18 +115,38 @@
                 {% endfor %}
                 <hr class="my-3">
               {% endif %}
-              {% if active.website %}
-
-                <a href="{{ active.website }}"
-                   target="_blank"
-                   rel="noopener"
-                   class="about-website-pill">
-                  {{ active.website | domain }}
-                  <i class="bi bi-box-arrow-up-right ms-1"></i>
-                </a>
-              {% endif %}
             </div>
           </div>
+
+          {# todo: link with entities browse #}
+          {% if view_class_count %}
+            <hr class="my-5 border-top">
+            <h4 class="mb-4 text-center">
+              {% if active.class_id == 5 %}
+                {{ _('data overview') | capitalize }}
+              {% else %}
+                {{ _('project data overview') | capitalize }}
+              {% endif %}
+            </h4>
+            <div class="row text-center g-4">
+              {% for key, data in view_class_count.items() %}
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="vcounter-item">
+                    <div class="vcounter-icon mb-2">
+                      <i class="bi {{ icons.get(key, 'bi-archive') }}"></i>
+                    </div>
+                    <div class="vcounter-number"
+                         data-target="{{ data.count }}">0
+                    </div>
+                    <div class="vcounter-label text-uppercase small mt-1">
+                      {{ key }}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
 
           {% if sub_projects and active.class_id == 5 %}
             <hr class="my-5">
@@ -121,7 +155,7 @@
             <div class="row g-3">
               {% for p in sub_projects %}
                 <div class="col-md-6 col-xl-4">
-                  <a href="{{ url_for('about', id_=p.id) }}"
+                  <a href="{{ url_for('about', slug=slugify(p.acronym)) }}"
                      class="text-decoration-none text-dark">
                     <div class="about-project-card">
                       {% if p.image %}
@@ -132,13 +166,12 @@
                         </div>
                       {% endif %}
 
-                      <div class="about-project-body">
+                      <div class="about-project-body pt-2">
                         <h5
                           class="about-project-title">{{ best_label(p.name) }}</h5>
-                        {% set d = best_label(p.description) %}
-                        {% if d %}
+                        {% if p.description %}
                           <p
-                            class="about-project-text">{{ d|truncate(180) }}</p>
+                            class="about-project-text">{{ p.description.display.label | safe |truncate(180) }}</p>
                         {% endif %}
                       </div>
                       <div class="about-project-footer">
@@ -151,24 +184,145 @@
             </div>
           {% endif %}
           <div class="row">
-            {% if active.imprint %}
-              {% set imprint = best_label(main_project.imprint) %}
-              {% if imprint %}
-                <h5 class="mt-4">Imprint</h5>
-                <p style="white-space:pre-wrap;">{{ imprint }}</p>
-              {% endif %}
+            {% if main_project.imprint %}
+              <h5 class="mt-4">{{ _('imprint') | capitalize }}</h5>
+              <p>{{ main_project.imprint.display.label | safe }}</p>
             {% endif %}
 
-            {% if active.legal_notice %}
-              {% set legal = best_label(main_project.legal_notice) %}
-              {% if legal %}
-                <h5 class="mt-4">Legal Notice</h5>
-                <p style="white-space:pre-wrap;">{{ legal }}</p>
-              {% endif %}
+            {% if main_project.legal_notice %}
+              <h5 class="mt-4">{{ _('legal notice') | capitalize }}</h5>
+              <p>{{ main_project.legal_notice.display.label | safe }}</p>
             {% endif %}
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Shared Entity Modal -->
+  <div class="modal fade" id="entityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="entityModalLabel">Loading...</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <div id="entityModalImage" class="text-center mb-3"></div>
+
+          <p id="entityModalDescription"></p>
+
+          <div id="entityModalMeta"></div>
+
+          <div id="entityModalLinks"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const ENTITY_DATA = {{ config_entities_mapped | tojson }};
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+      function bestLabel(obj) {
+        if (!obj) return "";
+
+        if (obj.display && typeof obj.display.label === "string") {
+          return obj.display.label;
+        }
+
+        for (const [k, v] of Object.entries(obj)) {
+          if (typeof v === "string") {
+            return v;
+          }
+        }
+
+        return "";
+      }
+
+      const modalLabel = document.getElementById("entityModalLabel");
+      const modalImage = document.getElementById("entityModalImage");
+      const modalDescription = document.getElementById("entityModalDescription");
+      const modalMeta = document.getElementById("entityModalMeta");
+      const modalLinks = document.getElementById("entityModalLinks");
+
+      document.querySelectorAll("[data-bs-target='#entityModal']").forEach(el => {
+        el.addEventListener("click", function () {
+
+          const id = this.dataset.id;
+          const entity = ENTITY_DATA[id];
+
+          modalLabel.textContent = bestLabel(entity.name);
+
+          // Image
+          if (entity.image) {
+            modalImage.innerHTML = `<img src="${entity.image}" class="img-fluid" style="max-height:200px;">`;
+          } else {
+            modalImage.innerHTML = "";
+          }
+
+          // Description
+          const desc = entity.description?.display?.label || "";
+          modalDescription.innerHTML = desc;
+
+          // Meta fields (website, email, address, ORCID…)
+          let metaHtml = "<ul class='list-unstyled'>";
+          if (entity.website) metaHtml += `<li><strong>Website:</strong> <a href="${entity.website}" target="_blank">${entity.website}</a></li>`;
+          if (entity.email) metaHtml += `<li><strong>Email:</strong> <a href="mailto:${entity.email}">${entity.email}</a></li>`;
+          if (entity.orcid_id) {
+            const cleanOrcid = entity.orcid_id.trim().replace(/\s/g, '');
+            metaHtml += `<li><strong>ORCID:</strong> <a href="https://orcid.org/${cleanOrcid}" target="_blank">${entity.orcid_id}</a></li>`;
+          }
+          if (entity.address && entity.address.display && entity.address.display.label) {
+            metaHtml += `<li><strong>Address:</strong> ${entity.address.display.label.replace(/\n/g, '<br>')}</li>`;
+          }
+          metaHtml += "</ul>";
+
+          modalMeta.innerHTML = metaHtml;
+
+          // Links (roles / affiliations)
+          let linkHtml = "";
+          if (entity.links && entity.links.length) {
+            linkHtml = "<hr><h6>{{ _('relations') | capitalize }}</h6><ul>";
+            entity.links.forEach(l => {
+              const role = l.role?.display?.label || "";
+              const endName = bestLabel(l.end_name);
+              linkHtml += `<li>${role ? role + " – " : ""}${endName}</li>`;
+            });
+            linkHtml += "</ul>";
+          }
+
+          modalLinks.innerHTML = linkHtml;
+        });
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const counters = document.querySelectorAll(".vcounter-number");
+
+      counters.forEach(counter => {
+        const target = +counter.dataset.target;
+        const duration = 800;
+        const steps = 200;
+        const increment = target / steps;
+        let current = 0;
+
+        const tick = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(tick);
+          }
+          counter.textContent = Math.floor(current);
+        }, duration / steps);
+      });
+    });
+  </script>
 {% endblock %}
