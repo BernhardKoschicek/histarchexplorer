@@ -934,6 +934,28 @@ body {
 #js-description {
   overflow-y: auto;
   max-height: 33vh;
+  padding-right: 6px; /* etwas Platz für Scrollbar */
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #999 transparent;
+}
+
+/* Chrome, Edge, Safari */
+#js-description::-webkit-scrollbar {
+  width: 8px;
+}
+
+#js-description::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#js-description::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 8px;
+}
+
+#js-description::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 #muuri-map {

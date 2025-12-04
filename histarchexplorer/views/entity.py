@@ -113,6 +113,7 @@ def get_features_for_map(
 
 
 def check_sidebar_elements(tab: str, id_: int) -> bool:
+    return True
     match tab:
         case 'map':
             return bool(get_first_geom(id_))
