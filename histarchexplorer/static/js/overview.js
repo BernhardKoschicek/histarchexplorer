@@ -182,8 +182,10 @@ function renderDescription(entity) {
 function renderMapTile(entity) {
     const tile = document.getElementById("tile-map");
     if (!tile) return;
-    if (!entity?.geometries?.length && !entity?.overviewMap.features?.length);
-    tile.hidden = false;
+    tile.hidden = false
+    if (entity.overviewMap.type === "FeatureCollection") {
+        if (entity.overviewMap.features.length === 0) tile.hidden = true
+    };
     relayout(10);
 }
 
@@ -200,7 +202,6 @@ function renderAttributes(categorizedTypes) {
         });
         host.appendChild(label);
         items.forEach((entry) => {
-            console.log(entry)
             const t = entry.type || {};
             const vu = t.value && t.unit ? `: ${t.value} ${t.unit}` : "";
             const badge = h("div", {class: "badge custom-badge text-wrap m-1", "data-id": t.id || ""},
@@ -275,7 +276,7 @@ function renderReferences(entity) {
     const refreshButton = data.refreshButton || {};
     const mainImage = data.mainImage;
     const initialImages = data.initialImage;
-    const allImages = data.images;
+    const allImages = data.images.filter(t => !t.from_super_entity);
     const additionalFilesOverview = window.additionalFilesOverview || 0;
 
     const grid = document.querySelector(".grid-overview");
@@ -414,9 +415,10 @@ function renderReferences(entity) {
     if (typeof renderReferences === "function") renderReferences(entity);
 
     // === MEDIA OVERVIEW ===
-    const files = [];
+    let files = [];
     if (mainImage) files.push(mainImage);
     if (Array.isArray(initialImages)) files.push(...initialImages);
+    files = files.filter(t => !t.from_super_entity);
     if (typeof renderOverviewMediaTiles === "function") {
         renderOverviewMediaTiles(files, allImages, additionalFilesOverview);
     }

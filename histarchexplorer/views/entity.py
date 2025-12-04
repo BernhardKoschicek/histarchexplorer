@@ -229,17 +229,28 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     return root
 
 
-def get_sub_count(main_entity: PresentationView) -> int:
-    count = 0
+def get_sub_count(main_entity: PresentationView, ent_id) -> int:
     sub_relations_map = {
         'place': ['feature'],
         'feature': ['stratigraphic_unit'],
         'stratigraphic_unit': ['artifact', 'human_remains'],
         'artifact': ['artifact'],
-        'human_remains': ['human_remains']}
+        'human_remains': ['human_remains'],
+    }
+
+    count = 0
+
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
-        count += len(main_entity.relations.get(rel_type, []))
+        for rel in main_entity.relations.get(rel_type, []):
+            count += sum(
+                1
+                for rt in rel.relation_types
+                if rt.get("relationTo") == ent_id
+                and rt.get("property") == "crm:P46i_forms_part_of"
+            )
+
     return count
+
 
 
 def get_files_for_id(id: int) -> dict[str, list[str]]:
@@ -286,7 +297,7 @@ def presentation_view(id_: int) -> dict[str, Any]:
 def entity_data(id_: int) -> dict[str, Any]:
     entity = PresentationView.from_api(id_)
     hierarchy = {
-        'subs': get_sub_count(entity),
+        'subs': get_sub_count(entity, id_),
         'root': get_hierarchy(entity)}
     overview_map_geometry = entity.geometry_json
 

@@ -132,7 +132,7 @@
 
     // Fit bounds
     features.forEach(f => extendBounds(f.geometry));
-    console.log(bounds)
+
     if (!bounds.isEmpty()) {
       overviewMap.fitBounds(bounds, { padding: 50, duration: 0 });
     }
