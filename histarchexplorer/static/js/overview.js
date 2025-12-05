@@ -237,7 +237,7 @@ function renderReferences(entity) {
             }),
             h("p", {
                 class: "reference-description",
-                text: `${ref.citation || ""} ${ref.pages.replace("##main", "") || ""}`.trim()
+                text: `${ref.citation || ""} ${(ref.pages || "").replace("##main", "")}`.trim()
             })
         ]));
         list.appendChild(li);
@@ -379,9 +379,9 @@ function renderReferences(entity) {
       }, [
         h("div", {class: "item-content"}, [h("div", {id: "js-attributes"})]),
       ]);*/
-    const mapTile = h("div", {class: "item", id: "tile-map", hidden: true}, [
+    const mapTile = h("div", {class: "item", id: "tile-map", hidden: true, title: "Click to open detailed Map"}, [
         h("div", {class: "item-content item-content-full"}, [
-            h("div", {id: "muuri-map", style: "height:300px;"}),
+            h("div", {id: "muuri-map", href: "/map", style: "height:300px;"}),
         ]),
     ]);
     const refTile = h("div", {
