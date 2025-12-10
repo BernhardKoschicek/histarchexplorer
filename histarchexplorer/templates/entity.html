@@ -36,10 +36,6 @@
             });
 
         {% else %}
-            console.log(tabsToLoad)
-
-
-
             window.entityData = fetchEntityData({{ entity_id }});
             (async function initializeEntity() {
                 // Wait until the entity data is fetched
