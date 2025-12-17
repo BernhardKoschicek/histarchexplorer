@@ -174,6 +174,9 @@
         paginationSize: 50,
         paginationSizeSelector: [20, 50, 100],
         columns: columns{{ tab_name }},
+        initialSort: [
+        { column: "name", dir: "asc" }
+        ],
         dataLoaded: function () {
             update{{ tab_name }}Counter();
         },
