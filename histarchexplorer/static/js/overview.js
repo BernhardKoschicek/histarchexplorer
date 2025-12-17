@@ -256,6 +256,9 @@ function renderSubTile(entity) {
         const tab = document.getElementById("tab-subunits");
         const tabTrigger = new bootstrap.Tab(tab);
         tabTrigger.show();
+        setTimeout(() => {
+    if (gridsubunits) gridsubunits.refreshItems().layout();
+  }, 50);
     })
 
 }
