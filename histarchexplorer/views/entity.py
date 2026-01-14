@@ -10,8 +10,8 @@ from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation)
 from histarchexplorer.database.entity import (
     check_if_place_hierarchy, get_first_geom)
-from histarchexplorer.utils.view_util import get_cite_button, \
-    get_refresh_button
+from histarchexplorer.utils.view_util import (
+    get_cite_button, get_refresh_button)
 from histarchexplorer.views.entities import get_browse_list_entities
 from histarchexplorer.views.views import type_tree
 
@@ -229,33 +229,27 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     return root
 
 
-def get_sub_count(main_entity: PresentationView, ent_id) -> int:
+def get_sub_count(main_entity: PresentationView) -> dict[str, int | list[int]]:
     sub_relations_map = {
         'place': ['feature'],
         'feature': ['stratigraphic_unit'],
         'stratigraphic_unit': ['artifact', 'human_remains'],
         'artifact': ['artifact'],
-        'human_remains': ['human_remains'],
-    }
-
+        'human_remains': ['human_remains']}
     count = 0
     ids = []
-
-    print(ent_id)
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
         for rel in main_entity.relations.get(rel_type, []):
             count += sum(
                 1
                 for rt in rel.relation_types
-                if rt.get("relationTo") == ent_id
-                and rt.get("property") == "crm:P46i_forms_part_of"
-            )
+                if rt.get("relationTo") == main_entity.id
+                and rt.get("property") == "crm:P46i_forms_part_of")
             for rt in rel.relation_types:
-                if rt.get("relationTo") == ent_id and rt.get("property") == "crm:P46i_forms_part_of":
-                    print(rt)
+                if rt.get("relationTo") == main_entity.id \
+                        and rt.get("property") == "crm:P46i_forms_part_of":
                     ids.append(rel.id)
-    data = {'count': count, 'ids': ids}
-    return data
+    return {'count': count, 'ids': ids}
 
 
 def get_files_for_id(id_: int) -> dict[str, list[str]] | None:
@@ -289,7 +283,7 @@ def get_files_for_id(id_: int) -> dict[str, list[str]] | None:
     return None
 
 
-@app.route('/get_rastermaps/<int:id>')
+@app.route('/get_rastermaps/<int:id_>')
 def get_rastermaps(id_: int) -> str:
     return json.dumps(get_files_for_id(id_))
 
@@ -302,12 +296,10 @@ def presentation_view(id_: int) -> dict[str, Any]:
 @app.route('/entity-data/<int:id_>')
 def entity_data(id_: int) -> dict[str, Any]:
     entity = PresentationView.from_api(id_)
-    data = get_sub_count(entity, id_)
-    count = data['count']
-    sub_ids = data['ids']
+    data = get_sub_count(entity)
     hierarchy = {
-        'ids': sub_ids,
-        'subs': count,
+        'ids': data['ids'],
+        'subs': data['count'],
         'root': get_hierarchy(entity)}
     overview_map_geometry = entity.geometry_json
 
