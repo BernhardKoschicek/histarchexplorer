@@ -201,7 +201,7 @@ def add_entry(data: dict) -> int:
     return id_
 
 
-def update_config_entry(data: dict) -> None:
+def update_config_entry(data: dict[str, str]) -> None:
     config_id = data['config_id']
     if not check_if_config_entry_exist(config_id):
         raise 404
@@ -220,7 +220,7 @@ def update_config_entry(data: dict) -> None:
     _upsert_jsonb_fields(config_id, data)
 
 
-def _upsert_jsonb_fields(config_id: int, data: dict) -> None:
+def _upsert_jsonb_fields(config_id: int, data: dict[str, str]) -> None:
     language = g.language
     valid_cols = {'address', 'description', 'imprint', 'legal_notice', 'name'}
     for col in valid_cols:

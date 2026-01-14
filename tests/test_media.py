@@ -3,7 +3,7 @@ from flask import url_for
 from histarchexplorer import app
 
 
-def test_media(client):
+def test_media(client) -> None:
     with app.app_context():
         rv = client.get(
             url_for(

@@ -3,7 +3,7 @@ from flask import url_for
 from histarchexplorer import app
 
 
-def test_entity(client):
+def test_entity(client) -> None:
     with app.app_context():
         rv = client.get(url_for('entity_view', id_=50505))
         assert rv.status_code == 200

@@ -4,31 +4,31 @@ from typing import Optional
 
 @dataclass
 class Parser:
-    search: list[str] = None
-    entities: list[str] = None
-    linked_entities: list[str] = None
-    cidoc_classes: list[str] = None
-    view_classes: list[str] = None
-    system_classes: list[str] = None
-    type_id: list[int] = None
-    show: list[str] = None
+    search: list[str]
+    entities: list[str]
+    linked_entities: list[str]
+    cidoc_classes: list[str]
+    view_classes: list[str]
+    system_classes: list[str]
+    type_id: list[int]
+    show: list[str]
+    first: int
+    last: int
+    page: int
+    export: str
+    relation_type: int
+    geometry: list[str]
+    file_id: int
+    properties: list[str]
     download: bool = False
     count: bool = False
     locale: str = 'en'
     sort: str = 'asc'
     column: str = 'name'
     limit: int = 0
-    first: int = None
-    last: int = None
-    page: int = None
-    export: str = None
     format: str = 'lpx'
-    relation_type: int = None
     centroid: str = 'false'
-    geometry: list[str] = None
     image_size: str = ''
-    file_id: int = None
-    properties: list[str] = None
 
     def __setattr__(
             self,

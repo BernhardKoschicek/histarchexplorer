@@ -19,7 +19,7 @@ _('about')
 
 
 @app.template_filter("domain")
-def domain_filter(url):
+def domain_filter(url: str) -> str:
     return urlsplit(url).netloc
 
 
@@ -32,7 +32,7 @@ def inject_menu() -> dict[str, Any]:
     return {'navbar': navbar}
 
 
-def find_children_by_id(data, target_id):
+def find_children_by_id(data, target_id) -> list[dict[str, str]]:
     result = []
 
     def collect_descendants(children, depth=1):

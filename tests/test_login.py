@@ -3,7 +3,7 @@ from flask import url_for
 from histarchexplorer import app
 
 
-def test_login(client):
+def test_login(client) -> None:
     with app.app_context():
         rv = client.get(url_for('login'))
         assert b"Username" in rv.data

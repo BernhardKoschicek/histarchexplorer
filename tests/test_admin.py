@@ -3,7 +3,7 @@ from flask import url_for
 from histarchexplorer import app
 
 
-def test_admin_page(client):
+def test_admin_page(client) -> None:
     with app.app_context():
         rv = client.get(url_for('admin'), follow_redirects=True)
         assert b"Username" in rv.data

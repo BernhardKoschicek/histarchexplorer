@@ -49,11 +49,11 @@ class Admin:
         return update_map(data)
 
     @staticmethod
-    def add_entry(data: dict) -> int:
+    def add_entry(data: dict[str, str]) -> int:
         return add_entry(data)
 
     @staticmethod
-    def edit_entry(data: dict) -> None:
+    def edit_entry(data: dict[str, str]) -> None:
         return update_config_entry(data)
 
     @staticmethod
@@ -92,7 +92,7 @@ class Admin:
 
     @staticmethod
     def process_entities_by_tab(
-            tabs: list[dict],
+            tabs: list[dict[str, str]],
             entry: Optional[str]) -> dict[str, list[dict[str, Any]]]:
         result = {}
         for t_data in tabs:

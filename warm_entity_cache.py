@@ -27,7 +27,7 @@ def get_by_system_class(
     return req['results']
 
 
-def refresh_entity_cache(entity_id: int):
+def refresh_entity_cache(entity_id: int) -> None:
     """Clear and rebuild cache for one entity via admin endpoint."""
     time.sleep(1)
     url = f"{API_BASE}/refresh-cache/{entity_id}"
@@ -37,7 +37,7 @@ def refresh_entity_cache(entity_id: int):
         print(f"Error refreshing {entity_id}: {e}")
 
 
-def warm_entity_cache(entity_id: int):
+def warm_entity_cache(entity_id: int) -> None:
     """Just trigger the cached endpoint."""
     time.sleep(1)
     url = f"{API_BASE}/presentation-view/{entity_id}"
@@ -47,7 +47,7 @@ def warm_entity_cache(entity_id: int):
         print(f"Error warming {entity_id}: {e}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Warm or refresh entity cache.")
     parser.add_argument(

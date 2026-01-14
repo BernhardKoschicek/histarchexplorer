@@ -6,7 +6,7 @@ from histarchexplorer.database.user import get_by_username, get_user_by_id
 
 
 class User(UserMixin):
-    def __init__(self, row: Optional[Any] = None) -> None:
+    def __init__(self, row: Any) -> None:
         self.id = row.id
         self.active = row.active == 1
         self.username = row.username

@@ -159,7 +159,7 @@ class Reference:
     pages: Optional[str] = None
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data) -> 'Reference':
         return cls(
             id=data["id"],
             title=data.get("title"),

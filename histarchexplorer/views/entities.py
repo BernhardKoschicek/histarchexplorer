@@ -1,10 +1,12 @@
+from typing import Any
+
 from flask import g, render_template
 
 from histarchexplorer import app
 from histarchexplorer.views.views import type_tree
 
 
-def get_recursive_type_ids(id):
+def get_recursive_type_ids(id_) -> dict[str, Any]:
     sql = """
             (WITH RECURSIVE children_chain AS (
             -- Anchor: start with the given id as the root
@@ -24,14 +26,13 @@ def get_recursive_type_ids(id):
         FROM children_chain
         ORDER BY level, id)
     """
-    g.cursor.execute(sql, {'id': id})
-    result = g.cursor.fetchall()
+    g.cursor.execute(sql, {'id': id_})
     #print('result get_recursive_type_ids(id)')
     #print(result)
-    return result
+    return g.cursor.fetchall()
 
 
-def build_id_collection(ids):
+def build_id_collection(ids) -> list[int]:
     if not ids:
         return []
 
@@ -45,7 +46,7 @@ def build_id_collection(ids):
     return result
 
 
-def get_browse_list_entities(id=None):
+def get_browse_list_entities(id = None) -> dict[str, Any] | None:
 
     #per default the whitelist ids are shown
     shown_ids = g.settings.shown_ids

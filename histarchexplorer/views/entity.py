@@ -51,7 +51,7 @@ def get_entity_images(
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
-def get_entity(id_: int, tab_name=None) -> str:
+def get_entity(id_: int, tab_name: str = None) -> str:
     if tab_name == 'subunits':
         subunit_data = get_browse_list_entities(id_)
         filtered_view_classes = {
@@ -86,7 +86,7 @@ def get_entity(id_: int, tab_name=None) -> str:
 def get_features_for_map(
         e: PresentationView,
         hierarchy: Optional[dict[str, Any]] = None) \
-        -> list[Optional[dict[str, Any]]]:
+        -> list[dict[str, Any] | None]:
     map_data = []
     first_geom = None
     if e.geometry_json:

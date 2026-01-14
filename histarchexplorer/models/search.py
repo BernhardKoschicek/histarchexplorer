@@ -7,7 +7,7 @@ from flask import g
 class SearchService:
     """Service layer for handling search-related business logic."""
 
-    def __init__(self, app):
+    def __init__(self, app) -> None:
         self.api_url = app.config['API_URL']
         self.view_classes = g.view_classes
         self.app_logger = app.logger
@@ -44,7 +44,7 @@ class SearchService:
             self,
             query: str,
             category: str,
-            system_classes: list) -> list:
+            system_classes: list[str]) -> list[str]:
         """
         Performs a search based on query, category, and system classes.
         Args:
@@ -68,7 +68,7 @@ class SearchService:
                 all_results.extend(self._make_api_call(url))
         return all_results
 
-    def get_entity_detail(self, entity_id: int) -> dict | None:
+    def get_entity_detail(self, entity_id: int) -> dict[str, str] | None:
         """
         Fetches detailed information for a specific entity.
         Args:

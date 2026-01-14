@@ -1,7 +1,9 @@
+from typing import NamedTuple
+
 from flask import g
 
 
-def get_config_entities() -> tuple[str]:
+def get_config_entities() -> NamedTuple:
     g.cursor.execute(
         f"""SELECT 
             c.id,

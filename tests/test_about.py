@@ -3,7 +3,7 @@ from flask import url_for
 from histarchexplorer import app
 
 
-def test_about_page(client):
+def test_about_page(client) -> None:
     with app.app_context():
         rv = client.get(url_for('about'))
         assert rv.status_code == 200

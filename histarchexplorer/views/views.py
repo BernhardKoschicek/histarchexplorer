@@ -1,7 +1,7 @@
 from typing import Optional
 
 from flask import (
-    g, jsonify, redirect, render_template, request, session, url_for)
+    Response, g, jsonify, redirect, render_template, request, session, url_for)
 from flask_login import login_required
 from werkzeug import Response
 
@@ -64,24 +64,23 @@ def set_language(language: Optional[str] = None) -> Response:
 
 
 @app.route('/type-tree')
-def type_tree():
+def type_tree() -> Response:
     return jsonify(ApiAccess.get_type_tree())
 
 
 @app.route('/files-of-entities')
-def get_files_of_entities():
+def get_files_of_entities() -> Response:
     return jsonify(ApiAccess.get_files_of_entities())
 
 
 @app.route('/entities-count')
-def get_entities_count_by_case_study():
+def get_entities_count_by_case_study() -> Response:
     return jsonify(ApiAccess.get_entities_count_by_case_studies())
 
 
 @app.route("/refresh-cache/<int:id_>", methods=["POST"])
 @login_required
-def refresh_cache(id_: int):
-    """Clear memoized cache for this entity."""
+def refresh_cache(id_: int) -> Response | tuple[Response, int]:
     try:
         cache.delete_memoized(PresentationView.from_api, PresentationView, id_)
         return redirect(url_for('entity_view', id_=id_))

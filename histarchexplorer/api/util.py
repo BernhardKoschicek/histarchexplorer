@@ -24,7 +24,7 @@ def is_full_year_span(date_from: str, date_to: str) -> bool:
     return date_from.startswith("01.01.") and date_to.startswith("31.12.")
 
 
-def format_date(date_from: str, date_to: str) -> Optional[str]:
+def format_date(date_from: str, date_to: str) -> str:
     bc_from = date_from.startswith("-")
     bc_to = date_to.startswith("-")
 

@@ -82,7 +82,7 @@ def get_sidebar_icons() -> dict[int, str]:
     return icons
 
 
-def get_type_divisions():
+def get_type_divisions() -> dict[Any, dict[str, Any]]:
     out = {}
     for label, value in app.config['TYPE_DIVISIONS'].items():
         icon = ''
