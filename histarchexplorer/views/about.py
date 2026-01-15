@@ -1,7 +1,6 @@
 from typing import Any, Optional
 
 from flask import Response, g, redirect, render_template, url_for
-from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.models.config import ConfigEntity

@@ -3,7 +3,6 @@ from typing import Optional
 from flask import (
     Response, g, jsonify, redirect, render_template, request, session, url_for)
 from flask_login import login_required
-from werkzeug import Response
 
 from histarchexplorer import ConfigEntity, app, cache
 from histarchexplorer.api.api_access import ApiAccess

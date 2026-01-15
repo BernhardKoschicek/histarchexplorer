@@ -1,6 +1,6 @@
-import requests
 import json
 
+import requests
 from flask import g
 
 

@@ -5,8 +5,8 @@ from typing import Any
 from flask import g
 
 from histarchexplorer.database.about import get_config_entities
-from histarchexplorer.database.admin import get_config_links, \
-    get_config_properties
+from histarchexplorer.database.admin import (get_config_links,
+                                             get_config_properties)
 from histarchexplorer.database.config_classes import get_config_classes_sql
 
 
@@ -71,6 +71,7 @@ class Properties:
         return properties
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass()
 class ConfigEntity:
     id: int
@@ -134,7 +135,8 @@ class ConfigEntity:
 #     for domain_id, attribute in attributes:
 #         if attribute:
 #             result[domain_id].append(localize(attribute))
-#     for range_id, attribute in get_project_attributes_sql_inverse(id_, config_class_id):
+#     for range_id, attribute in get_project_attributes_sql_inverse(id_,
+#     config_class_id):
 #         if attribute:
 #             result[range_id].append(localize(attribute))
 #     return dict(result)

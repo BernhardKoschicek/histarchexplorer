@@ -24,4 +24,3 @@ class User(UserMixin):
     def get_by_username(username: str) -> Optional['User']:
         user_data = get_by_username(username)
         return User(user_data) if user_data else None
-

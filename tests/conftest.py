@@ -1,8 +1,10 @@
+# pylint: disable=redefined-outer-name
 import os
 
 import pytest
 import psycopg2
 from histarchexplorer import app as flask_app_instance
+
 
 @pytest.fixture(scope='session')
 def flask_app():
@@ -16,7 +18,7 @@ def flask_app():
             host=app.config['DATABASE_HOST'],
             user=app.config['DATABASE_USER'],
             password=app.config['DATABASE_PASS'],
-            port=app.config['DATABASE_PORT'] )
+            port=app.config['DATABASE_PORT'])
         fixture_conn.autocommit = True
 
         with fixture_conn.cursor() as cursor:
@@ -31,8 +33,10 @@ def flask_app():
 
     except psycopg2.Error as e:
         print(f"\nERROR: Could not connect to the test database! "
-              f"Please ensure your test database '{app.config['DATABASE_NAME']}' "
-              f"is running and accessible with the specified credentials in 'instance/testing.py'.")
+              f"Please ensure your test database '"
+              f"{app.config['DATABASE_NAME']}' "
+              f"is running and accessible with the specified credentials in "
+              f"'instance/testing.py'.")
         print(f"PostgreSQL Error: {e}")
         yield app
     finally:
@@ -44,7 +48,8 @@ def flask_app():
 
 @pytest.fixture(scope='function')
 def client(flask_app):
-    with flask_app.test_client() as client:
-        with client.session_transaction() as sess:
+    """A test client for the app."""
+    with flask_app.test_client() as c_instance:
+        with c_instance.session_transaction() as sess:
             sess.clear()
-        yield client
+        yield c_instance

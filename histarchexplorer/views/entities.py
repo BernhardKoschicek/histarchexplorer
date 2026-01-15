@@ -46,17 +46,19 @@ def build_id_collection(ids) -> list[int]:
     return result
 
 
-def get_browse_list_entities(id = None) -> dict[str, Any] | None:
+# pylint: disable=too-many-locals
+def get_browse_list_entities(id_: int = None) -> dict[str, Any] | None:
 
     #per default the whitelist ids are shown
     shown_ids = g.settings.shown_ids
 
     #if an id is given the p46 children are requested (Possible future dev: define another param - property code - to get other connections to be shown)
-    if id:
+    if id_:
         sql = """
-        SELECT range_id from model.link where property_code = 'P46'  AND domain_id = %(id)s
+        SELECT range_id from model.link 
+        WHERE property_code = 'P46'  AND domain_id = %(id)s
         """
-        g.cursor.execute(sql, {'id': id})
+        g.cursor.execute(sql, {'id': id_})
         shown_ids = g.cursor.fetchall()
         if not shown_ids:
             return None
@@ -271,8 +273,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
 
 
 # get entities and return the template
-def return_entities(tab_name, id):
-    data = get_browse_list_entities(id)
+def return_entities(tab_name, id_):
+    data = get_browse_list_entities(id_)
 
     filtered_view_classes = {
         key: tuple(list(d.keys())[0] for d in value)
@@ -287,8 +289,6 @@ def return_entities(tab_name, id):
         }
         for i, key in enumerate(data['counts'].keys())
     ]
-
-
 
     if tab_name == "" and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
@@ -307,15 +307,13 @@ def return_entities(tab_name, id):
 
 @app.route('/entities')
 @app.route('/entities/<tab_name>')
-@app.route('/entities/<tab_name>/<id>')
-def entities(tab_name="", id=None) -> str:
-    return return_entities(tab_name, id)
-
-
+@app.route('/entities/<tab_name>/<id_>')
+def entities(tab_name="", id_=None) -> str:
+    return return_entities(tab_name, id_)
 
 
 @app.route('/get_entities/<tab_name>')
 def get_entities(tab_name: str) -> str:
     return render_template(
-        f'tabs/browse.html',
+        'tabs/browse.html',
         tab_name=tab_name)

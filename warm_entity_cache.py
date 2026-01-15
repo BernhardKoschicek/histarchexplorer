@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import concurrent.futures
 import time
 from typing import Any, Optional
 
 import requests
-import concurrent.futures
 
 from config.default import API_URL
 

@@ -8,4 +8,3 @@ def test_about_page(client) -> None:
         rv = client.get(url_for('about'))
         assert rv.status_code == 200
         assert b"TEAM" in rv.data
-

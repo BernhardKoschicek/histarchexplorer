@@ -43,7 +43,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     if not tab and tabs:
         tab = tabs[0]['target']
     for tab_ in tabs:
-        tab_['is_active'] = (tab_['target'] == tab)
+        tab_['is_active'] = tab_['target'] == tab
 
     initial_case_study_type_id = None
     initial_case_study_type_name = None
@@ -327,7 +327,7 @@ def make_reset():
 
 @app.route('/admin/clear-cache')
 @login_required
-def clear_cache():
+def clear_cache() -> Response:
     cache.clear()
     flash(_('cache cleared'), 'success')
     return redirect(url_for('admin'))
@@ -335,7 +335,7 @@ def clear_cache():
 
 @app.route("/admin/warm-entity-cache")
 @login_required
-def warm_entity_cache():
+def warm_entity_cache() -> Response:
     trigger_cache_warmup(False)
     flash(_("Cache warmup started in background (refresh mode)"), 'success')
     return redirect(url_for('admin'))
@@ -343,35 +343,34 @@ def warm_entity_cache():
 
 @app.route("/admin/refresh-entity-cache")
 @login_required
-def refresh_entity_cache():
+def refresh_entity_cache() -> Response:
     trigger_cache_warmup(True)
     flash(_("Cache warmup started in background."), 'success')
     return redirect(url_for('admin'))
 
 
-def trigger_cache_warmup(refresh: bool = False):
+def trigger_cache_warmup(refresh: bool = False) -> None:
     """Trigger external cache warm-up process."""
     try:
-        args = ["python3", "warm_entity_cache.py"]
-        print(' '.join([str(ids) for ids in g.case_study_ids]))
+        args: list[str] = ["python3", "warm_entity_cache.py"]
         if refresh:
             args.append("--refresh")
-        if g.case_study_ids:
-            args.append(
-                "--case-studies "
-                f"{' '.join([str(ids) for ids in g.case_study_ids])}")
-        subprocess.Popen(
-            args,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL)
+        if hasattr(g, "case_study_ids") and g.case_study_ids:
+            ids_str: str = " ".join(str(i) for i in g.case_study_ids)
+            args.extend(["--case-studies", ids_str])
+        with subprocess.Popen(
+                args,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL) as _proc:
+            pass
     except Exception as e:
         flash(str(e), "error")
-        return abort(404)
+        abort(404)
 
 
 @app.route('/admin/refresh-system-cache')
 @login_required
-def refresh_system_cache():
+def refresh_system_cache() -> None:
     cache.delete_memoized(ApiAccess.get_type_tree)
     cache.delete_memoized(ApiAccess.get_files_of_entities)
     cache.delete_memoized(ApiAccess.get_system_class_count)

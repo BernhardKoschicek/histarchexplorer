@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from flask import g
 
@@ -40,9 +40,8 @@ def format_date(date_from: str, date_to: str) -> str:
             year = year_part(clean_from)
             era = "BC" if bc_from else "AD"
             return f"{year} {era}"
-        else:
-            return (f"{year_part(clean_from)} {'BC' if bc_from else 'AD'} "
-                    f"- {year_part(clean_to)} {'BC' if bc_to else 'AD'}")
+        return (f"{year_part(clean_from)} {'BC' if bc_from else 'AD'} "
+                f"- {year_part(clean_to)} {'BC' if bc_to else 'AD'}")
 
     # Only one side available
     date = ".".join(s.lstrip("0") for s in
@@ -125,3 +124,20 @@ def get_description_translated(description: str) -> None | dict[str, str]:
 
     fallback_text = description.strip()
     return {'en': fallback_text, 'de': fallback_text}
+
+
+def to_camel_case(snake_str: str) -> str:
+    """Convert snake_case string to camelCase."""
+    components = snake_str.split("_")
+    return components[0] + "".join(x.title() for x in components[1:])
+
+
+def dict_to_camel_case(data: Any) -> Any:
+    """Recursively transform dictionary keys to camelCase."""
+    if isinstance(data, list):
+        return [dict_to_camel_case(i) for i in data]
+    if isinstance(data, dict):
+        return {
+            to_camel_case(k): dict_to_camel_case(v)
+            for k, v in data.items()}
+    return data

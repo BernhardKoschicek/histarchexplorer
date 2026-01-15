@@ -7,9 +7,10 @@ from flask import g, url_for
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
-from histarchexplorer.api.util import format_date, \
-    get_description_translated, get_divisions, get_icon, \
-    get_render_type, split_date_string
+from histarchexplorer.api.util import (dict_to_camel_case, format_date,
+                                       get_description_translated,
+                                       get_divisions, get_icon,
+                                       get_render_type, split_date_string)
 
 
 @dataclass
@@ -42,11 +43,11 @@ class GeometryModel:
 
 @dataclass
 class PropertyModel:
-    locationId: int
-    entityId: int
+    location_id: int
+    entity_id: int
     title: str
     description: str
-    shapeType: str
+    shape_type: str
     system_class: str
 
 
@@ -54,42 +55,6 @@ class PropertyModel:
 class FeatureModel:
     geometry: GeometryModel
     properties: PropertyModel
-
-    # def to_dict(self) -> dict:
-    #     return {
-    #         "type": "Feature",
-    #         "geometry": asdict(self.geometry),
-    #         "properties": asdict(self.properties)}
-
-
-#
-# def to_json(self, **kwargs) -> str:
-#     return json.dumps(self.to_dict(), **kwargs)
-#
-# def swap_latlng(self) -> "FeatureModel":
-#     return FeatureModel(
-#         geometry=self.geometry.swap_latlng(),
-#         properties=self.properties)
-#
-# def change_to_map_libre_dict(self, main: Optional[bool] = False):
-#     props = {
-#         'id': self.properties.entityId,
-#         'label': self.properties.title,
-#         'class': self.properties.system_class}
-#     if main:
-#         props['main'] = True
-#
-#     return {
-#         'type': 'Feature',
-#         'geometry': {
-#             'type': self.geometry.type,
-#             'coordinates': self.geometry.coordinates,
-#             'title': self.properties.title,
-#             'description': self.properties.description,
-#             'placeId': self.properties.entityId,
-#             'locationId': self.properties.locationId,
-#             'shapeType': self.properties.shapeType},
-#         'properties': props}
 
 
 @dataclass
@@ -123,9 +88,6 @@ class EntityTypeModel:
     unit: Optional[str]
     icon: Optional[str]
     division: Optional[dict[str, str]]
-
-    # def to_json(self, *, indent: Optional[int] = 2) -> str:
-    #     return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
 
 
 @dataclass
@@ -202,6 +164,7 @@ class Relation:
     types: list[EntityTypeModel] = field(default_factory=list)
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class PresentationView:
     id: int
@@ -216,14 +179,17 @@ class PresentationView:
     geometry_json: dict[str, Any] = None
     when: Optional[TimeRangeModel] = None
     types: list[EntityTypeModel] = field(default_factory=list)
-    externalReferenceSystems: list[ExternalReferenceModel] = field(
+    external_reference_systems: list[ExternalReferenceModel] = field(
         default_factory=list)
     references: list[Reference] = field(default_factory=list)
     files: list[File] = field(default_factory=list)
     relations: dict[str, list[Relation]] = field(default_factory=dict)
 
     def to_json(self, *, indent: Optional[int] = 2) -> str:
-        return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
+        """Serialize the model to camelCase JSON for the frontend."""
+        data_dict = asdict(self)
+        camel_case_data = dict_to_camel_case(data_dict)
+        return json.dumps(camel_case_data, indent=indent, ensure_ascii=False)
 
     @staticmethod
     def parse_geometries(
@@ -238,11 +204,11 @@ class PresentationView:
                 type=data['geometry']["type"],
                 coordinates=data["geometry"]["coordinates"])
             property_model = PropertyModel(
-                locationId=data["properties"]["locationId"],
-                entityId=data["properties"]["entityId"],
+                location_id=data["properties"]["locationId"],
+                entity_id=data["properties"]["entityId"],
                 title=data["properties"]["title"],
                 description=data["properties"]["description"],
-                shapeType=data["properties"]["shapeType"],
+                shape_type=data["properties"]["shapeType"],
                 system_class=system_class)
             return FeatureModel(
                 geometry=geometry_model,
@@ -401,7 +367,7 @@ class PresentationView:
             geometry_json=data.get("geometries", {}),
             when=when_data,
             types=cls.parse_types(data.get("types", [])),
-            externalReferenceSystems=[
+            external_reference_systems=[
                 ExternalReferenceModel.from_dict(er)
                 for er in data.get("externalReferenceSystems", [])
                 if isinstance(er, dict)],

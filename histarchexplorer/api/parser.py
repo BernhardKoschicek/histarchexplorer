@@ -2,24 +2,25 @@ from dataclasses import dataclass
 from typing import Optional
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class Parser:
-    search: list[str]
-    entities: list[str]
-    linked_entities: list[str]
-    cidoc_classes: list[str]
-    view_classes: list[str]
-    system_classes: list[str]
-    type_id: list[int]
-    show: list[str]
-    first: int
-    last: int
-    page: int
-    export: str
-    relation_type: int
-    geometry: list[str]
-    file_id: int
-    properties: list[str]
+    search: list[str] | None = None
+    entities: list[str] | None = None
+    linked_entities: list[str] | None = None
+    cidoc_classes: list[str] | None = None
+    view_classes: list[str] | None = None
+    system_classes: list[str] | None = None
+    type_id: list[int] | None = None
+    show: list[str] | None = None
+    first: int | None = None
+    last: int | None = None
+    page: int | None = None
+    export: str | None = None
+    relation_type: int | None = None
+    geometry: list[str] | None = None
+    file_id: int | None = None
+    properties: list[str] | None = None
     download: bool = False
     count: bool = False
     locale: str = 'en'
