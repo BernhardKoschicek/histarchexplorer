@@ -149,7 +149,7 @@ def add_entry() -> Response:
         'legal_notice': request.form.get('legal_notice', ''),
         'case_study': int(case_study_str)
         if case_study_str and case_study_str.isdigit() else 0}
-    current_tab = f'nav-{form_data['category']}'
+    current_tab = f'nav-{form_data["category"]}'
     redirect_base = url_for('admin') + current_tab
     try:
         new_id = Admin.add_entry(form_data)
