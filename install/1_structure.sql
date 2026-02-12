@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 3J2qy3FgOqncfOK3OYBpWPRt9kdthOIw7ugIWznRoV0mRntg3yoahn64xAadmKy
+\restrict wBDZkAP9xdVDxTOImgfcyo3Wfw37DoE6s7fAkoTpHgTAOzNmBxB2kOH2MNyBZlU
 
 -- Dumped from database version 17.7 (Debian 17.7-0+deb13u1)
 -- Dumped by pg_dump version 17.7 (Debian 17.7-0+deb13u1)
@@ -23,16 +23,14 @@ ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_class_id_fkey;
 DROP TRIGGER IF EXISTS delete_links_trigger ON tng.entities;
-ALTER TABLE IF EXISTS ONLY tng.settings DROP CONSTRAINT IF EXISTS settings_pkey;
+ALTER TABLE IF EXISTS ONLY tng.system_settings DROP CONSTRAINT IF EXISTS system_settings_pkey;
 ALTER TABLE IF EXISTS ONLY tng.maps DROP CONSTRAINT IF EXISTS maps_pkey;
 ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_pkey;
 ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_pkey;
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS config_properties_pkey;
 ALTER TABLE IF EXISTS ONLY tng.classes DROP CONSTRAINT IF EXISTS config_classes_pkey;
-ALTER TABLE IF EXISTS tng.settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.maps ALTER COLUMN id DROP DEFAULT;
-DROP SEQUENCE IF EXISTS tng.settings_id_seq;
-DROP TABLE IF EXISTS tng.settings;
+DROP TABLE IF EXISTS tng.system_settings;
 DROP TABLE IF EXISTS tng.properties;
 DROP SEQUENCE IF EXISTS tng.maps_id_seq;
 DROP TABLE IF EXISTS tng.maps;
@@ -282,61 +280,22 @@ ALTER TABLE tng.properties ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- Name: settings; Type: TABLE; Schema: tng; Owner: openatlas
+-- Name: system_settings; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
-CREATE TABLE tng.settings (
-    id integer NOT NULL,
-    index_img text,
-    index_map integer,
-    img_map text,
-    greyscale boolean,
-    shown_classes text[],
-    shown_types text[],
-    hidden_classes text[],
-    hidden_types text[],
-    shown_ids text[],
-    hidden_ids text[],
-    case_study_type_id integer
+CREATE TABLE tng.system_settings (
+    key text NOT NULL,
+    value jsonb NOT NULL
 );
 
 
-ALTER TABLE tng.settings OWNER TO openatlas;
-
---
--- Name: settings_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
---
-
-CREATE SEQUENCE tng.settings_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE tng.settings_id_seq OWNER TO openatlas;
-
---
--- Name: settings_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: openatlas
---
-
-ALTER SEQUENCE tng.settings_id_seq OWNED BY tng.settings.id;
-
+ALTER TABLE tng.system_settings OWNER TO openatlas;
 
 --
 -- Name: maps id; Type: DEFAULT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.maps ALTER COLUMN id SET DEFAULT nextval('tng.maps_id_seq'::regclass);
-
-
---
--- Name: settings id; Type: DEFAULT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.settings ALTER COLUMN id SET DEFAULT nextval('tng.settings_id_seq'::regclass);
 
 
 --
@@ -380,11 +339,11 @@ ALTER TABLE ONLY tng.maps
 
 
 --
--- Name: settings settings_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: system_settings system_settings_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.settings
-    ADD CONSTRAINT settings_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY tng.system_settings
+    ADD CONSTRAINT system_settings_pkey PRIMARY KEY (key);
 
 
 --
@@ -422,5 +381,5 @@ ALTER TABLE ONLY tng.properties
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 3J2qy3FgOqncfOK3OYBpWPRt9kdthOIw7ugIWznRoV0mRntg3yoahn64xAadmKy
+\unrestrict wBDZkAP9xdVDxTOImgfcyo3Wfw37DoE6s7fAkoTpHgTAOzNmBxB2kOH2MNyBZlU
 
