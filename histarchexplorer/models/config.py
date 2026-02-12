@@ -5,8 +5,8 @@ from typing import Any
 from flask import g
 
 from histarchexplorer.database.about import get_config_entities
-from histarchexplorer.database.admin import (get_config_links,
-                                             get_config_properties)
+from histarchexplorer.database.admin import (
+    get_config_links,  get_config_properties)
 from histarchexplorer.database.config_classes import get_config_classes_sql
 
 

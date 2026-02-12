@@ -136,7 +136,7 @@ def before_request() -> None:
     g.config_classes = get_config_classes()
     g.config_properties = Properties.get_all()
     g.config_links = Link.get_all()
-    g.settings = Settings.initialize_settings()
+    g.settings = Settings.load_from_db()
     g.config_classes_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
         'persons': 2,

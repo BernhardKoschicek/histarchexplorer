@@ -312,19 +312,12 @@ def delete_map(map_id: int) -> Response:
 @login_required
 def choose_index_background() -> Response:
     check_manager_user()
-
-    index_map = request.form.get('mapselection', '')
-    index_img = request.form.get('default_img', '')
-    img_map = request.form.get('imgmap', '')
-    greyscale = request.form.get('greyscale') == 'on'
-
-    settings: dict[str, Any] = {
-        'index_map': index_map,
-        'index_img': index_img,
-        'img_map': img_map,
-        'greyscale': greyscale}
+    g.settings.index_map = request.form.get('mapselection', '')
+    g.settings.index_img = request.form.get('default_img', '')
+    g.settings.img_map = request.form.get('imgmap', '')
+    g.settings.greyscale = request.form.get('greyscale') == 'on'
     try:
-        Admin.set_index_background(settings)
+        g.settings.save_to_db()
         flash(_('Index background updated successfully'), 'success')
     except Exception as e:
         app.logger.error("Failed to set index background: %s", e)
@@ -338,7 +331,8 @@ def choose_index_background() -> Response:
 def select_entities() -> Response:
     check_manager_user()
     if request.method == 'POST':
-        Admin.set_shown_classes(request.form.getlist('selected_entities'))
+        g.settings.hidden_classes = request.form.getlist('selected_entities')
+        g.settings.save_to_db()
         flash(_('set shown entities'), 'info')
     return redirect(url_for('admin'))
 
@@ -348,7 +342,8 @@ def select_entities() -> Response:
 def deselect_entities() -> Response:
     check_manager_user()
     if request.method == 'POST':
-        Admin.set_hidden_classes(request.form.getlist('selected_entities'))
+        g.settings.hidden_classes = request.form.getlist('selected_entities')
+        g.settings.save_to_db()
         flash(_('set hidden entities'), 'info')
     return redirect(url_for('admin'))
 
@@ -389,7 +384,8 @@ def update_case_study_id(id_: int) -> Response:
     if request.method == 'POST':
         validation_result = Admin.check_case_study_type_id(id_)
         if validation_result['is_valid']:
-            Admin.update_case_study_id_setting(id_)
+            g.settings.case_study_type_id = id_
+            g.settings.save_to_db()
             flash(_('updated case study id successfully'), 'info')
         else:
             message = _(

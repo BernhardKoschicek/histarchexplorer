@@ -93,30 +93,6 @@ def get_config_class_by_id(id_: int) -> int | None:
     return row[0] if row else None
 
 
-def set_hidden_classes(entities: list[str]) -> None:
-    g.cursor.execute(
-        'UPDATE tng.settings SET hidden_classes = %s',
-        (entities,))
-
-
-def set_shown_classes(entities: list[str]) -> None:
-    g.cursor.execute(
-        'UPDATE tng.settings SET shown_classes = %s',
-        (entities,))
-
-
-def set_index_background(settings: dict[str, str]) -> None:
-    g.cursor.execute(
-        """
-        UPDATE tng.settings
-        SET index_map = %(index_map)s,
-            index_img = %(index_img)s,
-            img_map   = %(img_map)s,
-            greyscale = %(greyscale)s
-        """,
-        settings)
-
-
 def add_new_map(data: dict[str, str]) -> int:
     g.cursor.execute(
         '''
@@ -274,12 +250,6 @@ def get_openatlas_entity(id_: int) -> NamedTuple:
         FROM model.entity
         WHERE id = %(id)s''', {'id': id_})
     return g.openatlas_cursor.fetchone()
-
-
-def update_case_study_type_hierarchy(id_: int) -> None:
-    g.cursor.execute(
-        'UPDATE tng.settings SET case_study_type_id = %s',
-        (id_,))
 
 
 def add_link(data: dict[str, Any]) -> None:

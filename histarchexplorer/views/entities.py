@@ -276,6 +276,7 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
 
     data['totals'] = category_totals
     data['counts'] = categorized_counts
+    print(data)
     return data
 
 

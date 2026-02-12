@@ -11,7 +11,6 @@ from flask_login import current_user
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import PresentationView
-from histarchexplorer.database.settings import get_shown_classes
 
 _('entities')
 _('search')
@@ -116,7 +115,7 @@ def get_view_class_count(type_id: Optional[int] = None) -> dict[str, Any]:
     entities_count = ApiAccess.get_entities_count_by_case_studies(type_id)
 
     for key in entities_count.copy():
-        if key not in get_shown_classes():
+        if key not in g.settings.shown_classes:
             del entities_count[key]
 
     return_classes: dict[str, dict[str, Any]] = {}
