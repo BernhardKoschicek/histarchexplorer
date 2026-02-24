@@ -6,7 +6,11 @@
         </button>
         <a class="navbar-brand" title="{{ _('home') }}"
            href="{{ url_for('index') }}">
-            <img id="logo" src="/static/images/logos/logo_mode_light.svg">
+            {% if g.settings.nav_logo.endswith('.svg') %}
+                <object id="logo" data="/static/images/logos/{{ g.settings.nav_logo }}"
+                        type="image/svg+xml"></object>
+            {% else %}
+                <img id="logo" alt="logo" src="/static/images/logos/{{ g.settings.nav_logo }}">{% endif %}
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target=".navbar-collapse"
@@ -58,4 +62,3 @@
         </div>
     </div>
 </nav>
-

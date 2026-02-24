@@ -143,13 +143,13 @@ def before_request() -> Response | None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
-
     return None
 
 
 @app.context_processor
 def inject_globals() -> dict[str, Any]:
     return {
+        'nav_logo': g.settings.nav_logo,
         'available_languages': g.available_languages,
         'preferred_language': g.preferred_langauge,
         'current_language': g.language,

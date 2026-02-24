@@ -24,7 +24,7 @@
       <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
         {% for filename in admin_instance.logos %}
           <div class="col">
-            <div class="card h-100">
+            <div class="card h-100 {% if settings.nav_logo == filename %}border-primary{% endif %}">
               <img src="{{ url_for('static', filename='images/logos/' + filename) }}" class="card-img-top p-3" alt="{{ filename }}" style="object-fit: contain; height: 150px;">
               <div class="card-body">
                 <p class="card-text small text-muted" style="word-break: break-all;">{{ filename }}</p>
@@ -48,6 +48,19 @@
                   <button type="submit" class="btn btn-sm btn-outline-primary w-100">{{ _('Save License') }}</button>
                 </form>
                 <hr>
+                {# Set as Main Logo Form #}
+                <form action="{{ url_for('set_main_logo') }}" method="post" class="d-grid mb-2">
+                    <input type="hidden" name="filename" value="{{ filename }}">
+                    {% if settings.nav_logo == filename %}
+                        <button type="button" class="btn btn-sm btn-primary" disabled>
+                            <i class="bi bi-star-fill"></i> {{ _('Main Logo') }}
+                        </button>
+                    {% else %}
+                        <button type="submit" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-star"></i> {{ _('Set as Main') }}
+                        </button>
+                    {% endif %}
+                </form>
                 {# Rename Form #}
                 <form action="{{ url_for('rename_logo') }}" method="post" class="input-group input-group-sm mb-2">
                     <input type="hidden" name="old_name" value="{{ filename }}">

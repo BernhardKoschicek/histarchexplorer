@@ -28,12 +28,6 @@ function setTheme(mode = 'auto') {
     // Update body class based on selected theme
     document.body.classList.remove('light', 'dark');
     document.body.classList.add(modeToUse);
-
-    const logo = document.getElementById('logo');
-    if (logo) {
-        const logoSrc = `/static/images/logos/logo_mode_${modeToUse}.svg`;
-        logo.setAttribute('src', logoSrc);
-    }
 }
 
 // Function to handle system mode change
@@ -49,4 +43,3 @@ window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', sy
 // Set initial theme based on localStorage or system preference
 if (darkmodeOverride) setTheme('light');
 if (!darkmodeOverride) setTheme();
-

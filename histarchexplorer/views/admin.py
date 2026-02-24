@@ -90,7 +90,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             tabs,
             entry),
         processed_links_by_entity=admin_instance.process_links_by_entity(),
-        processed_properties_by_tab=admin_instance.process_properties_by_tab(tabs),
+        processed_properties_by_tab=admin_instance.process_properties_by_tab(
+            tabs),
         processed_roles=admin_instance.process_roles(),
         processed_target_nodes=admin_instance.process_target_nodes(),
         maps=Admin.get_maps(),
@@ -105,7 +106,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_name=cs_type_name,
         case_study_children=case_study_children,
         active_main_sidebar_id=active_main_sidebar_id,
-        licenses=admin_instance.licenses    )
+        licenses=admin_instance.licenses)
 
 
 @app.route('/admin/upload_logo', methods=['POST'])
@@ -126,7 +127,8 @@ def upload_logo():
         upload_path = os.path.join(app.static_folder, 'images', 'logos')
         os.makedirs(upload_path, exist_ok=True)
         file.save(os.path.join(upload_path, filename))
-        flash(_('Logo "%(name)s" uploaded successfully.', name=filename), 'success')
+        flash(_('Logo "%(name)s" uploaded successfully.', name=filename),
+              'success')
 
     return redirect(url_for('admin', tab='sidebar-logo-management'))
 
@@ -156,7 +158,8 @@ def rename_logo():
 
     try:
         os.rename(old_filepath, new_filepath)
-        flash(_('Logo renamed from "%(old)s" to "%(new)s".', old=old_name, new=new_name), 'success')
+        flash(_('Logo renamed from "%(old)s" to "%(new)s".', old=old_name,
+                new=new_name), 'success')
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
@@ -181,9 +184,30 @@ def delete_logo():
 
     try:
         os.remove(filepath)
-        flash(_('Logo "%(name)s" deleted successfully.', name=filename), 'success')
+        flash(_('Logo "%(name)s" deleted successfully.', name=filename),
+              'success')
     except OSError as e:
         flash(_('Error deleting file: %(error)s', error=e), 'danger')
+
+    return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+
+@app.route('/admin/set_main_logo', methods=['POST'])
+@login_required
+def set_main_logo() -> Response:
+    check_manager_user()
+    filename = request.form.get('filename')
+    if not filename:
+        flash(_('No filename specified.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+    g.settings.nav_logo = filename
+    try:
+        g.settings.save_to_db()
+        flash(_('Main logo updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to set main logo: %s", e)
+        flash(_('Error updating settings'), 'error')
 
     return redirect(url_for('admin', tab='sidebar-logo-management'))
 
