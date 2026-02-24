@@ -57,6 +57,10 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             active_main_sidebar_id = 'sidebar-index-page-options'
         elif tab == 'sidebar-database':
             active_main_sidebar_id = 'sidebar-database'
+        elif tab == 'sidebar-cache-options':
+            active_main_sidebar_id = 'sidebar-cache-options'
+        elif tab == 'sidebar-content-group':
+            active_main_sidebar_id = 'sidebar-content-group'
         # If 'tab' is not recognized, it will default to
         # 'sidebar-general-settings-group'
 
@@ -475,26 +479,15 @@ def choose_index_background() -> Response:
     return redirect(url_for('admin'))
 
 
-@app.route('/admin/select_entities', methods=['POST'])
+@app.route('/admin/update_class_visibility', methods=['POST'])
 @login_required
-def select_entities() -> Response:
+def update_class_visibility() -> Response:
     check_manager_user()
-    if request.method == 'POST':
-        g.settings.shown_classes = request.form.getlist('selected_entities')
-        g.settings.save_to_db()
-        flash(_('set shown entities'), 'info')
-    return redirect(url_for('admin'))
-
-
-@app.route('/admin/deselect_entities', methods=['POST'])
-@login_required
-def deselect_entities() -> Response:
-    check_manager_user()
-    if request.method == 'POST':
-        g.settings.hidden_classes = request.form.getlist('selected_entities')
-        g.settings.save_to_db()
-        flash(_('set hidden entities'), 'info')
-    return redirect(url_for('admin'))
+    g.settings.shown_classes = request.form.getlist('shown_classes')
+    g.settings.hidden_classes = request.form.getlist('hidden_classes')
+    g.settings.save_to_db()
+    flash(_('Class visibility updated successfully.'), 'success')
+    return redirect(url_for('admin', tab='sidebar-general-settings-group'))
 
 
 @app.route('/sortlinks', methods=['POST'])
