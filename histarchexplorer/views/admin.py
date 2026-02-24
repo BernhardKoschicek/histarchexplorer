@@ -103,7 +103,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_id=cs_type_id,
         initial_case_study_type_name=cs_type_name,
         case_study_children=case_study_children,
-        active_main_sidebar_id=active_main_sidebar_id
+        active_main_sidebar_id=active_main_sidebar_id,
+        licenses=admin_instance.licenses,
+
     )
 
 
