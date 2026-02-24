@@ -9,25 +9,25 @@
   {% endif %}
 
   <!-- Fonts & CSS -->
-  <link href="/static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="/static/node_modules/nouislider/dist/nouislider.min.css">
-  <link rel="stylesheet" href="/static/node_modules/@fontsource/inter/index.css">
-  <link rel="stylesheet" href="/static/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/node_modules/quercus.js/src/treeview.css">
-  <link href="/static/node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/maplibre-gl/dist/maplibre-gl.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/nouislider/dist/nouislider.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@fontsource/inter/index.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap-icons/font/bootstrap-icons.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/quercus.js/src/treeview.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 
 
   <!-- JS -->
-  <script src="/static/node_modules/muuri/dist/muuri.min.js"></script>
-  <script src="/static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
-  <script src="/static/node_modules/@google/model-viewer/dist/model-viewer-umd.js"></script>
-  <script src="/static/node_modules/nouislider/dist/nouislider.min.js"></script>
-  <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/static/node_modules/quercus.js/src/treeview.js"></script>
-  <script defer src="/static/js/darkLightMode.js"></script>
-  <script type="text/javascript" src="/static/node_modules/tabulator-tables/dist/js/tabulator.js"></script>
+  <script src="{{ url_for('static', filename='node_modules/muuri/dist/muuri.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/maplibre-gl/dist/maplibre-gl.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/@google/model-viewer/dist/model-viewer-umd.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/nouislider/dist/nouislider.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/quercus.js/src/treeview.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/darkLightMode.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/tabulator-tables/dist/js/tabulator.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script
     src="{{ url_for('static', filename='js/globalFunctions.js') }}"></script>
