@@ -73,7 +73,21 @@
                               {% endif %}
                             </label>
 
-                            {% if field.type == 'textarea' %}
+                            {% if field.key == 'image' %}
+                              <select class="form-select"
+                                      id="InputImage{{ entity.id }}"
+                                      name="image"
+                                      aria-describedby="imageHelp{{ entity.id }}"
+                                      disabled>
+                                <option value="">{{ _('None') }}</option>
+                                {% for logo_filename in logos %}
+                                  <option value="{{ url_for('static', filename='images/logos/' + logo_filename) }}"
+                                          {% if entity.image == url_for('static', filename='images/logos/' + logo_filename) %}selected{% endif %}>
+                                    {{ logo_filename }}
+                                  </option>
+                                {% endfor %}
+                              </select>
+                            {% elif field.type == 'textarea' %}
                               <textarea
                                 class="form-control
                                 {% if field.key in ['description', 'legal_notice', 'imprint'] %}
@@ -86,7 +100,6 @@
                                 {% if field.required %}required data-required-field{% endif %}
                                 disabled>{{ entity[field.key + '_display_label'] or '' }}</textarea>
                             {% elif field.type == 'select' %}
-
                               <select class="form-select"
                                       id="Input {{ field.key | capitalize }}{{ entity.id }}"
                                       name="{{ field.key }}"

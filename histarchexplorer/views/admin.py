@@ -61,6 +61,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             active_main_sidebar_id = 'sidebar-cache-options'
         elif tab == 'sidebar-content-group':
             active_main_sidebar_id = 'sidebar-content-group'
+        elif tab == 'sidebar-logo-management':
+            active_main_sidebar_id = 'sidebar-logo-management'
         # If 'tab' is not recognized, it will default to
         # 'sidebar-general-settings-group'
 
@@ -85,6 +87,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         except (ValueError, TypeError) as e:
             app.logger.error('Error processing case study type ID: %s', e)
 
+    logo_path = os.path.join(app.static_folder, 'images', 'logos')
+    logos = sorted(os.listdir(logo_path)) if os.path.exists(logo_path) else []
+
     return render_template(
         "admin.html",
         tabs=tabs,
@@ -104,9 +109,89 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_id=cs_type_id,
         initial_case_study_type_name=cs_type_name,
         case_study_children=case_study_children,
-        active_main_sidebar_id=active_main_sidebar_id
-        # Pass this to the template
+        active_main_sidebar_id=active_main_sidebar_id,
+        logos=logos
     )
+
+
+@app.route('/admin/upload_logo', methods=['POST'])
+@login_required
+def upload_logo():
+    check_manager_user()
+    if 'logo_file' not in request.files:
+        flash(_('No file part'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+    
+    file = request.files['logo_file']
+    if file.filename == '':
+        flash(_('No selected file'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+    if file:
+        filename = secure_filename(file.filename)
+        upload_path = os.path.join(app.static_folder, 'images', 'logos')
+        os.makedirs(upload_path, exist_ok=True)
+        file.save(os.path.join(upload_path, filename))
+        flash(_('Logo "%(name)s" uploaded successfully.', name=filename), 'success')
+
+    return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+
+@app.route('/admin/rename_logo', methods=['POST'])
+@login_required
+def rename_logo():
+    check_manager_user()
+    old_name = request.form.get('old_name')
+    new_name = request.form.get('new_name')
+
+    if not old_name or not new_name:
+        flash(_('Invalid request for renaming.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+    logo_path = os.path.join(app.static_folder, 'images', 'logos')
+    old_filepath = os.path.join(logo_path, secure_filename(old_name))
+    new_filepath = os.path.join(logo_path, secure_filename(new_name))
+
+    if not os.path.exists(old_filepath):
+        flash(_('Original file not found.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+    if os.path.exists(new_filepath):
+        flash(_('A file with the new name already exists.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+    try:
+        os.rename(old_filepath, new_filepath)
+        flash(_('Logo renamed from "%(old)s" to "%(new)s".', old=old_name, new=new_name), 'success')
+    except OSError as e:
+        flash(_('Error renaming file: %(error)s', error=e), 'danger')
+
+    return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+
+@app.route('/admin/delete_logo', methods=['POST'])
+@login_required
+def delete_logo():
+    check_manager_user()
+    filename = request.form.get('filename')
+    if not filename:
+        flash(_('No filename specified for deletion.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+    logo_path = os.path.join(app.static_folder, 'images', 'logos')
+    filepath = os.path.join(logo_path, secure_filename(filename))
+
+    if not os.path.exists(filepath):
+        flash(_('File not found.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+    try:
+        os.remove(filepath)
+        flash(_('Logo "%(name)s" deleted successfully.', name=filename), 'success')
+    except OSError as e:
+        flash(_('Error deleting file: %(error)s', error=e), 'danger')
+
+    return redirect(url_for('admin', tab='sidebar-logo-management'))
 
 
 @app.route('/admin/backup_db')

@@ -32,6 +32,7 @@
             {'id': 'sidebar-content-group', 'label': _('Content'), 'is_group': True},
             {'id': 'sidebar-index-page-options', 'label': _('Start Content'), 'parent': 'sidebar-content-group'},
             {'id': 'sidebar-about-content', 'label': _('About Content'), 'parent': 'sidebar-content-group'},
+            {'id': 'sidebar-logo-management', 'label': _('Logo Management')},
             {'id': 'sidebar-maps', 'label': _('Maps')},
             {'id': 'sidebar-database', 'label': _('Database Interface')}
           ] %}
@@ -149,6 +150,14 @@
                 {% include 'admin/index_page_options.html' %}
               </div>
             </div>
+          </div>
+
+          {# Logo Management Section #}
+          <div
+            class="tab-pane fade {% if ns.active_sidebar == 'sidebar-logo-management' %}show active{% endif %}"
+            id="sidebar-logo-management" role="tabpanel"
+            aria-labelledby="sidebar-logo-management-tab" tabindex="0">
+            {% include 'admin/logo_management.html' %}
           </div>
 
           {# Maps Section #}
