@@ -13,7 +13,8 @@ from werkzeug import Response
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
-from histarchexplorer.database.admin import update_sort_order
+from histarchexplorer.database.admin import (
+    update_sort_order, add_logo_to_db, delete_logo_from_db, rename_logo_in_db)
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin
 from histarchexplorer.utils.view_util import find_children_by_id
@@ -54,6 +55,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                 case ('sidebar-maps' | 'sidebar-index-page-options' |
                       'sidebar-database' | 'sidebar-cache-options' |
                       'sidebar-content-group' | 'sidebar-logo-management' |
+                      'sidebar-footer-content' |
                       'sidebar-licenses'):
                     active_main_sidebar_id = tab
 
@@ -127,6 +129,7 @@ def upload_logo():
         upload_path = os.path.join(app.static_folder, 'images', 'logos')
         os.makedirs(upload_path, exist_ok=True)
         file.save(os.path.join(upload_path, filename))
+        add_logo_to_db(filename)
         flash(_('Logo "%(name)s" uploaded successfully.', name=filename),
               'success')
 
@@ -158,6 +161,7 @@ def rename_logo():
 
     try:
         os.rename(old_filepath, new_filepath)
+        rename_logo_in_db(old_name, new_name)
         flash(_('Logo renamed from "%(old)s" to "%(new)s".', old=old_name,
                 new=new_name), 'success')
     except OSError as e:
@@ -184,6 +188,7 @@ def delete_logo():
 
     try:
         os.remove(filepath)
+        delete_logo_from_db(filename)
         flash(_('Logo "%(name)s" deleted successfully.', name=filename),
               'success')
     except OSError as e:
@@ -210,6 +215,30 @@ def set_main_logo() -> Response:
         flash(_('Error updating settings'), 'error')
 
     return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+
+@app.route('/admin/footer_content', methods=['GET', 'POST'])
+@login_required
+def footer_content() -> str | Response:
+    check_manager_user()
+    admin_instance = Admin()
+    if request.method == 'POST':
+        selected_logo_ids = [int(logo_id) for logo_id in request.form.getlist('footer_logos')]
+        g.settings.footer_logos = selected_logo_ids
+        try:
+            g.settings.save_to_db()
+            flash(_('Footer logos updated successfully.'), 'success')
+        except Exception as e:
+            app.logger.error("Failed to update footer logos: %s", e)
+            flash(_('Error updating footer logos'), 'error')
+        return redirect(url_for('admin', tab='sidebar-footer-content'))
+    
+    all_logos = admin_instance.get_all_logos_with_ids()
+    return render_template(
+        "admin/footer_content_management.html",
+        admin_instance=admin_instance,
+        all_logos=all_logos,
+        selected_footer_logos=g.settings.footer_logos)
 
 
 @app.route('/admin/add_license', methods=['POST'])

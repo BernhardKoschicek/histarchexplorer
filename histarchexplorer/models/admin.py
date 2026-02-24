@@ -2,9 +2,8 @@ import os
 from collections import defaultdict
 from typing import Any, Optional
 
-from flask import g
+from flask import g, current_app
 
-from histarchexplorer import app
 from histarchexplorer.database.admin import (
     add_entry, add_license, add_link,
     add_new_map, check_sortorder,
@@ -15,7 +14,8 @@ from histarchexplorer.database.admin import (
     get_openatlas_entity,
     update_config_entry,
     update_file_license, update_map,
-    update_sort_order)
+    update_sort_order,
+    get_all_logos_from_db)
 from histarchexplorer.database.map import get_maps
 from histarchexplorer.models.config import ConfigEntity
 
@@ -28,22 +28,16 @@ class Admin:
     class TooManyMainProjects(Exception):
         pass
 
-    def __init__(self) -> None:
+    def __init__(self, fields=None) -> None:
         self.config_entities = g.config_entities
         self.config_links = g.config_links
         self.config_properties = g.config_properties
         self.config_classes = g.config_classes
-        self.admin_fields = g.admin_fields
+        self.admin_fields = fields if fields is not None else g.admin_fields
         self.language = g.language
-        self.logos = self.get_logos()
+        self.logos = self.get_all_logo_filenames()
         self.licenses = self.get_licenses()
         self.file_licenses = self.get_file_licenses()
-
-    @staticmethod
-    def get_logos() -> list[str]:
-        logo_path = os.path.join(app.static_folder, 'images', 'logos')
-        return sorted(os.listdir(logo_path)) if os.path.exists(
-            logo_path) else []
 
     @staticmethod
     def get_licenses() -> Any:
@@ -86,7 +80,7 @@ class Admin:
         return check_sortorder()
 
     @staticmethod
-    def get_config_config_classes_by_id(id_: int) -> int | None:
+    def get_config_class_by_id(id_: int) -> int | None:
         return get_config_class_by_id(id_)
 
     @staticmethod
@@ -115,6 +109,21 @@ class Admin:
             license_id: int,
             attribution: str) -> None:
         return update_file_license(filename, license_id, attribution)
+
+    @staticmethod
+    def get_all_logos_with_ids() -> list[dict[str, Any]]:
+        return get_all_logos_from_db()
+
+    @staticmethod
+    def get_logo_id_to_filename_map() -> dict[int, str]:
+        logo_list = Admin.get_all_logos_with_ids()
+        return {logo['id']: logo['filename'] for logo in logo_list}
+
+    @staticmethod
+    def get_all_logo_filenames() -> list[str]:
+        logo_path = os.path.join(current_app.static_folder, 'images', 'logos')
+        return sorted(os.listdir(logo_path)) if os.path.exists(
+            logo_path) else []
 
     def _has_translation(self, entity: ConfigEntity, field_key: str) -> bool:
         value_attr = getattr(entity, field_key, None)

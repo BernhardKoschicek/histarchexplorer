@@ -21,6 +21,7 @@ class Settings(BaseModel):
     hidden_ids: list[int] = []
     case_study_type_id: int = 8240
     nav_logo: str = 'thanados_light.svg'
+    footer_logos: list[int] = []
 
     @classmethod
     def load_from_db(cls) -> 'Settings':

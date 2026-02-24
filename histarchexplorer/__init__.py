@@ -13,6 +13,8 @@ from histarchexplorer.models.config import (
     ConfigEntity, Link, Properties, get_config_classes)
 from histarchexplorer.models.search import SearchService
 from histarchexplorer.models.settings import Settings
+from histarchexplorer.models.admin import Admin
+from histarchexplorer.database.admin import synchronize_logos_with_db
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
@@ -24,7 +26,6 @@ cache = Cache(app)
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
     admin, login, views, about, entity, entities, search, media)
-from histarchexplorer.utils import view_util
 from histarchexplorer.api.api_access import ApiAccess
 
 
@@ -103,6 +104,7 @@ def before_request() -> Response | None:
         return None
 
     g.settings = Settings.load_from_db()
+    synchronize_logos_with_db()
 
     # Todo: move somewhere else but be aware of circular imports
     if g.settings.access_restriction:
@@ -174,7 +176,8 @@ def inject_globals() -> dict[str, Any]:
             "event": "events",
             "artifact": "items",
             "source": "sources",
-            "file": "files"}}
+            "file": "files"},
+        'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map()}
 
 
 @app.after_request

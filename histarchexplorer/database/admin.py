@@ -1,7 +1,8 @@
 import json
+import os
 from typing import Any, NamedTuple
 
-from flask import abort, g
+from flask import abort, g, current_app
 import bleach
 
 ALLOWED_HTML_TAGS = [
@@ -321,3 +322,39 @@ def update_file_license(filename: str, license_id: int, attribution: str) -> Non
         """,
         {'filename': filename, 'license_id': license_id, 'attribution': attribution}
     )
+
+
+def get_all_logos_from_db() -> list[dict[str, Any]]:
+    g.cursor.execute('SELECT id, filename FROM tng.logos ORDER BY filename')
+    return [{'id': row.id, 'filename': row.filename} for row in g.cursor.fetchall()]
+
+
+def add_logo_to_db(filename: str) -> None:
+    g.cursor.execute(
+        'INSERT INTO tng.logos (filename) VALUES (%(filename)s)',
+        {'filename': filename})
+
+
+def delete_logo_from_db(filename: str) -> None:
+    g.cursor.execute(
+        'DELETE FROM tng.logos WHERE filename = %(filename)s',
+        {'filename': filename})
+
+
+def rename_logo_in_db(old_name: str, new_name: str) -> None:
+    g.cursor.execute(
+        'UPDATE tng.logos SET filename = %(new_name)s WHERE filename = %(old_name)s',
+        {'old_name': old_name, 'new_name': new_name})
+
+
+def synchronize_logos_with_db() -> None:
+    logo_path = os.path.join(current_app.static_folder, 'images', 'logos')
+    if not os.path.exists(logo_path):
+        return
+
+    fs_logos = set(os.listdir(logo_path))
+    db_logos = {logo['filename'] for logo in get_all_logos_from_db()}
+
+    missing_in_db = fs_logos - db_logos
+    for filename in missing_in_db:
+        add_logo_to_db(filename)
