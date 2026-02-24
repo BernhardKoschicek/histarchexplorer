@@ -47,24 +47,18 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     active_main_sidebar_id = 'sidebar-general-settings-group'  # Default
 
     if tab:
-        # Check if the 'tab' parameter corresponds to one of the 'About
-        # Section Content' sub-tabs
         if any(t['target'] == tab for t in tabs):
             active_main_sidebar_id = 'sidebar-about-content'
-        elif tab == 'sidebar-maps':
-            active_main_sidebar_id = 'sidebar-maps'
-        elif tab == 'sidebar-index-page-options':
-            active_main_sidebar_id = 'sidebar-index-page-options'
-        elif tab == 'sidebar-database':
-            active_main_sidebar_id = 'sidebar-database'
-        elif tab == 'sidebar-cache-options':
-            active_main_sidebar_id = 'sidebar-cache-options'
-        elif tab == 'sidebar-content-group':
-            active_main_sidebar_id = 'sidebar-content-group'
-        elif tab == 'sidebar-logo-management':
-            active_main_sidebar_id = 'sidebar-logo-management'
-        # If 'tab' is not recognized, it will default to
-        # 'sidebar-general-settings-group'
+        else:
+            match tab:
+                case ('sidebar-maps' | 'sidebar-index-page-options' |
+                      'sidebar-database' | 'sidebar-cache-options' |
+                      'sidebar-content-group' | 'sidebar-logo-management' |
+                      'sidebar-licenses'):
+                    active_main_sidebar_id = tab
+
+                case _:
+                    pass
 
     # Set is_active for the sub-tabs within 'About Section Content'
     for tab_item in tabs:
@@ -87,17 +81,17 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         except (ValueError, TypeError) as e:
             app.logger.error('Error processing case study type ID: %s', e)
 
-    logo_path = os.path.join(app.static_folder, 'images', 'logos')
-    logos = sorted(os.listdir(logo_path)) if os.path.exists(logo_path) else []
+    admin_instance = Admin()
 
     return render_template(
         "admin.html",
         tabs=tabs,
-        processed_entities_by_tab=Admin.process_entities_by_tab(tabs, entry),
-        processed_links_by_entity=Admin.process_links_by_entity(),
-        processed_properties_by_tab=Admin.process_properties_by_tab(tabs),
-        processed_roles=Admin.process_roles(),
-        processed_target_nodes=Admin.process_target_nodes(),
+        admin_instance=admin_instance,
+        processed_entities_by_tab=admin_instance.process_entities_by_tab(tabs, entry),
+        processed_links_by_entity=admin_instance.process_links_by_entity(),
+        processed_properties_by_tab=admin_instance.process_properties_by_tab(tabs),
+        processed_roles=admin_instance.process_roles(),
+        processed_target_nodes=admin_instance.process_target_nodes(),
         maps=Admin.get_maps(),
         settings=g.settings,
         class_items={
@@ -109,8 +103,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_id=cs_type_id,
         initial_case_study_type_name=cs_type_name,
         case_study_children=case_study_children,
-        active_main_sidebar_id=active_main_sidebar_id,
-        logos=logos
+        active_main_sidebar_id=active_main_sidebar_id
     )
 
 
@@ -121,7 +114,7 @@ def upload_logo():
     if 'logo_file' not in request.files:
         flash(_('No file part'), 'danger')
         return redirect(url_for('admin', tab='sidebar-logo-management'))
-    
+
     file = request.files['logo_file']
     if file.filename == '':
         flash(_('No selected file'), 'danger')
@@ -191,6 +184,44 @@ def delete_logo():
     except OSError as e:
         flash(_('Error deleting file: %(error)s', error=e), 'danger')
 
+    return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+
+@app.route('/admin/add_license', methods=['POST'])
+@login_required
+def add_license():
+    check_manager_user()
+    spdx_id = request.form.get('spdx_id')
+    uri = request.form.get('uri')
+    label = request.form.get('label')
+    category = request.form.get('category')
+    Admin.add_license(spdx_id, uri, label, category)
+    flash(_('License added successfully.'), 'success')
+    return redirect(url_for('admin', tab='sidebar-licenses'))
+
+
+@app.route('/admin/delete_license/<int:license_id>', methods=['POST'])
+@login_required
+def delete_license(license_id):
+    check_manager_user()
+    Admin.delete_license(license_id)
+    flash(_('License deleted successfully.'), 'success')
+    return redirect(url_for('admin', tab='sidebar-licenses'))
+
+
+@app.route('/admin/update_logo_license', methods=['POST'])
+@login_required
+def update_logo_license() -> Response:
+    check_manager_user()
+
+    filename = request.form.get('filename', '')
+    license_id = request.form.get('license_id', type=int)
+    attribution = request.form.get('attribution', '')
+
+    admin_instance = Admin()
+    admin_instance.update_file_license(filename, license_id, attribution)
+
+    flash(_('Logo license updated successfully.'), 'success')
     return redirect(url_for('admin', tab='sidebar-logo-management'))
 
 
@@ -387,7 +418,8 @@ def add_entry() -> Response:
         'imprint': request.form.get('imprint', ''),
         'legal_notice': request.form.get('legal_notice', ''),
         'case_study': int(case_study_str)
-        if case_study_str and case_study_str.isdigit() else 0}
+        if case_study_str and case_study_str.isdigit() else 0,
+        'license_id': request.form.get('license_id', type=int)}
     current_tab = f'nav-{form_data["category"]}'
     redirect_base = url_for('admin') + current_tab
     try:
@@ -443,7 +475,8 @@ def edit_entry() -> Response:
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
         'legal_notice': request.form.get('legal_notice', ''),
-        'case_study': case_study}
+        'case_study': case_study,
+        'license_id': request.form.get('license_id', type=int)}
 
     try:
         Admin.edit_entry(form_data)

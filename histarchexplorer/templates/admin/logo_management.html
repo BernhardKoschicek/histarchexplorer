@@ -20,9 +20,9 @@
 <div class="card mt-3 mb-5">
   <div class="card-body">
     <h5 class="card-title">{{ _('Existing Logos') | upper }}</h5>
-    {% if logos %}
+    {% if admin_instance.logos %}
       <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
-        {% for filename in logos %}
+        {% for filename in admin_instance.logos %}
           <div class="col">
             <div class="card h-100">
               <img src="{{ url_for('static', filename='images/logos/' + filename) }}" class="card-img-top p-3" alt="{{ filename }}" style="object-fit: contain; height: 150px;">
@@ -30,6 +30,24 @@
                 <p class="card-text small text-muted" style="word-break: break-all;">{{ filename }}</p>
               </div>
               <div class="card-footer bg-transparent border-top-0">
+                <form action="{{ url_for('update_logo_license') }}" method="post" class="mb-2">
+                  <input type="hidden" name="filename" value="{{ filename }}">
+                  <div class="mb-2">
+                    <select name="license_id" class="form-select form-select-sm">
+                      <option value="">{{ _('Select License...') }}</option>
+                      {% for license in admin_instance.licenses %}
+                        <option value="{{ license.id }}" {% if admin_instance.file_licenses.get(filename) and admin_instance.file_licenses[filename].license_id == license.id %}selected{% endif %}>
+                          {{ license.label }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="mb-2">
+                    <input type="text" name="attribution" class="form-control form-control-sm" placeholder="{{ _('Attribution (if any)...') }}" value="{{ admin_instance.file_licenses.get(filename).attribution if admin_instance.file_licenses.get(filename) else '' }}">
+                  </div>
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">{{ _('Save License') }}</button>
+                </form>
+                <hr>
                 {# Rename Form #}
                 <form action="{{ url_for('rename_logo') }}" method="post" class="input-group input-group-sm mb-2">
                     <input type="hidden" name="old_name" value="{{ filename }}">

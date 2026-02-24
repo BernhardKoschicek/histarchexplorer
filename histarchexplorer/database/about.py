@@ -19,6 +19,7 @@ def get_config_entities() -> NamedTuple:
                c.image,
                c.orcid_id,
                c.case_study_type_id,
+               c.license_id,
                cc.name as class_name
         FROM tng.entities as c
                  JOIN tng.classes as cc ON c.class_id = cc.id;""")

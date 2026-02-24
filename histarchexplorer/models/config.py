@@ -90,6 +90,7 @@ class ConfigEntity:
     case_study: int
     main_project: bool
     links: list[Link]
+    license_id: int
 
     @classmethod
     def get_all_localized(cls) -> list['ConfigEntity']:
@@ -113,6 +114,8 @@ class ConfigEntity:
                 case_study=entry.case_study_type_id,
                 main_project=(entry.class_name == 'main-project'),
                 links=[l_ for l_ in g.config_links if l_.start_id == entry.id]
+                if g.config_links else [],
+                license_id=entry.license_id
                 ))
 
         return entities

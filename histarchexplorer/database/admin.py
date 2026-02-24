@@ -153,14 +153,15 @@ def add_entry(data: dict[str, str | int]) -> int:
         """
         INSERT INTO tng.entities
         (email, website, orcid_id, image, case_study_type_id, class_id,
-         acronym)
+         acronym, license_id)
         VALUES (NULLIF(%(email)s, ''),
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
                 NULLIF(%(image)s, ''),
                 NULLIF(%(case_study)s, NULL),
                 %(class_id)s,
-                %(acronym)s)
+                %(acronym)s,
+                %(license_id)s)
         RETURNING id
         """, {
             'email': data.get('email'),
@@ -169,7 +170,8 @@ def add_entry(data: dict[str, str | int]) -> int:
             'image': data.get('image'),
             'case_study': data.get('case_study'),
             'acronym': data.get('acronym'),
-            'class_id': config_class})
+            'class_id': config_class,
+            'license_id': data.get('license_id')})
 
     id_ = g.cursor.fetchone()[0]
     _upsert_jsonb_fields(id_, data)
@@ -189,7 +191,8 @@ def update_config_entry(data: dict[str, str | int]) -> None:
             orcid_id           = NULLIF(%(orcid_id)s, ''),
             image              = NULLIF(%(image)s, ''),
             case_study_type_id = %(case_study)s,
-            acronym            = %(acronym)s
+            acronym            = %(acronym)s,
+            license_id         = %(license_id)s
         WHERE id = %(config_id)s
         """,
         data)
@@ -277,14 +280,44 @@ def delete_link(id_: int) -> None:
             'link_id': id_})
 
 
-# def get_config_data(language: str) -> Any:
-#     g.cursor.execute(
-#         f"SELECT * FROM tng.entities ORDER BY (name->>'{language}')")
-#     return g.cursor.fetchall()
-
-
 def check_if_config_entry_exist(id_: int) -> bool:
     g.cursor.execute(
         'SELECT 1 FROM tng.entities WHERE id = %(id)s',
         {'id': id_})
     return g.cursor.fetchone() is not None
+
+
+def get_licenses() -> Any:
+    g.cursor.execute('SELECT * FROM tng.licenses ORDER BY category, label')
+    return g.cursor.fetchall()
+
+
+def get_file_licenses() -> dict[str, Any]:
+    g.cursor.execute('SELECT filename, license_id, attribution FROM tng.file_licenses')
+    return {row.filename: {'license_id': row.license_id, 'attribution': row.attribution} for row in g.cursor.fetchall()}
+
+
+def add_license(spdx_id: str, uri: str, label: str, category: str) -> None:
+    g.cursor.execute(
+        """
+        INSERT INTO tng.licenses (spdx_id, uri, label, category)
+        VALUES (%(spdx_id)s, %(uri)s, %(label)s, %(category)s)
+        ON CONFLICT (spdx_id) DO NOTHING
+        """,
+        {'spdx_id': spdx_id, 'uri': uri, 'label': label, 'category': category}
+    )
+
+
+def delete_license(license_id: int) -> None:
+    g.cursor.execute('DELETE FROM tng.licenses WHERE id = %(id)s', {'id': license_id})
+
+
+def update_file_license(filename: str, license_id: int, attribution: str) -> None:
+    g.cursor.execute(
+        """
+        INSERT INTO tng.file_licenses (filename, license_id, attribution)
+        VALUES (%(filename)s, %(license_id)s, %(attribution)s)
+        ON CONFLICT (filename) DO UPDATE SET license_id = %(license_id)s, attribution = %(attribution)s
+        """,
+        {'filename': filename, 'license_id': license_id, 'attribution': attribution}
+    )

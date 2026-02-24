@@ -22,6 +22,8 @@ SET row_security = off;
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_class_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_license_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.file_licenses DROP CONSTRAINT IF EXISTS file_licenses_license_id_fkey;
 DROP TRIGGER IF EXISTS delete_links_trigger ON tng.entities;
 ALTER TABLE IF EXISTS ONLY tng.system_settings DROP CONSTRAINT IF EXISTS system_settings_pkey;
 ALTER TABLE IF EXISTS ONLY tng.maps DROP CONSTRAINT IF EXISTS maps_pkey;
@@ -29,6 +31,8 @@ ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_pkey;
 ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_pkey;
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS config_properties_pkey;
 ALTER TABLE IF EXISTS ONLY tng.classes DROP CONSTRAINT IF EXISTS config_classes_pkey;
+ALTER TABLE IF EXISTS ONLY tng.licenses DROP CONSTRAINT IF EXISTS licenses_pkey;
+ALTER TABLE IF EXISTS ONLY tng.file_licenses DROP CONSTRAINT IF EXISTS file_licenses_pkey;
 ALTER TABLE IF EXISTS tng.maps ALTER COLUMN id DROP DEFAULT;
 DROP TABLE IF EXISTS tng.system_settings;
 DROP TABLE IF EXISTS tng.properties;
@@ -38,6 +42,8 @@ DROP SEQUENCE IF EXISTS tng.links_id_seq;
 DROP TABLE IF EXISTS tng.links;
 DROP TABLE IF EXISTS tng.entities;
 DROP TABLE IF EXISTS tng.classes;
+DROP TABLE IF EXISTS tng.licenses;
+DROP TABLE IF EXISTS tng.file_licenses;
 DROP FUNCTION IF EXISTS tng.getdates(first timestamp without time zone, last timestamp without time zone, comment text);
 DROP FUNCTION IF EXISTS tng.delete_links_on_config_delete();
 DROP SCHEMA IF EXISTS tng;
@@ -141,7 +147,8 @@ CREATE TABLE tng.entities (
     legal_notice jsonb,
     imprint jsonb,
     case_study_type_id integer,
-    acronym text
+    acronym text,
+    license_id integer
 );
 
 
@@ -292,6 +299,32 @@ CREATE TABLE tng.system_settings (
 ALTER TABLE tng.system_settings OWNER TO openatlas;
 
 --
+-- Name: licenses; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.licenses (
+    id SERIAL PRIMARY KEY,
+    spdx_id VARCHAR(50) UNIQUE NOT NULL,
+    uri VARCHAR(255) NOT NULL,
+    label VARCHAR(255) NOT NULL,
+    category VARCHAR(20) NOT NULL CHECK (category IN ('LICENSE', 'STATEMENT'))
+);
+
+ALTER TABLE tng.licenses OWNER TO openatlas;
+
+--
+-- Name: file_licenses; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.file_licenses (
+    filename VARCHAR(255) PRIMARY KEY,
+    license_id INTEGER
+);
+
+ALTER TABLE tng.file_licenses OWNER TO openatlas;
+
+
+--
 -- Name: maps id; Type: DEFAULT; Schema: tng; Owner: openatlas
 --
 
@@ -345,6 +378,20 @@ ALTER TABLE ONLY tng.maps
 ALTER TABLE ONLY tng.system_settings
     ADD CONSTRAINT system_settings_pkey PRIMARY KEY (key);
 
+--
+-- Name: licenses licenses_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.licenses
+    ADD CONSTRAINT licenses_pkey PRIMARY KEY (id);
+
+--
+-- Name: file_licenses file_licenses_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.file_licenses
+    ADD CONSTRAINT file_licenses_pkey PRIMARY KEY (filename);
+
 
 --
 -- Name: entities delete_links_trigger; Type: TRIGGER; Schema: tng; Owner: openatlas
@@ -376,10 +423,23 @@ ALTER TABLE ONLY tng.properties
 ALTER TABLE ONLY tng.properties
     ADD CONSTRAINT relationship_labels_range_id_fkey FOREIGN KEY (range_type_id) REFERENCES tng.classes(id) NOT VALID;
 
+--
+-- Name: entities entities_license_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.entities
+    ADD CONSTRAINT entities_license_id_fkey FOREIGN KEY (license_id) REFERENCES tng.licenses(id) ON DELETE SET NULL;
+
+--
+-- Name: file_licenses file_licenses_license_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.file_licenses
+    ADD CONSTRAINT file_licenses_license_id_fkey FOREIGN KEY (license_id) REFERENCES tng.licenses(id) ON DELETE SET NULL;
+
 
 --
 -- PostgreSQL database dump complete
 --
 
 \unrestrict wBDZkAP9xdVDxTOImgfcyo3Wfw37DoE6s7fAkoTpHgTAOzNmBxB2kOH2MNyBZlU
-
