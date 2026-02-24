@@ -7,7 +7,7 @@
           {% for logo in all_logos %}
             <div class="col">
               <div class="card h-100">
-                <img src="{{ url_for('static', filename='images/logos/' + logo.filename) }}" class="card-img-top p-3" alt="{{ logo.filename }}" style="object-fit: contain; height: 150px;">
+                <img src="{{ get_logo_url(logo.filename) }}" class="card-img-top p-3" alt="{{ logo.filename }}" style="object-fit: contain; height: 150px;">
                 <div class="card-body">
                   <p class="card-text small text-muted" style="word-break: break-all;">{{ logo.filename }}</p>
                   <div class="form-check">

@@ -81,8 +81,8 @@
                                       disabled>
                                 <option value="">{{ _('None') }}</option>
                                 {% for logo_filename in admin_instance.logos %}
-                                  <option value="{{ url_for('static', filename='images/logos/' + logo_filename) }}"
-                                          {% if entity.image == url_for('static', filename='images/logos/' + logo_filename) %}selected{% endif %}>
+                                  <option value="{{ get_logo_url(logo_filename) }}"
+                                          {% if entity.image == get_logo_url(logo_filename) %}selected{% endif %}>
                                     {{ logo_filename }}
                                   </option>
                                 {% endfor %}

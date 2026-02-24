@@ -325,20 +325,29 @@ def update_file_license(filename: str, license_id: int, attribution: str) -> Non
 
 
 def get_all_logos_from_db() -> list[dict[str, Any]]:
-    g.cursor.execute('SELECT id, filename FROM tng.logos ORDER BY filename')
-    return [{'id': row.id, 'filename': row.filename} for row in g.cursor.fetchall()]
+    g.cursor.execute('SELECT id, filename, is_default FROM tng.logos WHERE is_active = TRUE ORDER BY filename')
+    return [{'id': row.id, 'filename': row.filename, 'is_default': row.is_default} for row in g.cursor.fetchall()]
 
 
-def add_logo_to_db(filename: str) -> None:
+def add_logo_to_db(filename: str, is_default: bool = False) -> None:
     g.cursor.execute(
-        'INSERT INTO tng.logos (filename) VALUES (%(filename)s)',
-        {'filename': filename})
+        'INSERT INTO tng.logos (filename, is_default, is_active) VALUES (%(filename)s, %(is_default)s, TRUE)',
+        {'filename': filename, 'is_default': is_default})
 
 
 def delete_logo_from_db(filename: str) -> None:
     g.cursor.execute(
-        'DELETE FROM tng.logos WHERE filename = %(filename)s',
+        'SELECT is_default FROM tng.logos WHERE filename = %(filename)s',
         {'filename': filename})
+    row = g.cursor.fetchone()
+    if row and row.is_default:
+        g.cursor.execute(
+            'UPDATE tng.logos SET is_active = FALSE WHERE filename = %(filename)s',
+            {'filename': filename})
+    else:
+        g.cursor.execute(
+            'DELETE FROM tng.logos WHERE filename = %(filename)s',
+            {'filename': filename})
 
 
 def rename_logo_in_db(old_name: str, new_name: str) -> None:
@@ -353,8 +362,9 @@ def synchronize_logos_with_db() -> None:
         return
 
     fs_logos = set(os.listdir(logo_path))
-    db_logos = {logo['filename'] for logo in get_all_logos_from_db()}
+    g.cursor.execute('SELECT filename FROM tng.logos WHERE is_default = TRUE')
+    db_logos = {row.filename for row in g.cursor.fetchall()}
 
     missing_in_db = fs_logos - db_logos
     for filename in missing_in_db:
-        add_logo_to_db(filename)
+        add_logo_to_db(filename, is_default=True)

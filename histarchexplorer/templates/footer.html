@@ -3,9 +3,9 @@
         {% set logo_filename = logo_id_to_filename_map.get(logo_id) %}
         {% if logo_filename %}
             {% if logo_filename.endswith('.svg') %}
-                <object class="footerimg img-fluid" data="{{ url_for('static', filename='images/logos/' + logo_filename) }}" type="image/svg+xml" style="height: 50px;"></object>
+                <object class="footerimg img-fluid" data="{{ get_logo_url(logo_filename) }}" type="image/svg+xml" style="max-height: 100px; width: auto;"></object>
             {% else %}
-                <img class="footerimg img-fluid" src="{{ url_for('static', filename='images/logos/' + logo_filename) }}" alt="{{ logo_filename }}">
+                <img class="footerimg img-fluid" src="{{ get_logo_url(logo_filename) }}" alt="{{ logo_filename }}" style="max-height: 100px; width: auto;">
             {% endif %}
         {% endif %}
     {% endfor %}

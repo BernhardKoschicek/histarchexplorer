@@ -1,4 +1,5 @@
 import time
+import os
 from typing import Any
 
 import psycopg2.extras
@@ -149,6 +150,13 @@ def before_request() -> Response | None:
     return None
 
 
+def get_logo_url(filename: str) -> str:
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
+    if os.path.exists(os.path.join(uploads_path, filename)):
+        return url_for('uploaded_logo', filename=filename)
+    return url_for('static', filename='images/logos/' + filename)
+
+
 @app.context_processor
 def inject_globals() -> dict[str, Any]:
     return {
@@ -179,7 +187,8 @@ def inject_globals() -> dict[str, Any]:
             "source": "sources",
             "file": "files"},
         'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map(),
-        'favicon_version': int(time.time())}
+        'favicon_version': int(time.time()),
+        'get_logo_url': get_logo_url}
 
 
 @app.after_request

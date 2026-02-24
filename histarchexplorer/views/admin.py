@@ -7,7 +7,7 @@ from PIL import Image
 
 from flask import (
     abort, current_app, flash, g, jsonify, redirect, render_template,
-    request, url_for, send_file)
+    request, url_for, send_file, send_from_directory)
 from flask_babel import gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
@@ -131,10 +131,10 @@ def upload_logo():
 
     if file:
         filename = secure_filename(file.filename)
-        upload_path = os.path.join(app.static_folder, 'images', 'logos')
+        upload_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
         os.makedirs(upload_path, exist_ok=True)
         file.save(os.path.join(upload_path, filename))
-        add_logo_to_db(filename)
+        add_logo_to_db(filename, is_default=False)
         flash(_('Logo "%(name)s" uploaded successfully.', name=filename),
               'success')
 
@@ -151,12 +151,19 @@ def rename_logo():
     if not old_name or not new_name:
         flash(_('Invalid request for renaming.'), 'danger')
         return redirect(url_for('admin', tab='sidebar-logo-management'))
+    static_path = os.path.join(app.static_folder, 'images', 'logos')
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
 
-    logo_path = os.path.join(app.static_folder, 'images', 'logos')
-    old_filepath = os.path.join(logo_path, secure_filename(old_name))
-    new_filepath = os.path.join(logo_path, secure_filename(new_name))
+    old_filepath_static = os.path.join(static_path, secure_filename(old_name))
+    old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
 
-    if not os.path.exists(old_filepath):
+    if os.path.exists(old_filepath_static):
+        flash(_('Cannot rename default logos.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+    elif os.path.exists(old_filepath_uploads):
+        old_filepath = old_filepath_uploads
+        new_filepath = os.path.join(uploads_path, secure_filename(new_name))
+    else:
         flash(_('Original file not found.'), 'danger')
         return redirect(url_for('admin', tab='sidebar-logo-management'))
 
@@ -184,20 +191,20 @@ def delete_logo():
         flash(_('No filename specified for deletion.'), 'danger')
         return redirect(url_for('admin', tab='sidebar-logo-management'))
 
-    logo_path = os.path.join(app.static_folder, 'images', 'logos')
-    filepath = os.path.join(logo_path, secure_filename(filename))
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
+    filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
 
-    if not os.path.exists(filepath):
-        flash(_('File not found.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
-
-    try:
-        os.remove(filepath)
-        delete_logo_from_db(filename)
-        flash(_('Logo "%(name)s" deleted successfully.', name=filename),
-              'success')
-    except OSError as e:
-        flash(_('Error deleting file: %(error)s', error=e), 'danger')
+    if os.path.exists(filepath_uploads):
+        try:
+            os.remove(filepath_uploads)
+            delete_logo_from_db(filename) # This will delete the row
+            flash(_('Logo "%(name)s" deleted successfully.', name=filename),
+                  'success')
+        except OSError as e:
+            flash(_('Error deleting file: %(error)s', error=e), 'danger')
+    else:
+        delete_logo_from_db(filename) # This will set is_active = FALSE
+        flash(_('Default logo "%(name)s" deactivated.', name=filename), 'success')
 
     return redirect(url_for('admin', tab='sidebar-logo-management'))
 
@@ -231,7 +238,14 @@ def set_favicon() -> Response:
         flash(_('No filename specified.'), 'danger')
         return redirect(url_for('admin', tab='sidebar-logo-management'))
 
-    logo_path = os.path.join(app.static_folder, 'images', 'logos', filename)
+    # Check uploads first, then static
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
+    static_path = os.path.join(app.static_folder, 'images', 'logos')
+
+    logo_path = os.path.join(uploads_path, filename)
+    if not os.path.exists(logo_path):
+        logo_path = os.path.join(static_path, filename)
+
     favicon_path = os.path.join(app.static_folder, 'favicon.ico')
 
     try:
@@ -824,3 +838,8 @@ def refresh_system_cache() -> Response:
 
     flash(_('system cache refreshed'), 'success')
     return redirect(url_for('admin'))
+
+
+@app.route('/uploads/logos/<filename>')
+def uploaded_logo(filename):
+    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'logos'), filename)

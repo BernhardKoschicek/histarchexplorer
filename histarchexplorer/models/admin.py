@@ -121,9 +121,7 @@ class Admin:
 
     @staticmethod
     def get_all_logo_filenames() -> list[str]:
-        logo_path = os.path.join(current_app.static_folder, 'images', 'logos')
-        return sorted(os.listdir(logo_path)) if os.path.exists(
-            logo_path) else []
+        return [logo['filename'] for logo in Admin.get_all_logos_with_ids()]
 
     def _has_translation(self, entity: ConfigEntity, field_key: str) -> bool:
         value_attr = getattr(entity, field_key, None)

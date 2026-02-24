@@ -7,10 +7,10 @@
         <a class="navbar-brand" title="{{ _('home') }}"
            href="{{ url_for('index') }}">
             {% if g.settings.nav_logo.endswith('.svg') %}
-                <object id="logo" data="/static/images/logos/{{ g.settings.nav_logo }}"
-                        type="image/svg+xml"></object>
+                <object id="logo" data="{{ get_logo_url(g.settings.nav_logo) }}"
+                        type="image/svg+xml" style="max-height: 50px; width: auto;"></object>
             {% else %}
-                <img id="logo" alt="logo" src="/static/images/logos/{{ g.settings.nav_logo }}">{% endif %}
+                <img id="logo" alt="logo" src="{{ get_logo_url(g.settings.nav_logo) }}" style="max-height: 50px; width: auto;">{% endif %}
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target=".navbar-collapse"
