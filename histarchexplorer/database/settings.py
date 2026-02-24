@@ -36,13 +36,3 @@ def save_settings(key: str, value: Any) -> None:
                 VALUES (%s, %s)
                 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
             """, (key, psycopg2.extras.Json(value)))
-
-
-
-
-
-
-
-
-
-

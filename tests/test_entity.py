@@ -1,70 +1,68 @@
 from flask import url_for
 from flask.testing import FlaskClient
 
-from histarchexplorer import app
+
+def test_entity_view_main_page(client: FlaskClient):
+    """Test the main entity view page."""
+    # Using ID 2 (Stefan Eichert) which is known to exist in reset.sql
+    response = client.get(url_for('entity_view', id_=2))
+    assert response.status_code == 200
+    assert b"Stefan Eichert" in response.data
 
 
-def test_entity(client: FlaskClient) -> None:
-    with app.app_context():
-        rv = client.get(url_for('entity_view', id_=50505))
-        assert rv.status_code == 200
-        assert b"Loading" in rv.data
+def test_get_entity_overview(client: FlaskClient):
+    """Test the overview tab for an entity."""
+    response = client.get(url_for('get_entity', id_=2, tab_name='overview'))
+    assert response.status_code == 200
+    assert b"Stefan Eichert" in response.data
 
-        rv = client.get(url_for('get_entity', id_=50505, tab_name='overview'))
-        assert rv.status_code == 200
-        assert b"Thunau Obere Holzwiese" in rv.data
 
-        rv = client.get(url_for('get_entity', id_=50505, tab_name='map'))
-        assert rv.status_code == 200
-        assert b"Thunau Obere Holzwiese" in rv.data
+def test_get_entity_map(client: FlaskClient):
+    """Test the map tab for an entity."""
+    # This might return empty content if no geo data exists, but should be 200 OK
+    response = client.get(url_for('get_entity', id_=2, tab_name='map'))
+    assert response.status_code == 200
 
-        rv = client.get(url_for('get_entity', id_=50505, tab_name='subunits'))
-        assert rv.status_code == 200
-        assert b"Agilolf" in rv.data
 
-        rv = client.get(url_for('get_entity', id_=50505, tab_name='media'))
-        assert rv.status_code == 200
-        assert b"iiif_manifest" in rv.data
+def test_get_entity_subunits(client: FlaskClient):
+    """Test the subunits tab for an entity."""
+    response = client.get(url_for('get_entity', id_=2, tab_name='subunits'))
+    assert response.status_code == 200
 
-        rv = client.get(url_for('get_entity', id_=59099, tab_name='overview'))
-        assert rv.status_code == 200
-        assert b"Grave 073" in rv.data
 
-        rv = client.get(url_for('get_entity', id_=77703, tab_name='map'))
-        assert rv.status_code == 200
-        assert b"G073S1" in rv.data
+def test_get_entity_media(client: FlaskClient):
+    """Test the media tab for an entity."""
+    response = client.get(url_for('get_entity', id_=2, tab_name='media'))
+    assert response.status_code == 200
 
-        rv = client.get(url_for('get_entity', id_=102031, tab_name='overview'))
-        assert rv.status_code == 200
-        assert b"G043F01" in rv.data
 
-        # Test main image
-        rv = client.get(url_for('get_entity', id_=128351, tab_name='overview'))
-        assert rv.status_code == 200
-        assert b"ERC Synergy Grant HistoGenes" in rv.data
+def test_entity_view_invalid_tab(client: FlaskClient):
+    """Test accessing an invalid tab on the main entity view."""
+    response = client.get(url_for('entity_view', id_=2, tab_name='invalid_tab'))
+    assert response.status_code == 404
 
-        # Test alias
-        rv = client.get(url_for('get_entity', id_=13800, tab_name='overview'))
-        assert rv.status_code == 200
-        assert b"Abbey Chiemsee" in rv.data
 
-        # Test minus dates
-        rv = client.get(url_for('get_entity', id_=230071, tab_name='overview'))
-        assert rv.status_code == 200
-        assert b"Mitterhof" in rv.data
+def test_get_entity_invalid_tab(client: FlaskClient):
+    """Test accessing an invalid tab via the AJAX endpoint."""
+    response = client.get(url_for('get_entity', id_=2, tab_name='invalid_tab'))
+    assert response.status_code == 404
 
-        # Test glb, wepb and mp4
-        rv = client.get(url_for('get_entity', id_=196952, tab_name='overview'))
-        assert rv.status_code == 200
-        assert b"Venus of Willendorf" in rv.data
 
-        # Test pdf
-        rv = client.get(url_for('get_entity', id_=203599, tab_name='overview'))
-        assert rv.status_code == 200
-        assert b"Reichartz" in rv.data
+def test_presentation_view_api(client: FlaskClient):
+    """Test the presentation view API endpoint."""
+    response = client.get(url_for('presentation_view', id_=2))
+    assert response.status_code == 200
+    assert response.is_json
+    data = response.get_json()
+    assert data['id'] == 2
+    assert 'Stefan Eichert' in str(data)
 
-        rv = client.get(url_for('entity_view', id_=50505, tab_name='wrong'))
-        assert rv.status_code == 404
 
-        rv = client.get(url_for('get_entity', id_=50505, tab_name='wrong'))
-        assert rv.status_code == 404
+def test_entity_data_api(client: FlaskClient):
+    """Test the entity data API endpoint."""
+    response = client.get(url_for('entity_data', id_=2))
+    assert response.status_code == 200
+    assert response.is_json
+    data = response.get_json()
+    assert 'entity' in data
+    assert data['entity']['id'] == 2

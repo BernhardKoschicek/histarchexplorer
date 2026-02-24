@@ -179,6 +179,51 @@ DATABASE_USER = ''
 DATABASE_PASS = ''
 ```
 
+## 🧪 Running Tests
+
+Histarchexplorer uses `pytest` for testing. The test suite runs against a dedicated test database.
+
+### Prerequisites
+
+1.  **Install development dependencies:**
+
+    ```bash
+    sudo apt install python3-pytest python3-pytest-cov python3-pytest-flask
+    ```
+
+2.  **Create a test database:**
+
+    Create a new, empty database for testing (e.g., `tng_test`). Do **NOT** use your production or development database, as it will be reset during tests!
+
+    ```bash
+    createdb tng_test -O openatlas
+    ```
+
+3.  **Configure the test environment:**
+
+    Copy the example testing configuration:
+
+    ```bash
+    cp example_testing.py instance/testing.py
+    ```
+
+    Edit `instance/testing.py` and set `DATABASE_NAME` to your test database (e.g., `'tng_test'`). Adjust other credentials if necessary.
+
+### Running the tests
+
+To run all tests and generate a coverage report:
+
+```bash
+export PYTHONPATH=".:$PYTHONPATH"
+pytest
+```
+
+This will:
+1.  Connect to the configured test database.
+2.  **Reset the database** (drop schema `tng` and reload `tests/sql/reset.sql`).
+3.  Run all tests in the `tests/` directory.
+4.  Output a coverage report.
+
 ## Redis Installation (Optional but Recommended)
 
 Histarchexplorer can use **Redis** as a high-performance backend for Flask-Caching (memoize). Redis is optional, but strongly recommended for production environments.

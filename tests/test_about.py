@@ -1,11 +1,11 @@
 from flask import url_for
 from flask.testing import FlaskClient
 
-from histarchexplorer import app
-
 
 def test_about_page(client: FlaskClient) -> None:
-    with app.app_context():
-        rv = client.get(url_for('about'))
-        assert rv.status_code == 200
-        assert b"TEAM" in rv.data
+    """
+    Test the about page for a successful response and content.
+    """
+    response = client.get(url_for('about'))
+    assert response.status_code == 200
+    assert b"About" in response.data

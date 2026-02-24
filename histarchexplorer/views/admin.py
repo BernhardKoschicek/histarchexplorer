@@ -44,10 +44,11 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
          'id': g.config_classes['attribute']}]
 
     # Determine which main sidebar section should be active
-    active_main_sidebar_id = 'sidebar-general-settings-group' # Default
+    active_main_sidebar_id = 'sidebar-general-settings-group'  # Default
 
     if tab:
-        # Check if the 'tab' parameter corresponds to one of the 'About Section Content' sub-tabs
+        # Check if the 'tab' parameter corresponds to one of the 'About
+        # Section Content' sub-tabs
         if any(t['target'] == tab for t in tabs):
             active_main_sidebar_id = 'sidebar-about-content'
         elif tab == 'sidebar-maps':
@@ -56,7 +57,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             active_main_sidebar_id = 'sidebar-index-page-options'
         elif tab == 'sidebar-database':
             active_main_sidebar_id = 'sidebar-database'
-        # If 'tab' is not recognized, it will default to 'sidebar-general-settings-group'
+        # If 'tab' is not recognized, it will default to
+        # 'sidebar-general-settings-group'
 
     # Set is_active for the sub-tabs within 'About Section Content'
     for tab_item in tabs:
@@ -98,13 +100,14 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_id=cs_type_id,
         initial_case_study_type_name=cs_type_name,
         case_study_children=case_study_children,
-        active_main_sidebar_id=active_main_sidebar_id # Pass this to the template
+        active_main_sidebar_id=active_main_sidebar_id
+        # Pass this to the template
     )
 
 
 @app.route('/admin/backup_db')
 @login_required
-def backup_db():
+def backup_db() -> Response:
     check_manager_user()
     try:
         db_name = current_app.config['DATABASE_NAME']
@@ -130,10 +133,14 @@ def backup_db():
             '-f', filepath,
             '--clean',
             '--if-exists',
-            '--create'
-        ]
+            '--create']
 
-        subprocess.run(command, env=env, check=True, capture_output=True, text=True)
+        subprocess.run(
+            command,
+            env=env,
+            check=True,
+            capture_output=True,
+            text=True)
 
         return send_file(filepath, as_attachment=True)
 
@@ -142,14 +149,15 @@ def backup_db():
         flash(_('Database backup failed. Check logs for details.'), 'danger')
     except Exception as e:
         app.logger.error(f"An unexpected error occurred during backup: {e}")
-        flash(_('An unexpected error occurred. Check logs for details.'), 'danger')
+        flash(_('An unexpected error occurred. Check logs for details.'),
+              'danger')
 
     return redirect(url_for('admin', tab='sidebar-database'))
 
 
 @app.route('/admin/restore_db', methods=['POST'])
 @login_required
-def restore_db():
+def restore_db() -> Response:
     check_manager_user()
     if 'sql_file' not in request.files:
         flash(_('No file part'), 'danger')
@@ -183,8 +191,8 @@ def restore_db():
                 '-d', db_name,
                 '-c', 'DROP SCHEMA IF EXISTS tng CASCADE;',
                 '-c', 'CREATE SCHEMA tng;',
-                '-c', f'ALTER SCHEMA tng OWNER TO {db_user};'
-            ]
+                '-c', f'ALTER SCHEMA tng OWNER TO {db_user};']
+
             subprocess.run(
                 psql_command,
                 env=env,
@@ -200,17 +208,25 @@ def restore_db():
                 '-d', db_name,
                 '-f', filepath]
 
-            subprocess.run(restore_command, env=env, check=True, capture_output=True, text=True)
+            subprocess.run(
+                restore_command,
+                env=env,
+                check=True,
+                capture_output=True,
+                text=True)
 
             os.remove(filepath)
             flash(_('Database restored successfully.'), 'success')
 
         except subprocess.CalledProcessError as e:
             app.logger.error(f"Database restore failed: {e.stderr}")
-            flash(_('Database restore failed. Check logs for details.'), 'danger')
+            flash(_('Database restore failed. Check logs for details.'),
+                  'danger')
         except Exception as e:
-            app.logger.error(f"An unexpected error occurred during restore: {e}")
-            flash(_('An unexpected error occurred. Check logs for details.'), 'danger')
+            app.logger.error(
+                f"An unexpected error occurred during restore: {e}")
+            flash(_('An unexpected error occurred. Check logs for details.'),
+                  'danger')
     else:
         flash(_('Invalid file type. Please upload a .sql file.'), 'danger')
 

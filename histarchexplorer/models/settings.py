@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 
 from histarchexplorer.database.settings import (
     create_settings_table, get_settings, save_settings, set_default_settings)
@@ -14,12 +13,12 @@ class Settings(BaseModel):
     darkmode: bool = False
     language_selector: bool = False
     access_restriction: bool = False
-    shown_classes: List[str] = ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains', 'person', 'group', 'acquisition', 'event', 'activity', 'creation', 'move', 'production', 'modification']
-    shown_types: List[str] = []
-    hidden_classes: List[str] = ['group']
-    hidden_types: List[str] = []
-    shown_ids: List[int] = []
-    hidden_ids: List[int] = []
+    shown_classes: list[str] = ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains', 'person', 'group', 'acquisition', 'event', 'activity', 'creation', 'move', 'production', 'modification']
+    shown_types: list[str] = []
+    hidden_classes: list[str] = ['group']
+    hidden_types: list[str] = []
+    shown_ids: list[int] = []
+    hidden_ids: list[int] = []
     case_study_type_id: int = 8240
 
     @classmethod
@@ -41,4 +40,3 @@ class Settings(BaseModel):
             'map': self.index_map,
             'img_map': self.img_map,
             'greyscale': self.greyscale}
-
