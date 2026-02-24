@@ -9,16 +9,23 @@
     <div class="container pt-3 pb-3 text-center">
       <h3>
         {{ _('admin options') |upper }}
-        <span class="text-body-secondary"> | {{ _('DB Interface') }}</span>
+          <button id="logoutButton" class="btn btn-danger align-content-end"
+                  data-bs-toggle="tooltip"
+                  title="{{ _('logout') }}">
+            {{ _('logout') | upper }}
+          </button>
+
       </h3>
       {{ ui.flash_messages() }}
     </div>
 
     <div class="d-flex container">
       {# Sidebar Navigation #}
-      <div class="d-flex flex-column flex-shrink-0 p-3 bg-light text-dark" style="width: 280px; min-height: 100vh;">
+      <div class="d-flex flex-column flex-shrink-0 p-3 bg-light text-dark"
+           style="width: 280px; min-height: 100vh;">
 
-        <ul class="nav nav-pills flex-column mb-auto" id="admin-sidebar-nav" role="tablist">
+        <ul class="nav nav-pills flex-column mb-auto" id="admin-sidebar-nav"
+            role="tablist">
           {% set sidebar_sections = [
             {'id': 'sidebar-general-settings-group', 'label': _('General Settings')},
             {'id': 'sidebar-about-content', 'label': _('About Content')},
@@ -31,7 +38,8 @@
 
           {% for section in sidebar_sections %}
             <li class="nav-item">
-              <a href="#{{ section.id }}" class="nav-link text-dark {% if section.id == ns.active_sidebar %}active{% endif %}"
+              <a href="#{{ section.id }}"
+                 class="nav-link text-dark {% if section.id == ns.active_sidebar %}active{% endif %}"
                  id="{{ section.id }}-tab" data-bs-toggle="pill"
                  role="tab" aria-controls="{{ section.id }}"
                  aria-selected="{% if section.id == ns.active_sidebar %}true{% else %}false{% endif %}">
@@ -46,13 +54,23 @@
       <div class="flex-grow-1 p-3 scrollable-container">
         <div class="tab-content" id="admin-tab-content">
           {# Combined General Settings Section #}
-          <div class="tab-pane fade {% if ns.active_sidebar == 'sidebar-general-settings-group' %}show active{% endif %}" id="sidebar-general-settings-group" role="tabpanel" aria-labelledby="sidebar-general-settings-group-tab" tabindex="0">
+          <div
+            class="tab-pane fade {% if ns.active_sidebar == 'sidebar-general-settings-group' %}show active{% endif %}"
+            id="sidebar-general-settings-group" role="tabpanel"
+            aria-labelledby="sidebar-general-settings-group-tab" tabindex="0">
             <div class="card mt-3 mb-5">
               <div class="card-body">
                 <h5 class="card-title">{{ _('tools') | upper }}</h5>
                 <div class="d-flex justify-content-start align-items-start">
                   {% include 'admin/tools.html' %}
                 </div>
+              </div>
+            </div>
+
+            <div class="card mt-3 mb-5">
+              <div class="card-body">
+                <h5 class="card-title">{{ _('general settings') | upper }}</h5>
+                {% include 'admin/general_settings.html' %}
               </div>
             </div>
 
@@ -65,21 +83,21 @@
               </div>
             </div>
 
-            <div class="card mt-3 mb-5">
-              <div class="card-body">
-                <h5 class="card-title">{{ _('general settings') | upper }}</h5>
-                {% include 'admin/general_settings.html' %}
-              </div>
-            </div>
           </div>
 
           {# About Section Content #}
-          <div class="tab-pane fade {% if ns.active_sidebar == 'sidebar-about-content' %}show active{% endif %}" id="sidebar-about-content" role="tabpanel" aria-labelledby="sidebar-about-content-tab" tabindex="0">
-             {% include 'admin/about_content.html' %}
+          <div
+            class="tab-pane fade {% if ns.active_sidebar == 'sidebar-about-content' %}show active{% endif %}"
+            id="sidebar-about-content" role="tabpanel"
+            aria-labelledby="sidebar-about-content-tab" tabindex="0">
+            {% include 'admin/about_content.html' %}
           </div>
 
           {# Maps Section #}
-          <div class="tab-pane fade {% if ns.active_sidebar == 'sidebar-maps' %}show active{% endif %}" id="sidebar-maps" role="tabpanel" aria-labelledby="sidebar-maps-tab" tabindex="0">
+          <div
+            class="tab-pane fade {% if ns.active_sidebar == 'sidebar-maps' %}show active{% endif %}"
+            id="sidebar-maps" role="tabpanel"
+            aria-labelledby="sidebar-maps-tab" tabindex="0">
             <div class="card mt-3 mb-5">
               <div class="card-body">
                 <h5 class="card-title">{{ _('maps') |upper }}</h5>
@@ -89,7 +107,10 @@
           </div>
 
           {# Index Page Options Section #}
-          <div class="tab-pane fade {% if ns.active_sidebar == 'sidebar-index-page-options' %}show active{% endif %}" id="sidebar-index-page-options" role="tabpanel" aria-labelledby="sidebar-index-page-options-tab" tabindex="0">
+          <div
+            class="tab-pane fade {% if ns.active_sidebar == 'sidebar-index-page-options' %}show active{% endif %}"
+            id="sidebar-index-page-options" role="tabpanel"
+            aria-labelledby="sidebar-index-page-options-tab" tabindex="0">
             <div class="card mt-3 mb-5">
               <div class="card-body">
                 <h5 class="card-title">
@@ -101,7 +122,10 @@
           </div>
 
           {# Database Interface Section #}
-          <div class="tab-pane fade {% if ns.active_sidebar == 'sidebar-database' %}show active{% endif %}" id="sidebar-database" role="tabpanel" aria-labelledby="sidebar-database-tab" tabindex="0">
+          <div
+            class="tab-pane fade {% if ns.active_sidebar == 'sidebar-database' %}show active{% endif %}"
+            id="sidebar-database" role="tabpanel"
+            aria-labelledby="sidebar-database-tab" tabindex="0">
             {% include 'admin/database.html' %}
           </div>
 
