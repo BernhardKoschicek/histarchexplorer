@@ -79,8 +79,6 @@ class ConfigEntity:
     acronym: str
     description: dict[str, dict[str, str | None]]
     website: str
-    legal_notice: dict[str, dict[str, str | None]]
-    imprint: dict[str, dict[str, str | None]]
     class_id: int
     address: dict[str, dict[str, str | None]]
     email: str
@@ -103,8 +101,6 @@ class ConfigEntity:
                 acronym=entry.acronym,
                 description=add_display(entry.description),
                 website=entry.website,
-                legal_notice=add_display(entry.legal_notice),
-                imprint=add_display(entry.imprint),
                 class_id=entry.class_id,
                 address=add_display(entry.address),
                 email=entry.email,

@@ -184,29 +184,29 @@
             </div>
           {% endif %}
           <div class="row">
-            {% if main_project.imprint or main_project.legal_notice %}
+            {% if settings.imprint.get(current_language) or settings.legal_info.get(current_language) %}
               <hr class="my-5">
               <div class="row g-3">
-                {% if main_project.imprint %}
+                {% if settings.imprint.get(current_language) %}
                   <div class="col-12 col-lg-6">
                     <div class="about-imprint-card h-100">
                       <div class="about-project-body">
                         <h5 class="about-project-title mb-3">{{ _('imprint') | capitalize }}</h5>
                         <div class="about-project-text">
-                          {{ main_project.imprint.display.label | safe }}
+                          {{ settings.imprint[current_language] | safe }}
                         </div>
                       </div>
                     </div>
                   </div>
                 {% endif %}
 
-                {% if main_project.legal_notice %}
+                {% if settings.legal_info.get(current_language) %}
                   <div class="col-12 col-lg-6">
                     <div class="about-imprint-card h-100">
                       <div class="about-project-body">
                         <h5 class="about-project-title mb-3">{{ _('legal notice') | capitalize }}</h5>
                         <div class="about-project-text">
-                          {{ main_project.legal_notice.display.label | safe }}
+                          {{ settings.legal_info[current_language] | safe }}
                         </div>
                       </div>
                     </div>

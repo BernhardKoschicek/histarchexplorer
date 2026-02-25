@@ -22,6 +22,8 @@ class Settings(BaseModel):
     case_study_type_id: int = 8240
     nav_logo: str = 'thanados_light.svg'
     footer_logos: list[int] = []
+    legal_info: dict[str, str] = {}
+    imprint: dict[str, str] = {}
 
     @classmethod
     def load_from_db(cls) -> 'Settings':

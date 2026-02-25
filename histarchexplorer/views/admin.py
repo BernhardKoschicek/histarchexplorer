@@ -58,7 +58,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                       'sidebar-database' | 'sidebar-cache-options' |
                       'sidebar-content-group' | 'sidebar-logo-management' |
                       'sidebar-footer-content' | 'sidebar-file-management-group' |
-                      'sidebar-assets' |
+                      'sidebar-assets' | 'sidebar-legal-notice' |
                       'sidebar-licenses'):
                     active_main_sidebar_id = tab
 
@@ -118,6 +118,32 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         all_logos=all_logos,
         all_assets=all_assets,
         selected_footer_logos=selected_footer_logos)
+
+
+@app.route('/admin/update_legal_notice', methods=['POST'])
+@login_required
+def update_legal_notice() -> Response:
+    check_manager_user()
+    legal_info_data = {}
+    imprint_data = {}
+
+    for lang_code in g.available_languages.keys():
+        legal_info_data[lang_code] = request.form.get(
+            f'legal_info_{lang_code}', '')
+        imprint_data[lang_code] = request.form.get(
+            f'imprint_{lang_code}', '')
+
+    g.settings.legal_info = legal_info_data
+    g.settings.imprint = imprint_data
+
+    try:
+        g.settings.save_to_db()
+        flash(_('Legal notice and imprint updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update legal notice/imprint: %s", e)
+        flash(_('Error updating settings'), 'error')
+
+    return redirect(url_for('admin', tab='sidebar-legal-notice'))
 
 
 @app.route('/admin/upload_logo', methods=['POST'])
@@ -509,8 +535,6 @@ def add_entry() -> Response:
         'image': request.form.get('image', ''),
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
-        'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legal_notice', ''),
         'case_study': int(case_study_str)
         if case_study_str and case_study_str.isdigit() else 0,
         'license_id': request.form.get('license_id', type=int)}
@@ -567,8 +591,6 @@ def edit_entry() -> Response:
         'image': request.form.get('image', ''),
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
-        'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legal_notice', ''),
         'case_study': case_study,
         'license_id': request.form.get('license_id', type=int)}
 
@@ -850,6 +872,23 @@ def refresh_system_cache() -> Response:
 @app.route('/uploads/logos/<filename>')
 def uploaded_logo(filename):
     return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'logos'), filename)
+
+
+@app.context_processor
+def utility_processor():
+    def get_logo_url(filename):
+        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
+        if os.path.exists(os.path.join(uploads_path, filename)):
+            return url_for('uploaded_logo', filename=filename)
+        return url_for('static', filename=f'images/logos/{filename}')
+    
+    def get_asset_url(filename):
+        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
+        if os.path.exists(os.path.join(uploads_path, filename)):
+            return url_for('uploaded_asset', filename=filename)
+        return url_for('static', filename=f'assets/{filename}')
+
+    return dict(get_logo_url=get_logo_url, get_asset_url=get_asset_url)
 
 
 @app.route('/admin/upload_asset', methods=['POST'])

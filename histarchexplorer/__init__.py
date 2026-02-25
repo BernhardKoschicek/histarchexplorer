@@ -162,6 +162,7 @@ def get_logo_url(filename: str) -> str:
 @app.context_processor
 def inject_globals() -> dict[str, Any]:
     return {
+        'settings': g.settings,
         'nav_logo': g.settings.nav_logo,
         'available_languages': g.available_languages,
         'preferred_language': g.preferred_langauge,

@@ -11,8 +11,6 @@ def get_config_entities() -> NamedTuple:
                c.acronym,
                c.description,
                c.website,
-               c.legal_notice,
-               c.imprint,
                c.class_id,
                c.address,
                c.email,

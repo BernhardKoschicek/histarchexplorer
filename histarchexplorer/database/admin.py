@@ -202,10 +202,10 @@ def update_config_entry(data: dict[str, str | int]) -> None:
 
 def _upsert_jsonb_fields(config_id: int, data: dict[str, str | int]) -> None:
     language = g.language
-    valid_cols = {'address', 'description', 'imprint', 'legal_notice', 'name'}
+    valid_cols = {'address', 'description', 'name'}
     for col in valid_cols:
         val = data.get(col, '')
-        if col in ('description', 'imprint', 'legal_notice') and val:
+        if col in ('description') and val:
             val = sanitize_richtext(str(val))
         if val:
             g.cursor.execute(
@@ -324,7 +324,7 @@ def update_file_license(filename: str, license_id: int, attribution: str) -> Non
     if not res:
         return # Or handle error
     file_id = res.id
-    
+
     g.cursor.execute(
         """
         INSERT INTO tng.file_licenses (file_id, license_id, attribution)

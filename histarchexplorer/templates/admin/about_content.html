@@ -90,7 +90,7 @@
                             {% elif field.type == 'textarea' %}
                               <textarea
                                 class="form-control
-                                {% if field.key in ['description', 'legal_notice', 'imprint'] %}
+                                {% if field.key in ['description'] %}
                                   js-richtext-rich
                                 {% endif %}"
                                 id="Input {{ field.key | capitalize }}{{ entity.id }}"
