@@ -15,7 +15,8 @@ from histarchexplorer.database.admin import (
     update_file_license, update_map,
     update_sort_order,
     get_all_logos_from_db,
-    get_all_assets_from_db)
+    get_all_assets_from_db,
+    get_files_by_type_from_db)
 from histarchexplorer.database.map import get_maps
 from histarchexplorer.models.config import ConfigEntity
 
@@ -39,6 +40,10 @@ class Admin:
         self.assets = self.get_all_asset_filenames()
         self.licenses = self.get_licenses()
         self.file_licenses = self.get_file_licenses()
+
+    @staticmethod
+    def get_files_by_type(file_type: str) -> list[dict[str, Any]]:
+        return get_files_by_type_from_db(file_type)
 
     @staticmethod
     def get_licenses() -> Any:

@@ -340,6 +340,10 @@ def get_all_files_from_db(file_type: str) -> list[dict[str, Any]]:
     return [{'id': row.id, 'filename': row.filename, 'is_default': row.is_default} for row in g.cursor.fetchall()]
 
 
+def get_files_by_type_from_db(file_type: str) -> list[dict[str, Any]]:
+    return get_all_files_from_db(file_type)
+
+
 def add_file_to_db(filename: str, file_type: str, is_default: bool = False) -> None:
     g.cursor.execute(
         'INSERT INTO tng.files (type, filename, is_default, is_active) VALUES (%(type)s, %(filename)s, %(is_default)s, TRUE)',
@@ -422,3 +426,25 @@ def rename_asset_in_db(old_name: str, new_name: str) -> None:
 def synchronize_assets_with_db() -> None:
     asset_path = os.path.join(current_app.static_folder, 'assets')
     synchronize_files_with_db('asset', asset_path)
+
+
+# Wrapper functions for Members
+def get_all_members_from_db() -> list[dict[str, Any]]:
+    return get_all_files_from_db('member')
+
+
+def add_member_to_db(filename: str, is_default: bool = False) -> None:
+    add_file_to_db(filename, 'member', is_default)
+
+
+def delete_member_from_db(filename: str) -> None:
+    delete_file_from_db(filename, 'member')
+
+
+def rename_member_in_db(old_name: str, new_name: str) -> None:
+    rename_file_in_db(old_name, new_name, 'member')
+
+
+def synchronize_members_with_db() -> None:
+    member_path = os.path.join(current_app.static_folder, 'uploads', 'members')
+    synchronize_files_with_db('member', member_path)

@@ -16,7 +16,8 @@ from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.database.admin import (
     update_sort_order, add_logo_to_db, delete_logo_from_db, rename_logo_in_db,
-    add_asset_to_db, delete_asset_from_db, rename_asset_in_db)
+    add_asset_to_db, delete_asset_from_db, rename_asset_in_db,
+    add_file_to_db, delete_file_from_db, rename_file_in_db)
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin
 from histarchexplorer.utils.view_util import find_children_by_id
@@ -59,7 +60,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                       'sidebar-content-group' | 'sidebar-logo-management' |
                       'sidebar-footer-content' | 'sidebar-file-management-group' |
                       'sidebar-assets' | 'sidebar-legal-notice' |
-                      'sidebar-licenses'):
+                      'sidebar-licenses' | 'sidebar-members'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -888,7 +889,13 @@ def utility_processor():
             return url_for('uploaded_asset', filename=filename)
         return url_for('static', filename=f'assets/{filename}')
 
-    return dict(get_logo_url=get_logo_url, get_asset_url=get_asset_url)
+    def get_member_url(filename):
+        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'members')
+        if os.path.exists(os.path.join(uploads_path, filename)):
+            return url_for('uploaded_member', filename=filename)
+        return url_for('static', filename=f'images/team/{filename}')
+
+    return dict(get_logo_url=get_logo_url, get_asset_url=get_asset_url, get_member_url=get_member_url)
 
 
 @app.route('/admin/upload_asset', methods=['POST'])
@@ -1006,6 +1013,132 @@ def uploaded_asset(filename):
     return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
 
 
+@app.route('/uploads/members/<filename>')
+def uploaded_member(filename):
+    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'members'), filename)
+
+
 @app.route('/uploads/favicon.ico')
 def uploaded_favicon():
     return send_from_directory(os.path.join(app.root_path, '..', 'uploads'), 'favicon.ico')
+
+
+@app.route('/admin/upload_file', methods=['POST'])
+@login_required
+def upload_file():
+    check_manager_user()
+    file_type = request.form.get('file_type')
+    if not file_type:
+        flash(_('File type is missing.'), 'danger')
+        return redirect(url_for('admin'))
+
+    if 'file' not in request.files:
+        flash(_('No file part'), 'danger')
+        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+
+    file = request.files['file']
+    if file.filename == '':
+        flash(_('No selected file'), 'danger')
+        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+
+    if file:
+        filename = secure_filename(file.filename)
+        upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'members'
+        upload_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
+        os.makedirs(upload_path, exist_ok=True)
+        file.save(os.path.join(upload_path, filename))
+        add_file_to_db(filename, file_type, is_default=False)
+        flash(_('%(type)s "%(name)s" uploaded successfully.', type=file_type.capitalize(), name=filename), 'success')
+
+    return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+
+
+@app.route('/admin/rename_file', methods=['POST'])
+@login_required
+def rename_file():
+    check_manager_user()
+    old_name = request.form.get('old_name')
+    new_name = request.form.get('new_name')
+    file_type = request.form.get('file_type')
+
+    if not all([old_name, new_name, file_type]):
+        flash(_('Invalid request for renaming.'), 'danger')
+        return redirect(url_for('admin'))
+
+    upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'members'
+    static_folder = 'images/logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'images/team'
+
+    static_path = os.path.join(app.static_folder, static_folder) if static_folder else None
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
+
+    old_filepath_static = os.path.join(static_path, secure_filename(old_name)) if static_path else None
+    old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
+
+    if old_filepath_static and os.path.exists(old_filepath_static):
+        flash(_('Cannot rename default files.'), 'danger')
+        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+    elif os.path.exists(old_filepath_uploads):
+        old_filepath = old_filepath_uploads
+        new_filepath = os.path.join(uploads_path, secure_filename(new_name))
+    else:
+        flash(_('Original file not found.'), 'danger')
+        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+
+    if os.path.exists(new_filepath):
+        flash(_('A file with the new name already exists.'), 'danger')
+        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+
+    try:
+        os.rename(old_filepath, new_filepath)
+        rename_file_in_db(old_name, new_name, file_type)
+        flash(_('%(type)s renamed from "%(old)s" to "%(new)s".', type=file_type.capitalize(), old=old_name, new=new_name), 'success')
+    except OSError as e:
+        flash(_('Error renaming file: %(error)s', error=e), 'danger')
+
+    return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+
+
+@app.route('/admin/delete_file', methods=['POST'])
+@login_required
+def delete_file():
+    check_manager_user()
+    filename = request.form.get('filename')
+    file_type = request.form.get('file_type')
+
+    if not filename or not file_type:
+        flash(_('No filename or type specified for deletion.'), 'danger')
+        return redirect(url_for('admin'))
+
+    upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'members'
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
+    filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
+
+    if os.path.exists(filepath_uploads):
+        try:
+            os.remove(filepath_uploads)
+            delete_file_from_db(filename, file_type)
+            flash(_('%(type)s "%(name)s" deleted successfully.', type=file_type.capitalize(), name=filename), 'success')
+        except OSError as e:
+            flash(_('Error deleting file: %(error)s', error=e), 'danger')
+    else:
+        delete_file_from_db(filename, file_type)
+        flash(_('Default %(type)s "%(name)s" deactivated.', type=file_type.capitalize(), name=filename), 'success')
+
+    return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+
+
+@app.route('/admin/update_file_license', methods=['POST'])
+@login_required
+def update_file_license() -> Response:
+    check_manager_user()
+
+    filename = request.form.get('filename', '')
+    file_type = request.form.get('file_type', '')
+    license_id = request.form.get('license_id', type=int)
+    attribution = request.form.get('attribution', '')
+
+    admin_instance = Admin()
+    admin_instance.update_file_license(filename, license_id, attribution)
+
+    flash(_('%(type)s license updated successfully.', type=file_type.capitalize()), 'success')
+    return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
