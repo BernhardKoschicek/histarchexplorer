@@ -58,9 +58,10 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                 case ('sidebar-maps' | 'sidebar-index-page-options' |
                       'sidebar-database' | 'sidebar-cache-options' |
                       'sidebar-content-group' | 'sidebar-logo-management' |
-                      'sidebar-footer-content' | 'sidebar-file-management-group' |
-                      'sidebar-assets' | 'sidebar-legal-notice' |
-                      'sidebar-licenses' | 'sidebar-members'):
+                      'sidebar-menu-management' | 'sidebar-footer-content' |
+                      'sidebar-file-management-group' | 'sidebar-assets' |
+                      'sidebar-legal-notice' | 'sidebar-licenses' |
+                      'sidebar-members'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -119,6 +120,29 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         all_logos=all_logos,
         all_assets=all_assets,
         selected_footer_logos=selected_footer_logos)
+
+
+@app.route('/admin/update_menu_management', methods=['POST'])
+@login_required
+def update_menu_management() -> Response:
+    check_manager_user()
+    menu_data = {}
+    for item_key in g.settings.menu_management.keys():
+        menu_data[item_key] = {
+            'show': request.form.get(f'show_{item_key}') == 'on',
+            'page_type': request.form.get(f'page_type_{item_key}', 'default')
+        }
+
+    g.settings.menu_management = menu_data
+
+    try:
+        g.settings.save_to_db()
+        flash(_('Menu settings updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update menu settings: %s", e)
+        flash(_('Error updating menu settings'), 'error')
+
+    return redirect(url_for('admin', tab='sidebar-menu-management'))
 
 
 @app.route('/admin/update_legal_notice', methods=['POST'])

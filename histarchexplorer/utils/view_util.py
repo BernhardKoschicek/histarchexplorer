@@ -1,10 +1,11 @@
 import datetime
 import re
+from pathlib import Path
 from typing import Any, Optional
 from unicodedata import normalize
 from urllib.parse import urlsplit
 
-from flask import g, render_template, url_for
+from flask import g, render_template, render_template_string, url_for
 from flask_babel import gettext as _
 from flask_login import current_user
 
@@ -18,6 +19,20 @@ _('search')
 _('about')
 
 
+def render_page_template(page_name: str, **context: Any) -> str:
+    template_name = f"{page_name}.html"
+    key = page_name.replace('-', '_')
+    menu_settings = g.settings.menu_management.get(key, {})
+
+    if menu_settings.get('page_type') == 'individual':
+        page_path = Path(app.root_path)/'..'/'uploads'/'pages'/template_name
+        if page_path.is_file():
+            template_content = page_path.read_text(encoding='utf-8')
+            return render_template_string(template_content, **context)
+
+    return render_template(template_name, **context)
+
+
 @app.template_filter("domain")
 def domain_filter(url: str) -> str:
     return urlsplit(url).netloc
@@ -25,15 +40,23 @@ def domain_filter(url: str) -> str:
 
 @app.context_processor
 def inject_menu() -> dict[str, Any]:
-    navbar = [
-        {'entities': _('browse/select/find all entities')},
-        {'search': _('detailed search')}]
+    navbar = []
+    menu_config = g.settings.menu_management
 
-    for page in g.individual_pages:
-        if page not in ['index', 'about']:
-            navbar.append({page: page})
+    if menu_config.get('start_page', {}).get('show', True):
+        navbar.append({'index': _('Start page')})
 
-    navbar.append({'about': _('about the project')})
+    navbar.append({'entities': _('browse/select/find all entities')})
+
+    if menu_config.get('search', {}).get('show', True):
+        navbar.append({'search': _('detailed search')})
+
+    if menu_config.get('publication', {}).get('show', True):
+        navbar.append({'publication': _('Publication')})
+
+    if menu_config.get('about', {}).get('show', True):
+        navbar.append({'about': _('about the project')})
+
     return {'navbar': navbar}
 
 

@@ -5,7 +5,8 @@ from histarchexplorer.database.settings import (
 
 
 class Settings(BaseModel):
-    index_img: str = '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
+    index_img: str = \
+        '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
     index_map: int = 1
     img_map: str = 'map'
     preferred_language: str = 'en'
@@ -13,7 +14,11 @@ class Settings(BaseModel):
     darkmode: bool = False
     language_selector: bool = False
     access_restriction: bool = False
-    shown_classes: list[str] = ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains', 'person', 'group', 'acquisition', 'event', 'activity', 'creation', 'move', 'production', 'modification']
+    shown_classes: list[str] = [
+        'place', 'feature', 'stratigraphic_unit',
+        'artifact', 'human_remains', 'person', 'group',
+        'acquisition', 'event', 'activity', 'creation',
+        'move', 'production', 'modification']
     shown_types: list[str] = []
     hidden_classes: list[str] = ['group']
     hidden_types: list[str] = []
@@ -24,6 +29,13 @@ class Settings(BaseModel):
     footer_logos: list[int] = []
     legal_info: dict[str, str] = {}
     imprint: dict[str, str] = {}
+    menu_management: dict = {
+        'start_page': {'show': True, 'page_type': 'default'},
+        'about': {'show': True, 'page_type': 'default'},
+        'publication': {'show': True, 'page_type': 'default'},
+        'search': {'show': True, 'page_type': 'default'},
+        'footer': {'show': True, 'page_type': 'default'},
+        }
 
     @classmethod
     def load_from_db(cls) -> 'Settings':

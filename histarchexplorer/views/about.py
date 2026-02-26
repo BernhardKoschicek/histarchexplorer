@@ -1,21 +1,17 @@
 from typing import Any, Optional
 
-from flask import Response, g, redirect, render_template, url_for
+from flask import Response, g, redirect, url_for
 from flask.typing import ResponseValue
 
 from histarchexplorer import app
 from histarchexplorer.models.config import ConfigEntity
-from histarchexplorer.utils.view_util import get_view_class_count, slugify
+from histarchexplorer.utils.view_util import (
+    get_view_class_count, slugify, render_page_template)
 
 
 @app.route('/about', strict_slashes=False)
 @app.route('/about/<slug>')
 def about(slug: Optional[str] = None) -> Response | str | ResponseValue:
-
-
-    if 'about' in app.config['INDIVIDUAL_PAGES']:
-        return render_template("individual/content.html", content="about")
-
     grouped = ConfigEntity.group_by_class_name(g.config_entities)
     main_project = grouped['main-project'][0]
     sub_projects = grouped.get('project', [])
@@ -68,8 +64,9 @@ def about(slug: Optional[str] = None) -> Response | str | ResponseValue:
             if role:
                 institutions_map[target.id]["roles"].append(role)
                 institutions_by_role.setdefault(role, []).append(target)
-    return render_template(
-        "about.html",
+
+    return render_page_template(
+        "about",
         active=active,
         main_project=main_project,
         sub_projects=project_choices or sub_projects,

@@ -135,6 +135,3 @@ SIDEBAR_OPTIONS = [
     {'order': 4, 'route': 'catalogue', 'icon': 'bi bi-journal-text'},
     {'order': 5, 'route': 'subunits', 'icon': 'bi bi-diagram-3'},
     ]
-
-#if index or about should be rendered individually from index.html and about.html in the templates/individual folder
-INDIVIDUAL_PAGES = []

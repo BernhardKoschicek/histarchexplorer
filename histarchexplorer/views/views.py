@@ -1,7 +1,7 @@
 from typing import Optional
 
 from flask import (
-    Response, g, jsonify, redirect, render_template, request, session, url_for)
+    Response, g, jsonify, redirect, request, session, url_for)
 from flask.typing import ResponseValue
 from flask_login import login_required
 
@@ -10,34 +10,20 @@ from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.models.config import ConfigEntity
-from histarchexplorer.utils.view_util import get_view_class_count, slugify
+from histarchexplorer.utils.view_util import (
+    get_view_class_count, slugify, render_page_template)
 
 
 def register_individual_pages(app):
-    for page in app.config['INDIVIDUAL_PAGES']:
-        if page in ('index', 'about'):
-            continue
+    # This function is kept for now to avoid breaking other parts of the app
+    # that might depend on it. It will be removed in a future refactoring.
+    pass
 
-        def make_view(page_name):
-            def view():
-                return render_template(
-                    "individual/content.html",
-                    content=page_name
-                )
-            return view
-
-        app.add_url_rule(
-            f"/{page}",
-            endpoint=f"individual_{page}",
-            view_func=make_view(page)
-        )
 register_individual_pages(app)
+
 
 @app.route('/')
 def index() -> str:
-    if 'index' in app.config['INDIVIDUAL_PAGES']:
-        return render_template("individual/content.html", content="index")
-    # todo: replace g.settings.get_map_settings()  with g.settings
     map_data = g.settings.get_map_settings()
     map_ = None
     if index_map := map_data['map']:
@@ -72,8 +58,8 @@ def index() -> str:
     # This is just for the carousal
     project_cards = project_cards[:12]
 
-    return render_template(
-        'index.html',
+    return render_page_template(
+        'index',
         map=map_,
         map_data=map_data,
         view_class_count=get_view_class_count(),
