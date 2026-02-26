@@ -1,5 +1,5 @@
 
-<h3>{{ _('legal notice and imprint') | upper }} </h3>
+<h3>{{ _('legal notice') | upper }} </h3>
 <div class="card mt-3 mb-5">
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs" id="legal-notice-tabs" role="tablist">
@@ -18,14 +18,8 @@
                         <h5 class="card-title">{{ lang_name }}</h5>
                         <div class="mb-5">
                             <label for="legal-notice-editor-{{ lang_code }}" class="form-label">{{ _('legal notice') | capitalize}}</label>
-                            <textarea id="legal-notice-editor-{{ lang_code }}" name="legal_info_{{ lang_code }}" class="tinymce-editor">
-                                {{ settings.legal_info.get(lang_code, '') }}
-                            </textarea>
-                        </div>
-                        <div class="mb-5">
-                            <label for="imprint-editor-{{ lang_code }}" class="form-label">{{ _('imprint') | capitalize}}</label>
-                            <textarea id="imprint-editor-{{ lang_code }}" name="imprint_{{ lang_code }}" class="tinymce-editor">
-                                {{ settings.imprint.get(lang_code, '') }}
+                            <textarea id="legal-notice-editor-{{ lang_code }}" name="legal_notice_{{ lang_code }}" class="tinymce-editor">
+                                {{ settings.legal_notice.get(lang_code, '') }}
                             </textarea>
                         </div>
                     </div>

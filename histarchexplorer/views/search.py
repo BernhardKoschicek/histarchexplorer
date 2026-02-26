@@ -1,6 +1,7 @@
 from flask import Response, g, jsonify, render_template, request
 
 from histarchexplorer import app
+from histarchexplorer.utils.view_util import render_page_template
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -25,8 +26,8 @@ def search() -> str:
             category,
             system_classes)
 
-    return render_template(
-        'search.html',
+    return render_page_template(
+        'search',
         results=results,
         query=query,
         category=category,

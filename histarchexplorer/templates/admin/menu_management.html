@@ -11,8 +11,43 @@
         </tr>
         </thead>
         <tbody>
-        {% set menu_items = ['Start page', 'About', 'Publication', 'Search', 'Footer'] %}
+        {% set static_items = ['Start page', 'Legal notice'] %}
+        {% for item in static_items %}
+          {% set item_key = item|lower|replace(' ', '_') %}
+          <tr>
+            <td>{{ _(item) }}</td>
+            <td>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox"
+                       id="show_{{ item_key }}"
+                       name="show_{{ item_key }}"
+                       checked disabled>
+              </div>
+            </td>
+            <td>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio"
+                       name="page_type_{{ item_key }}"
+                       id="default_{{ item_key }}"
+                       value="default"
+                        {% if settings.menu_management[item_key].page_type == 'default' %}checked{% endif %}>
+                <label class="form-check-label"
+                       for="default_{{ item_key }}">{{ _('Default') }}</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio"
+                       name="page_type_{{ item_key }}"
+                       id="individual_{{ item_key }}"
+                       value="individual"
+                        {% if settings.menu_management[item_key].page_type == 'individual' %}checked{% endif %}>
+                <label class="form-check-label"
+                       for="individual_{{ item_key }}">{{ _('Individual') }}</label>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
 
+        {% set menu_items = ['About', 'Publication', 'Search', 'Footer'] %}
         {% for item in menu_items %}
           {% set item_key = item|lower|replace(' ', '_') %}
           <tr>
@@ -47,27 +82,6 @@
             </td>
           </tr>
         {% endfor %}
-        <tr>
-          <td>{{ _('Legal notice') }}</td>
-          <td>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox"
-                     id="show_legal_notice"
-                     name="show_legal_notice"
-                     checked disabled>
-            </div>
-          </td>
-          <td>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio"
-                     name="page_type_legal_notice"
-                     id="default_legal_notice"
-                     value="default" checked disabled>
-              <label class="form-check-label"
-                     for="default_legal_notice">{{ _('Default') }}</label>
-            </div>
-          </td>
-        </tr>
         </tbody>
       </table>
       <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>

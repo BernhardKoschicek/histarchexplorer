@@ -21,7 +21,12 @@ _('about')
 
 def render_page_template(page_name: str, **context: Any) -> str:
     template_name = f"{page_name}.html"
-    key = page_name.replace('-', '_')
+    print(page_name)
+    if page_name == 'index':
+        key = 'start_page'
+    else:
+        key = page_name.replace('-', '_')
+
     menu_settings = g.settings.menu_management.get(key, {})
 
     if menu_settings.get('page_type') == 'individual':
@@ -43,8 +48,6 @@ def inject_menu() -> dict[str, Any]:
     navbar = []
     menu_config = g.settings.menu_management
 
-    if menu_config.get('start_page', {}).get('show', True):
-        navbar.append({'index': _('Start page')})
 
     navbar.append({'entities': _('browse/select/find all entities')})
 

@@ -28,7 +28,7 @@ cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
-    admin, login, views, about, entity, entities, search, media)
+    admin, login, views, about, entity, entities, search, media, publication)
 from histarchexplorer.api.api_access import ApiAccess
 
 

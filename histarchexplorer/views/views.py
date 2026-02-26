@@ -14,14 +14,6 @@ from histarchexplorer.utils.view_util import (
     get_view_class_count, slugify, render_page_template)
 
 
-def register_individual_pages(app):
-    # This function is kept for now to avoid breaking other parts of the app
-    # that might depend on it. It will be removed in a future refactoring.
-    pass
-
-register_individual_pages(app)
-
-
 @app.route('/')
 def index() -> str:
     map_data = g.settings.get_map_settings()

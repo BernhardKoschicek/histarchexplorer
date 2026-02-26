@@ -1,7 +1,8 @@
+import json
 from pydantic import BaseModel
 
 from histarchexplorer.database.settings import (
-    create_settings_table, get_settings, save_settings, set_default_settings)
+    create_settings_table, get_settings, save_settings)
 
 
 class Settings(BaseModel):
@@ -27,10 +28,10 @@ class Settings(BaseModel):
     case_study_type_id: int = 8240
     nav_logo: str = 'thanados_light.svg'
     footer_logos: list[int] = []
-    legal_info: dict[str, str] = {}
-    imprint: dict[str, str] = {}
+    legal_notice: dict[str, str] = {}
     menu_management: dict = {
         'start_page': {'show': True, 'page_type': 'default'},
+        'legal_notice': {'show': True, 'page_type': 'default'},
         'about': {'show': True, 'page_type': 'default'},
         'publication': {'show': True, 'page_type': 'default'},
         'search': {'show': True, 'page_type': 'default'},
@@ -41,10 +42,31 @@ class Settings(BaseModel):
     def load_from_db(cls) -> 'Settings':
         create_settings_table()
 
-        for key, value in cls().model_dump().items():
-            set_default_settings(key, value)
+        default_settings = cls().model_dump()
+        db_settings_raw = {row.key: row.value for row in get_settings()}
 
-        return cls(**{row.key: row.value for row in get_settings()})
+        default_menu = default_settings.get('menu_management', {})
+        db_menu_raw = db_settings_raw.get('menu_management')
+        db_menu = {}
+        if isinstance(db_menu_raw, str):
+            try:
+                loaded_json = json.loads(db_menu_raw)
+                if isinstance(loaded_json, dict):
+                    db_menu = loaded_json
+            except json.JSONDecodeError:
+                pass
+        elif isinstance(db_menu_raw, dict):
+            db_menu = db_menu_raw
+
+        merged_menu = {**default_menu, **db_menu}
+
+        merged_settings_data = {**default_settings, **db_settings_raw}
+        merged_settings_data['menu_management'] = merged_menu
+
+        instance = cls(**merged_settings_data)
+        instance.save_to_db()
+
+        return instance
 
     def save_to_db(self):
         for key, value in self.model_dump().items():
