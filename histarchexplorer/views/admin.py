@@ -780,10 +780,11 @@ def sort_links() -> tuple[Response, int] | Response:
 
 
 @app.route('/admin/update_general_settings', methods=['POST'])
+@app.route('/admin/update_general_settings/<int:ignore_id>', methods=['POST'])
 @login_required
-def update_general_settings() -> Response:
+def update_general_settings(ignore_id: Optional[int] = None) -> Response:
     check_manager_user()
-    case_study_id = request.form.get('case_study_id')
+    case_study_id = int(request.form.get('case_study_id'))
     validation_result = Admin.check_case_study_type_id(case_study_id)
     if validation_result['is_valid']:
         g.settings.case_study_type_id = case_study_id
@@ -907,7 +908,7 @@ def utility_processor():
         if os.path.exists(os.path.join(uploads_path, filename)):
             return url_for('uploaded_logo', filename=filename)
         return url_for('static', filename=f'images/logos/{filename}')
-    
+
     def get_asset_url(filename):
         uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
         if os.path.exists(os.path.join(uploads_path, filename)):
