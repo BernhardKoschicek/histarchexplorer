@@ -1,4 +1,5 @@
 <form method="POST" action="{{ url_for('choose_index_background') }}">
+  <input type="hidden" name="active_sidebar" value="sidebar-index-page-options">
   <div class="col-md-3 mt-3">
     <label for="ImgMap">
       {{ _('choose index background') | capitalize }}
@@ -39,7 +40,7 @@
                for="greyscaleSwitch">Greyscale</label>
       </div>
     </div>
-    <div class="col-md-6">
+    <div  class="col-md-6">
       <h6>{{ _('image options') | upper }}</h6>
       <label for="defaultImg" class="form-label">
         {{ _('define default background image') | capitalize }}

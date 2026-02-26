@@ -2,6 +2,7 @@
   <div class="card-body">
     <h5 class="card-title">{{ _('Footer Content') | upper }}</h5>
     <form action="{{ url_for('update_footer_content') }}" method="post">
+      <input type="hidden" name="active_sidebar" value="sidebar-footer-content">
       {% if all_logos %}
         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
           {% for logo in all_logos %}

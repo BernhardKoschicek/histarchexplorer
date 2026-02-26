@@ -29,6 +29,11 @@ def check_manager_user() -> None:
         abort(403)
 
 
+def _redirect_to_admin_tab(default_tab: str) -> Response:
+    tab = request.form.get('active_sidebar', default_tab)
+    return redirect(url_for('admin', tab=tab))
+
+
 @app.route('/admin/')
 @app.route('/admin/<tab>')
 @app.route('/admin/<tab>/<entry>')
@@ -142,33 +147,29 @@ def update_menu_management() -> Response:
         app.logger.error("Failed to update menu settings: %s", e)
         flash(_('Error updating menu settings'), 'error')
 
-    return redirect(url_for('admin', tab='sidebar-menu-management'))
+    return _redirect_to_admin_tab('sidebar-menu-management')
 
 
 @app.route('/admin/update_legal_notice', methods=['POST'])
 @login_required
 def update_legal_notice() -> Response:
     check_manager_user()
-    legal_info_data = {}
-    imprint_data = {}
+    legal_notice_data = {}
 
     for lang_code in g.available_languages.keys():
-        legal_info_data[lang_code] = request.form.get(
-            f'legal_info_{lang_code}', '')
-        imprint_data[lang_code] = request.form.get(
-            f'imprint_{lang_code}', '')
+        legal_notice_data[lang_code] = request.form.get(
+            f'legal_notice_{lang_code}', '')
 
-    g.settings.legal_info = legal_info_data
-    g.settings.imprint = imprint_data
+    g.settings.legal_notice = legal_notice_data
 
     try:
         g.settings.save_to_db()
-        flash(_('Legal notice and imprint updated successfully.'), 'success')
+        flash(_('Legal notice updated successfully.'), 'success')
     except Exception as e:
-        app.logger.error("Failed to update legal notice/imprint: %s", e)
+        app.logger.error("Failed to update legal notice: %s", e)
         flash(_('Error updating settings'), 'error')
 
-    return redirect(url_for('admin', tab='sidebar-legal-notice'))
+    return _redirect_to_admin_tab('sidebar-legal-notice')
 
 
 @app.route('/admin/upload_logo', methods=['POST'])
@@ -177,12 +178,12 @@ def upload_logo():
     check_manager_user()
     if 'logo_file' not in request.files:
         flash(_('No file part'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
+        return _redirect_to_admin_tab('sidebar-logo-management')
 
     file = request.files['logo_file']
     if file.filename == '':
         flash(_('No selected file'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
+        return _redirect_to_admin_tab('sidebar-logo-management')
 
     if file:
         filename = secure_filename(file.filename)
@@ -193,7 +194,7 @@ def upload_logo():
         flash(_('Logo "%(name)s" uploaded successfully.', name=filename),
               'success')
 
-    return redirect(url_for('admin', tab='sidebar-logo-management'))
+    return _redirect_to_admin_tab('sidebar-logo-management')
 
 
 @app.route('/admin/rename_logo', methods=['POST'])
@@ -205,7 +206,7 @@ def rename_logo():
 
     if not old_name or not new_name:
         flash(_('Invalid request for renaming.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
+        return _redirect_to_admin_tab('sidebar-logo-management')
 
     static_path = os.path.join(app.static_folder, 'images', 'logos')
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
@@ -215,17 +216,17 @@ def rename_logo():
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default logos.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
+        return _redirect_to_admin_tab('sidebar-logo-management')
     elif os.path.exists(old_filepath_uploads):
         old_filepath = old_filepath_uploads
         new_filepath = os.path.join(uploads_path, secure_filename(new_name))
     else:
         flash(_('Original file not found.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
+        return _redirect_to_admin_tab('sidebar-logo-management')
 
     if os.path.exists(new_filepath):
         flash(_('A file with the new name already exists.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
+        return _redirect_to_admin_tab('sidebar-logo-management')
 
     try:
         os.rename(old_filepath, new_filepath)
@@ -235,7 +236,7 @@ def rename_logo():
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
-    return redirect(url_for('admin', tab='sidebar-logo-management'))
+    return _redirect_to_admin_tab('sidebar-logo-management')
 
 
 @app.route('/admin/delete_logo', methods=['POST'])
@@ -245,7 +246,7 @@ def delete_logo():
     filename = request.form.get('filename')
     if not filename:
         flash(_('No filename specified for deletion.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
+        return _redirect_to_admin_tab('sidebar-logo-management')
 
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
     filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
@@ -262,7 +263,7 @@ def delete_logo():
         delete_logo_from_db(filename) # This will set is_active = FALSE
         flash(_('Default logo "%(name)s" deactivated.', name=filename), 'success')
 
-    return redirect(url_for('admin', tab='sidebar-logo-management'))
+    return _redirect_to_admin_tab('sidebar-logo-management')
 
 
 @app.route('/admin/set_main_logo', methods=['POST'])
@@ -272,7 +273,7 @@ def set_main_logo() -> Response:
     filename = request.form.get('filename')
     if not filename:
         flash(_('No filename specified.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
+        return _redirect_to_admin_tab('sidebar-logo-management')
 
     g.settings.nav_logo = filename
     try:
@@ -282,7 +283,7 @@ def set_main_logo() -> Response:
         app.logger.error("Failed to set main logo: %s", e)
         flash(_('Error updating settings'), 'error')
 
-    return redirect(url_for('admin', tab='sidebar-logo-management'))
+    return _redirect_to_admin_tab('sidebar-logo-management')
 
 
 @app.route('/admin/set_favicon', methods=['POST'])
@@ -292,7 +293,7 @@ def set_favicon() -> Response:
     filename = request.form.get('filename')
     if not filename:
         flash(_('No filename specified.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-logo-management'))
+        return _redirect_to_admin_tab('sidebar-logo-management')
 
     # Check uploads first, then static
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
@@ -314,7 +315,7 @@ def set_favicon() -> Response:
         app.logger.error(f"Failed to set favicon: {e}")
         flash(_('Error creating favicon: %(error)s', error=str(e)), 'danger')
 
-    return redirect(url_for('admin', tab='sidebar-logo-management'))
+    return _redirect_to_admin_tab('sidebar-logo-management')
 
 
 @app.route('/admin/update_footer_content', methods=['POST'])
@@ -329,7 +330,7 @@ def update_footer_content() -> Response:
     except Exception as e:
         app.logger.error("Failed to update footer logos: %s", e)
         flash(_('Error updating footer logos'), 'error')
-    return redirect(url_for('admin', tab='sidebar-footer-content'))
+    return _redirect_to_admin_tab('sidebar-footer-content')
 
 
 @app.route('/admin/add_license', methods=['POST'])
@@ -342,7 +343,7 @@ def add_license():
     category = request.form.get('category')
     Admin.add_license(spdx_id, uri, label, category)
     flash(_('License added successfully.'), 'success')
-    return redirect(url_for('admin', tab='sidebar-licenses'))
+    return _redirect_to_admin_tab('sidebar-licenses')
 
 
 @app.route('/admin/delete_license/<int:license_id>', methods=['POST'])
@@ -351,7 +352,7 @@ def delete_license(license_id):
     check_manager_user()
     Admin.delete_license(license_id)
     flash(_('License deleted successfully.'), 'success')
-    return redirect(url_for('admin', tab='sidebar-licenses'))
+    return _redirect_to_admin_tab('sidebar-licenses')
 
 
 @app.route('/admin/update_logo_license', methods=['POST'])
@@ -367,7 +368,7 @@ def update_logo_license() -> Response:
     admin_instance.update_file_license(filename, license_id, attribution)
 
     flash(_('Logo license updated successfully.'), 'success')
-    return redirect(url_for('admin', tab='sidebar-logo-management'))
+    return _redirect_to_admin_tab('sidebar-logo-management')
 
 
 @app.route('/admin/backup_db')
@@ -417,7 +418,7 @@ def backup_db() -> Response:
         flash(_('An unexpected error occurred. Check logs for details.'),
               'danger')
 
-    return redirect(url_for('admin', tab='sidebar-database'))
+    return _redirect_to_admin_tab('sidebar-database')
 
 
 @app.route('/admin/restore_db', methods=['POST'])
@@ -426,12 +427,12 @@ def restore_db() -> Response:
     check_manager_user()
     if 'sql_file' not in request.files:
         flash(_('No file part'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-database'))
+        return _redirect_to_admin_tab('sidebar-database')
 
     file = request.files['sql_file']
     if file.filename == '':
         flash(_('No selected file'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-database'))
+        return _redirect_to_admin_tab('sidebar-database')
 
     if file and file.filename.endswith('.sql'):
         try:
@@ -495,7 +496,7 @@ def restore_db() -> Response:
     else:
         flash(_('Invalid file type. Please upload a .sql file.'), 'danger')
 
-    return redirect(url_for('admin', tab='sidebar-database'))
+    return _redirect_to_admin_tab('sidebar-database')
 
 
 @app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>', methods=['GET'])
@@ -604,7 +605,7 @@ def edit_entry() -> Response:
 
     if config_id is None:
         flash(_('Configuration ID is required'), 'danger')
-        return redirect(url_for('admin'))
+        return _redirect_to_admin_tab('sidebar-about-content')
 
     form_data: dict[str, str | int | None] = {
         'config_id': config_id,
@@ -648,13 +649,13 @@ def edit_map() -> Response:
 
     if not raw_map_id:
         flash(_('Map ID is required'), 'danger')
-        return redirect(url_for('admin'))
+        return _redirect_to_admin_tab('sidebar-maps')
 
     try:
         map_id = int(raw_map_id)
         if not check_if_map_id_exist(map_id):
             flash(_(f'Map with ID {map_id} not found'), 'danger')
-            return redirect(url_for('admin'))
+            return _redirect_to_admin_tab('sidebar-maps')
 
         form_data: dict[str, str] = {
             'name': name,
@@ -672,7 +673,7 @@ def edit_map() -> Response:
         app.logger.error("Map update failed: %s", e)
         flash(_('Error updating map: %(error)s', error=str(e)), 'danger')
 
-    return redirect(url_for('admin'))
+    return _redirect_to_admin_tab('sidebar-maps')
 
 
 @app.route('/admin/add_map', methods=['POST'])
@@ -689,7 +690,7 @@ def add_map() -> Response:
         flash(
             _('Error: Name, Display Name and Description are required'),
             'danger')
-        return redirect(url_for('admin'))
+        return _redirect_to_admin_tab('sidebar-maps')
 
     data: dict[str, str] = {
         'name': name,
@@ -705,7 +706,7 @@ def add_map() -> Response:
         app.logger.error("Failed to add map: %s", e)
         flash(f"Error adding map {data['name']}: {e}", 'danger')
 
-    return redirect(url_for('admin'))
+    return _redirect_to_admin_tab('sidebar-maps')
 
 
 @app.route('/admin/delete_map/<int:map_id>')
@@ -717,7 +718,7 @@ def delete_map(map_id: int) -> Response:
         flash('Map deleted successfully!', 'success')
     except Exception as e:
         flash(f'Error deleting map: {str(e)}', 'danger')
-    return redirect(url_for('admin'))
+    return _redirect_to_admin_tab('sidebar-maps')
 
 
 @app.route('/admin/choose_index_background', methods=['POST'])
@@ -735,7 +736,7 @@ def choose_index_background() -> Response:
         app.logger.error("Failed to set index background: %s", e)
         flash(_('Error updating settings'), 'error')
 
-    return redirect(url_for('admin'))
+    return _redirect_to_admin_tab('sidebar-index-page-options')
 
 
 @app.route('/admin/update_class_visibility', methods=['POST'])
@@ -746,7 +747,7 @@ def update_class_visibility() -> Response:
     g.settings.hidden_classes = request.form.getlist('hidden_classes')
     g.settings.save_to_db()
     flash(_('Class visibility updated successfully.'), 'success')
-    return redirect(url_for('admin', tab='sidebar-general-settings-group'))
+    return _redirect_to_admin_tab('sidebar-general-settings-group')
 
 
 @app.route('/sortlinks', methods=['POST'])
@@ -778,29 +779,29 @@ def sort_links() -> tuple[Response, int] | Response:
     return jsonify({'status': 'ok'})
 
 
-@app.route('/admin/update_general_settings/<int:id_>', methods=['POST'])
+@app.route('/admin/update_general_settings', methods=['POST'])
 @login_required
-def update_general_settings(id_: int) -> Response:
+def update_general_settings() -> Response:
     check_manager_user()
-    if request.method == 'POST':
-        validation_result = Admin.check_case_study_type_id(id_)
-        if validation_result['is_valid']:
-            g.settings.case_study_type_id = id_
-            g.settings.darkmode = request.form.get('darkMode') == 'on'
-            g.settings.access_restriction = request.form.get(
-                'accessRestriction') == 'on'
-            g.settings.language_selector = request.form.get(
-                'languageSelection') == 'on'
-            g.settings.preferred_language = request.form.get(
-                'preferredLanguage')
-            g.settings.save_to_db()
-            flash(_('updated case study id successfully'), 'info')
-        else:
-            message = _(
-                'Invalid Case Study ID. Must be a positive integer '
-                'and its entity type must be "type".')
-            flash(message, 'error')
-    return redirect(url_for('admin'))
+    case_study_id = request.form.get('case_study_id')
+    validation_result = Admin.check_case_study_type_id(case_study_id)
+    if validation_result['is_valid']:
+        g.settings.case_study_type_id = case_study_id
+        g.settings.darkmode = request.form.get('darkMode') == 'on'
+        g.settings.access_restriction = request.form.get(
+            'accessRestriction') == 'on'
+        g.settings.language_selector = request.form.get(
+            'languageSelection') == 'on'
+        g.settings.preferred_language = request.form.get(
+            'preferredLanguage')
+        g.settings.save_to_db()
+        flash(_('Updated case study ID successfully'), 'info')
+    else:
+        message = _(
+            'Invalid Case Study ID. Must be a positive integer '
+            'and its entity type must be "type".')
+        flash(message, 'error')
+    return _redirect_to_admin_tab('sidebar-general-settings-group')
 
 
 @app.route('/admin/check_case_study_id_ajax/<int:entity_id>', methods=['GET'])
@@ -838,7 +839,7 @@ def make_reset() -> None:
 def clear_cache() -> Response:
     cache.clear()
     flash(_('cache cleared'), 'success')
-    return redirect(url_for('admin'))
+    return _redirect_to_admin_tab('sidebar-cache-options')
 
 
 @app.route("/admin/warm-entity-cache")
@@ -846,7 +847,7 @@ def clear_cache() -> Response:
 def warm_entity_cache() -> Response:
     trigger_cache_warmup(False)
     flash(_("Cache warmup started in background (refresh mode)"), 'success')
-    return redirect(url_for('admin'))
+    return _redirect_to_admin_tab('sidebar-cache-options')
 
 
 @app.route("/admin/refresh-entity-cache")
@@ -854,7 +855,7 @@ def warm_entity_cache() -> Response:
 def refresh_entity_cache() -> Response:
     trigger_cache_warmup(True)
     flash(_("Cache warmup started in background."), 'success')
-    return redirect(url_for('admin'))
+    return _redirect_to_admin_tab('sidebar-cache-options')
 
 
 def trigger_cache_warmup(refresh: bool = False) -> None:
@@ -891,7 +892,7 @@ def refresh_system_cache() -> Response:
         ApiAccess.get_entities_count_by_case_studies(case_study)
 
     flash(_('system cache refreshed'), 'success')
-    return redirect(url_for('admin'))
+    return _redirect_to_admin_tab('sidebar-cache-options')
 
 
 @app.route('/uploads/logos/<filename>')
@@ -928,12 +929,12 @@ def upload_asset():
     check_manager_user()
     if 'asset_file' not in request.files:
         flash(_('No file part'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-assets'))
+        return _redirect_to_admin_tab('sidebar-assets')
 
     file = request.files['asset_file']
     if file.filename == '':
         flash(_('No selected file'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-assets'))
+        return _redirect_to_admin_tab('sidebar-assets')
 
     if file:
         filename = secure_filename(file.filename)
@@ -944,7 +945,7 @@ def upload_asset():
         flash(_('Asset "%(name)s" uploaded successfully.', name=filename),
               'success')
 
-    return redirect(url_for('admin', tab='sidebar-assets'))
+    return _redirect_to_admin_tab('sidebar-assets')
 
 
 @app.route('/admin/rename_asset', methods=['POST'])
@@ -956,7 +957,7 @@ def rename_asset():
 
     if not old_name or not new_name:
         flash(_('Invalid request for renaming.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-assets'))
+        return _redirect_to_admin_tab('sidebar-assets')
 
     static_path = os.path.join(app.static_folder, 'assets')
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
@@ -966,17 +967,17 @@ def rename_asset():
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default assets.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-assets'))
+        return _redirect_to_admin_tab('sidebar-assets')
     elif os.path.exists(old_filepath_uploads):
         old_filepath = old_filepath_uploads
         new_filepath = os.path.join(uploads_path, secure_filename(new_name))
     else:
         flash(_('Original file not found.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-assets'))
+        return _redirect_to_admin_tab('sidebar-assets')
 
     if os.path.exists(new_filepath):
         flash(_('A file with the new name already exists.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-assets'))
+        return _redirect_to_admin_tab('sidebar-assets')
 
     try:
         os.rename(old_filepath, new_filepath)
@@ -986,7 +987,7 @@ def rename_asset():
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
-    return redirect(url_for('admin', tab='sidebar-assets'))
+    return _redirect_to_admin_tab('sidebar-assets')
 
 
 @app.route('/admin/delete_asset', methods=['POST'])
@@ -996,7 +997,7 @@ def delete_asset():
     filename = request.form.get('filename')
     if not filename:
         flash(_('No filename specified for deletion.'), 'danger')
-        return redirect(url_for('admin', tab='sidebar-assets'))
+        return _redirect_to_admin_tab('sidebar-assets')
 
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
     filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
@@ -1013,7 +1014,7 @@ def delete_asset():
         delete_asset_from_db(filename)
         flash(_('Default asset "%(name)s" deactivated.', name=filename), 'success')
 
-    return redirect(url_for('admin', tab='sidebar-assets'))
+    return _redirect_to_admin_tab('sidebar-assets')
 
 
 @app.route('/admin/update_asset_license', methods=['POST'])
@@ -1029,7 +1030,7 @@ def update_asset_license() -> Response:
     admin_instance.update_file_license(filename, license_id, attribution)
 
     flash(_('Asset license updated successfully.'), 'success')
-    return redirect(url_for('admin', tab='sidebar-assets'))
+    return _redirect_to_admin_tab('sidebar-assets')
 
 
 @app.route('/uploads/assets/<filename>')
@@ -1054,16 +1055,16 @@ def upload_file():
     file_type = request.form.get('file_type')
     if not file_type:
         flash(_('File type is missing.'), 'danger')
-        return redirect(url_for('admin'))
+        return _redirect_to_admin_tab('sidebar-file-management-group')
 
     if 'file' not in request.files:
         flash(_('No file part'), 'danger')
-        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
 
     file = request.files['file']
     if file.filename == '':
         flash(_('No selected file'), 'danger')
-        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
 
     if file:
         filename = secure_filename(file.filename)
@@ -1074,7 +1075,7 @@ def upload_file():
         add_file_to_db(filename, file_type, is_default=False)
         flash(_('%(type)s "%(name)s" uploaded successfully.', type=file_type.capitalize(), name=filename), 'success')
 
-    return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+    return _redirect_to_admin_tab(f'sidebar-{file_type}s')
 
 
 @app.route('/admin/rename_file', methods=['POST'])
@@ -1087,7 +1088,7 @@ def rename_file():
 
     if not all([old_name, new_name, file_type]):
         flash(_('Invalid request for renaming.'), 'danger')
-        return redirect(url_for('admin'))
+        return _redirect_to_admin_tab('sidebar-file-management-group')
 
     upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'members'
     static_folder = 'images/logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'images/team'
@@ -1100,17 +1101,17 @@ def rename_file():
 
     if old_filepath_static and os.path.exists(old_filepath_static):
         flash(_('Cannot rename default files.'), 'danger')
-        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
     elif os.path.exists(old_filepath_uploads):
         old_filepath = old_filepath_uploads
         new_filepath = os.path.join(uploads_path, secure_filename(new_name))
     else:
         flash(_('Original file not found.'), 'danger')
-        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
 
     if os.path.exists(new_filepath):
         flash(_('A file with the new name already exists.'), 'danger')
-        return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
 
     try:
         os.rename(old_filepath, new_filepath)
@@ -1119,7 +1120,7 @@ def rename_file():
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
-    return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+    return _redirect_to_admin_tab(f'sidebar-{file_type}s')
 
 
 @app.route('/admin/delete_file', methods=['POST'])
@@ -1131,7 +1132,7 @@ def delete_file():
 
     if not filename or not file_type:
         flash(_('No filename or type specified for deletion.'), 'danger')
-        return redirect(url_for('admin'))
+        return _redirect_to_admin_tab('sidebar-file-management-group')
 
     upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'members'
     uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
@@ -1148,7 +1149,7 @@ def delete_file():
         delete_file_from_db(filename, file_type)
         flash(_('Default %(type)s "%(name)s" deactivated.', type=file_type.capitalize(), name=filename), 'success')
 
-    return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+    return _redirect_to_admin_tab(f'sidebar-{file_type}s')
 
 
 @app.route('/admin/update_file_license', methods=['POST'])
@@ -1165,4 +1166,4 @@ def update_file_license() -> Response:
     admin_instance.update_file_license(filename, license_id, attribution)
 
     flash(_('%(type)s license updated successfully.', type=file_type.capitalize()), 'success')
-    return redirect(url_for('admin', tab=f'sidebar-{file_type}s'))
+    return _redirect_to_admin_tab(f'sidebar-{file_type}s')

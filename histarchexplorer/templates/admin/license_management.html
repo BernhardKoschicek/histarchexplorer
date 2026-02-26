@@ -2,6 +2,7 @@
   <div class="card-body">
     <h5 class="card-title">{{ _('Add New License') | upper }}</h5>
     <form action="{{ url_for('add_license') }}" method="post">
+      <input type="hidden" name="active_sidebar" value="sidebar-licenses">
       <div class="row">
         <div class="col-md-3 mb-3">
           <label for="spdx_id" class="form-label">{{ _('SPDX ID') }}</label>
@@ -53,6 +54,7 @@
             <td><span class="badge bg-secondary">{{ license.category }}</span></td>
             <td>
               <form action="{{ url_for('delete_license', license_id=license.id) }}" method="post" class="d-inline">
+                <input type="hidden" name="active_sidebar" value="sidebar-licenses">
                 <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{{ _('Are you sure?') }}')">
                   <i class="bi bi-trash"></i>
                 </button>

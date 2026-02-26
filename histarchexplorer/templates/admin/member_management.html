@@ -12,6 +12,7 @@
   <div class="card-body">
     <h5 class="card-title">{{ _('Upload New Member Image') | upper }}</h5>
     <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="active_sidebar" value="sidebar-members">
       <input type="hidden" name="file_type" value="member">
       <div class="input-group">
         <input type="file" class="form-control" id="memberFile" name="file"
@@ -44,6 +45,7 @@
               </div>
               <div class="card-footer bg-transparent border-top-0">
                 <form action="{{ url_for('update_file_license') }}" method="post" class="mb-2">
+                  <input type="hidden" name="active_sidebar" value="sidebar-members">
                   <input type="hidden" name="filename" value="{{ file.filename }}">
                   <input type="hidden" name="file_type" value="member">
                   <div class="mb-2">
@@ -67,6 +69,7 @@
                 <hr>
                 {# Rename Form #}
                 <form action="{{ url_for('rename_file') }}" method="post" class="input-group input-group-sm mb-2">
+                  <input type="hidden" name="active_sidebar" value="sidebar-members">
                   <input type="hidden" name="old_name" value="{{ file.filename }}">
                   <input type="hidden" name="file_type" value="member">
                   <input type="text" class="form-control" name="new_name" placeholder="{{ _('New name...') }}" required>
@@ -75,6 +78,7 @@
                 </form>
                 {# Delete Form #}
                 <form action="{{ url_for('delete_file') }}" method="post" class="d-grid">
+                  <input type="hidden" name="active_sidebar" value="sidebar-members">
                   <input type="hidden" name="filename" value="{{ file.filename }}">
                   <input type="hidden" name="file_type" value="member">
                   <button type="submit" class="btn btn-sm btn-outline-danger"
