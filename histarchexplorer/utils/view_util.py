@@ -17,6 +17,7 @@ from histarchexplorer.models.admin import Admin
 _('entities')
 _('search')
 _('about')
+_('Outcome')
 
 
 def render_page_template(page_name: str, **context: Any) -> str:
@@ -55,6 +56,9 @@ def inject_menu() -> dict[str, Any]:
 
     if menu_config.get('publications', {}).get('show', True):
         navbar.append({'publications': _('Publications')})
+
+    if menu_config.get('outcome', {}).get('show', True):
+        navbar.append({'outcome': _('Outcome')})
 
     if menu_config.get('about', {}).get('show', True):
         navbar.append({'about': _('about the project')})

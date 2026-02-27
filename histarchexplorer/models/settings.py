@@ -34,6 +34,7 @@ class Settings(BaseModel):
         'legal_notice': {'show': True, 'page_type': 'default'},
         'about': {'show': True, 'page_type': 'default'},
         'publications': {'show': True, 'page_type': 'default'},
+        'outcome': {'show': True, 'page_type': 'default'},
         'search': {'show': True, 'page_type': 'default'},
         'footer': {'show': True, 'page_type': 'default'},
         }
