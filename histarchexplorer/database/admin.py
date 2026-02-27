@@ -371,17 +371,23 @@ def rename_file_in_db(old_name: str, new_name: str, file_type: str) -> None:
         {'old_name': old_name, 'new_name': new_name, 'type': file_type})
 
 
-def synchronize_files_with_db(file_type: str, folder_path: str) -> None:
+def synchronize_files_with_db(file_type: str, folder_path: str, is_default_source: bool) -> None:
     if not os.path.exists(folder_path):
         return
 
-    fs_files = set(os.listdir(folder_path))
-    g.cursor.execute('SELECT filename FROM tng.files WHERE type = %s AND is_default = TRUE', (file_type,))
-    db_files = {row.filename for row in g.cursor.fetchall()}
+    fs_files = set()
+    for f in os.listdir(folder_path):
+        if not f.startswith('.'):  # Ignore dotfiles like .gitignore
+            fs_files.add(f)
 
-    missing_in_db = fs_files - db_files
-    for filename in missing_in_db:
-        add_file_to_db(filename, file_type, is_default=True)
+    # Get all active filenames of this type from DB
+    g.cursor.execute('SELECT filename FROM tng.files WHERE type = %s AND is_active = TRUE', (file_type,))
+    db_filenames = {row.filename for row in g.cursor.fetchall()}
+
+    # Add new files from filesystem to DB if they don't exist yet
+    for filename in fs_files:
+        if filename not in db_filenames:
+            add_file_to_db(filename, file_type, is_default=is_default_source)
 
 
 # Wrapper functions for Logos
@@ -403,7 +409,7 @@ def rename_logo_in_db(old_name: str, new_name: str) -> None:
 
 def synchronize_logos_with_db() -> None:
     logo_path = os.path.join(current_app.static_folder, 'images', 'logos')
-    synchronize_files_with_db('logo', logo_path)
+    synchronize_files_with_db('logo', logo_path, is_default_source=True)
 
 
 # Wrapper functions for Assets
@@ -425,26 +431,53 @@ def rename_asset_in_db(old_name: str, new_name: str) -> None:
 
 def synchronize_assets_with_db() -> None:
     asset_path = os.path.join(current_app.static_folder, 'assets')
-    synchronize_files_with_db('asset', asset_path)
+    synchronize_files_with_db('asset', asset_path, is_default_source=True)
 
 
-# Wrapper functions for Members
-def get_all_members_from_db() -> list[dict[str, Any]]:
-    return get_all_files_from_db('member')
+# Wrapper functions for Teams
+def get_all_teams_from_db() -> list[dict[str, Any]]:
+    return get_all_files_from_db('team')
 
 
-def add_member_to_db(filename: str, is_default: bool = False) -> None:
-    add_file_to_db(filename, 'member', is_default)
+def add_team_to_db(filename: str, is_default: bool = False) -> None:
+    add_file_to_db(filename, 'team', is_default)
 
 
-def delete_member_from_db(filename: str) -> None:
-    delete_file_from_db(filename, 'member')
+def delete_team_from_db(filename: str) -> None:
+    delete_file_from_db(filename, 'team')
 
 
-def rename_member_in_db(old_name: str, new_name: str) -> None:
-    rename_file_in_db(old_name, new_name, 'member')
+def rename_team_in_db(old_name: str, new_name: str) -> None:
+    rename_file_in_db(old_name, new_name, 'team')
 
 
-def synchronize_members_with_db() -> None:
-    member_path = os.path.join(current_app.static_folder, 'uploads', 'members')
-    synchronize_files_with_db('member', member_path)
+def synchronize_teams_with_db() -> None:
+    file_type = 'team'
+    static_team_path = os.path.join(current_app.static_folder, 'images', 'team')
+    uploaded_team_path = os.path.join(current_app.root_path, '..', 'uploads', 'team')
+
+    # First, add new files from static source to DB
+    synchronize_files_with_db(file_type, static_team_path, is_default_source=True)
+
+    # Then, add new files from uploaded source to DB
+    synchronize_files_with_db(file_type, uploaded_team_path, is_default_source=False)
+
+    # Now, get all files from both filesystem sources
+    all_fs_files = set()
+    for path in [static_team_path, uploaded_team_path]:
+        if os.path.exists(path):
+            for f in os.listdir(path):
+                if not f.startswith('.'):  # Ignore dotfiles
+                    all_fs_files.add(f)
+
+    # Get all active files from DB for this file_type
+    g.cursor.execute('SELECT id, filename FROM tng.files WHERE type = %s AND is_active = TRUE', (file_type,))
+    db_records = {row.filename: row.id for row in g.cursor.fetchall()}
+
+    # Deactivate files in DB that no longer exist in *any* filesystem source
+    for filename, file_id in db_records.items():
+        if filename not in all_fs_files:
+            g.cursor.execute(
+                'UPDATE tng.files SET is_active = FALSE WHERE id = %s',
+                (file_id,)
+            )

@@ -33,7 +33,7 @@ class Settings(BaseModel):
         'start_page': {'show': True, 'page_type': 'default'},
         'legal_notice': {'show': True, 'page_type': 'default'},
         'about': {'show': True, 'page_type': 'default'},
-        'publication': {'show': True, 'page_type': 'default'},
+        'publications': {'show': True, 'page_type': 'default'},
         'search': {'show': True, 'page_type': 'default'},
         'footer': {'show': True, 'page_type': 'default'},
         }

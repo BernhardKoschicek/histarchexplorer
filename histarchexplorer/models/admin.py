@@ -16,10 +16,11 @@ from histarchexplorer.database.admin import (
     update_sort_order,
     get_all_logos_from_db,
     get_all_assets_from_db,
-    get_files_by_type_from_db)
+    get_files_by_type_from_db,
+    synchronize_teams_with_db,
+    get_all_teams_from_db)
 from histarchexplorer.database.map import get_maps
 from histarchexplorer.models.config import ConfigEntity
-
 
 class EntryNotFound(Exception):
     pass
@@ -38,8 +39,10 @@ class Admin:
         self.language = g.language
         self.logos = self.get_all_logo_filenames()
         self.assets = self.get_all_asset_filenames()
+        self.teams = self.get_all_team_filenames() # Initialize teams
         self.licenses = self.get_licenses()
         self.file_licenses = self.get_file_licenses()
+        synchronize_teams_with_db() # Call synchronize_teams_with_db here
 
     @staticmethod
     def get_files_by_type(file_type: str) -> list[dict[str, Any]]:
@@ -141,6 +144,19 @@ class Admin:
     @staticmethod
     def get_all_asset_filenames() -> list[str]:
         return [asset['filename'] for asset in Admin.get_all_assets_with_ids()]
+
+    @staticmethod
+    def get_all_teams_with_ids() -> list[dict[str, Any]]:
+        return get_all_teams_from_db()
+
+    @staticmethod
+    def get_team_id_to_filename_map() -> dict[int, str]:
+        team_list = Admin.get_all_teams_with_ids()
+        return {team['id']: team['filename'] for team in team_list}
+
+    @staticmethod
+    def get_all_team_filenames() -> list[str]:
+        return [team['filename'] for team in Admin.get_all_teams_with_ids()]
 
     def _has_translation(self, entity: ConfigEntity, field_key: str) -> bool:
         value_attr = getattr(entity, field_key, None)

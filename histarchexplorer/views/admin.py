@@ -66,7 +66,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                       'sidebar-menu-management' | 'sidebar-footer-content' |
                       'sidebar-file-management-group' | 'sidebar-assets' |
                       'sidebar-legal-notice' | 'sidebar-licenses' |
-                      'sidebar-members'):
+                      'sidebar-team' | 'sidebar-about-publications'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -915,13 +915,13 @@ def utility_processor():
             return url_for('uploaded_asset', filename=filename)
         return url_for('static', filename=f'assets/{filename}')
 
-    def get_member_url(filename):
-        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'members')
+    def get_team_url(filename):
+        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'team')
         if os.path.exists(os.path.join(uploads_path, filename)):
-            return url_for('uploaded_member', filename=filename)
+            return url_for('uploaded_team', filename=filename)
         return url_for('static', filename=f'images/team/{filename}')
 
-    return dict(get_logo_url=get_logo_url, get_asset_url=get_asset_url, get_member_url=get_member_url)
+    return dict(get_logo_url=get_logo_url, get_asset_url=get_asset_url, get_team_url=get_team_url)
 
 
 @app.route('/admin/upload_asset', methods=['POST'])
@@ -1039,9 +1039,9 @@ def uploaded_asset(filename):
     return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
 
 
-@app.route('/uploads/members/<filename>')
-def uploaded_member(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'members'), filename)
+@app.route('/uploads/team/<filename>')
+def uploaded_team(filename):
+    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'team'), filename)
 
 
 @app.route('/uploads/favicon.ico')
@@ -1069,7 +1069,7 @@ def upload_file():
 
     if file:
         filename = secure_filename(file.filename)
-        upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'members'
+        upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'team'
         upload_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
         os.makedirs(upload_path, exist_ok=True)
         file.save(os.path.join(upload_path, filename))
@@ -1091,7 +1091,7 @@ def rename_file():
         flash(_('Invalid request for renaming.'), 'danger')
         return _redirect_to_admin_tab('sidebar-file-management-group')
 
-    upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'members'
+    upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'team'
     static_folder = 'images/logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'images/team'
 
     static_path = os.path.join(app.static_folder, static_folder) if static_folder else None
@@ -1135,7 +1135,7 @@ def delete_file():
         flash(_('No filename or type specified for deletion.'), 'danger')
         return _redirect_to_admin_tab('sidebar-file-management-group')
 
-    upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'members'
+    upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'team'
     uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
     filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
 
