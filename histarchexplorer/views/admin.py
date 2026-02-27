@@ -1,4 +1,5 @@
 import os
+import json
 import subprocess
 from typing import Optional
 from datetime import datetime
@@ -322,14 +323,32 @@ def set_favicon() -> Response:
 @login_required
 def update_footer_content() -> Response:
     check_manager_user()
-    selected_logo_ids = [int(logo_id) for logo_id in request.form.getlist('footer_logos')]
-    g.settings.footer_logos = selected_logo_ids
+    selected_logo_ids = [
+        int(logo_id) for logo_id in request.form.getlist('footer_logos')]
+    ordered_logo_ids_str = request.form.get('footer_logo_order')
+
+    if ordered_logo_ids_str:
+        try:
+            ordered_logo_ids = json.loads(ordered_logo_ids_str)
+            # Ensure all selected logos are in the ordered list
+            final_logo_ids = [
+                int(id) for id in ordered_logo_ids if int(id) in selected_logo_ids]
+            for logo_id in selected_logo_ids:
+                if logo_id not in final_logo_ids:
+                    final_logo_ids.append(logo_id)
+            g.settings.footer_logos = final_logo_ids
+        except json.JSONDecodeError:
+            g.settings.footer_logos = selected_logo_ids
+    else:
+        g.settings.footer_logos = selected_logo_ids
+
     try:
         g.settings.save_to_db()
         flash(_('Footer logos updated successfully.'), 'success')
     except Exception as e:
         app.logger.error("Failed to update footer logos: %s", e)
         flash(_('Error updating footer logos'), 'error')
+
     return _redirect_to_admin_tab('sidebar-footer-content')
 
 
