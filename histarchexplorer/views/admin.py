@@ -900,6 +900,10 @@ def refresh_system_cache() -> Response:
 def uploaded_logo(filename):
     return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'logos'), filename)
 
+@app.route('/uploads/assets/<filename>')
+def uploaded_assets(filename):
+    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
+
 
 @app.context_processor
 def utility_processor():

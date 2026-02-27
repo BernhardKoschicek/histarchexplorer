@@ -157,6 +157,18 @@ def get_logo_url(filename: str) -> str:
         return url_for('uploaded_logo', filename=filename)
     return url_for('static', filename='images/logos/' + filename)
 
+def get_assets_url(filename: str) -> str:
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
+    if os.path.exists(os.path.join(uploads_path, filename)):
+        return url_for('uploaded_assets', filename=filename)
+    return url_for('static', filename='assets/' + filename)
+
+def get_team_url(filename: str) -> str:
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'team')
+    if os.path.exists(os.path.join(uploads_path, filename)):
+        return url_for('uploaded_team', filename=filename)
+    return url_for('static', filename='images/team/' + filename)
+
 
 @app.context_processor
 def inject_globals() -> dict[str, Any]:
@@ -188,6 +200,8 @@ def inject_globals() -> dict[str, Any]:
         'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map(),
         'favicon_version': int(time.time()),
         'get_logo_url': get_logo_url,
+        'get_assets_url': get_assets_url,
+        'get_team_url': get_team_url,
         'has_uploaded_favicon': os.path.exists(
             os.path.join(app.root_path, '..', 'uploads', 'favicon.ico'))}
 

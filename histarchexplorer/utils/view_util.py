@@ -21,7 +21,6 @@ _('about')
 
 def render_page_template(page_name: str, **context: Any) -> str:
     template_name = f"{page_name}.html"
-    print(page_name)
     if page_name == 'index':
         key = 'start_page'
     else:
@@ -30,7 +29,7 @@ def render_page_template(page_name: str, **context: Any) -> str:
     menu_settings = g.settings.menu_management.get(key, {})
 
     if menu_settings.get('page_type') == 'individual':
-        page_path = Path(app.root_path)/'..'/'uploads'/'pages'/template_name
+        page_path = Path(app.root_path)/'..'/'uploads'/'templates'/template_name
         if page_path.is_file():
             template_content = page_path.read_text(encoding='utf-8')
             return render_template_string(template_content, **context)
