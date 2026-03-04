@@ -36,3 +36,4 @@ ALTER TABLE tng.file_licenses ADD PRIMARY KEY (file_id);
 DROP TABLE IF EXISTS tng.logos;
 
 GRANT USAGE, SELECT ON SEQUENCE tng.files_id_seq TO openatlas;
+ALTER TABLE tng.files_id_seq OWNER TO openatlas;
