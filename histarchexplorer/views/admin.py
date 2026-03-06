@@ -69,7 +69,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                       'sidebar-file-management-group' | 'sidebar-assets' |
                       'sidebar-legal-notice' | 'sidebar-licenses' |
                       'sidebar-team' | 'sidebar-about-publications' |
-                      'sidebar-colors'):
+                      'sidebar-colors' | 'sidebar-type-divisions'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -128,6 +128,41 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         all_logos=all_logos,
         all_assets=all_assets,
         selected_footer_logos=selected_footer_logos)
+
+
+@app.route('/admin/update_type_divisions', methods=['POST'])
+@login_required
+def update_type_divisions() -> Response:
+    check_manager_user()
+    new_type_divisions = {}
+    indices = {key.split('_')[-1] for key in request.form if key.startswith('label_')}
+    for index in indices:
+        label = request.form.get(f'label_{index}')
+        if not label:
+            continue
+
+        ids_str = request.form.get(f'ids_{index}', '')
+        try:
+            ids = [int(i.strip()) for i in ids_str.split(',') if i.strip()]
+        except ValueError:
+            flash(_('Invalid ID format for label "%(label)s". Please use comma-separated integers.', label=label), 'danger')
+            return _redirect_to_admin_tab('sidebar-type-divisions')
+
+        new_type_divisions[label] = {
+            'icon_type': request.form.get(f'icon_type_{index}'),
+            'icon_value': request.form.get(f'icon_value_{index}'),
+            'ids': ids
+        }
+
+    g.settings.type_divisions = new_type_divisions
+    try:
+        g.settings.save_to_db()
+        flash(_('Type divisions updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update type divisions: %s", e)
+        flash(_('Error updating type divisions'), 'error')
+
+    return _redirect_to_admin_tab('sidebar-type-divisions')
 
 
 @app.route('/admin/update_entity_colors', methods=['POST'])
