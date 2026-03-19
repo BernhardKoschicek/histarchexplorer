@@ -262,14 +262,14 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
             results = g.openatlas_cursor.fetchone()
             cs = {'id': case_study, 'ids': results}
             for row in cs_infos:
-                if row.cs_id == cs['id']:
-                    if row.name:
-                        cs['name'] = row.name
-                        cs['acronym'] = row.name
-                    if row.acronym:
-                        cs['acronym'] = row.acronym
-                    if row.description:
-                        cs['description'] = row.description
+                if row['cs_id'] == cs['id']:
+                    if row['name']:
+                        cs['name'] = row['name']
+                        cs['acronym'] = row['name']
+                    if row['acronym']:
+                        cs['acronym'] = row['acronym']
+                    if row['description']:
+                        cs['description'] = row['description']
             data['cs_ids'].append(cs)
 
 

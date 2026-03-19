@@ -98,7 +98,7 @@ def get_type_divisions() -> dict[Any, dict[str, Any]]:
 def before_request() -> Response | None:
     # todo: maybe change the cursor_factory to psycopg2.extras.RealDictCursor
     g.db = connect(app.config['DATABASE_NAME'])
-    g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     g.openatlas_db = connect(app.config['OPENATLAS_DATABASE_NAME'])
     g.openatlas_cursor = g.openatlas_db.cursor(

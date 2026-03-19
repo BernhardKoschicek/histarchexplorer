@@ -110,7 +110,7 @@ class Settings(BaseModel):
     def load_from_db(cls) -> 'Settings':
         create_settings_table()
         default_settings = cls().model_dump()
-        db_settings_raw = {row.key: row.value for row in get_settings()}
+        db_settings_raw = {row['key']: row['value'] for row in get_settings()}
 
         merged_settings_data = {**default_settings, **db_settings_raw}
 
