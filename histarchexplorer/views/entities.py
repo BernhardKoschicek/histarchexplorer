@@ -10,14 +10,10 @@ from histarchexplorer.views.views import type_tree
 # pylint: disable=too-many-locals
 def get_browse_list_entities(
         id_: int) -> dict[str, str | int | list[Any] | dict[str, Any]] | None:
-
-    # per default the whitelist ids are shown
     shown_ids = g.settings.shown_ids
 
-    # if an id is given the p46 children are requested
-    # (Possible future dev: define another param - property code -
-    # to get other connections to be shown)
     if id_:
+        # Get p46 children if id is provided
         shown_ids = db_entities.get_p46_range_ids(id_)
         if not shown_ids:
             return None
@@ -32,9 +28,8 @@ def get_browse_list_entities(
         'shown case studies': g.case_study_ids,
         'shown ids': shown_ids,
         'hidden ids': g.settings.hidden_ids}
-
-    # Build WHERE clauses dynamically
     where_clauses = []
+
     params = []
 
     if shown_classes := data['shown classes']:
@@ -49,30 +44,26 @@ def get_browse_list_entities(
         where_clauses.append(
             "e.id IN (SELECT a.id FROM model.entity a "
             "JOIN model.link b ON a.id = b.domain_id "
-            "WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))"
-        )
+            "WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(shown_types)
 
     if shown_case_studies := data['shown case studies']:
         where_clauses.append(
             "e.id IN (SELECT a.id FROM model.entity a "
             "JOIN model.link b ON a.id = b.domain_id "
-            "WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))"
-        )
+            "WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(shown_case_studies)
 
     if hidden_types := data['hidden types']:
         where_clauses.append(
             "e.id NOT IN (SELECT a.id FROM model.entity a "
             "JOIN model.link b ON a.id = b.domain_id "
-            "WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))"
-        )
+            "WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(hidden_types)
 
     if shown_ids_data := data['shown ids']:
         where_clauses.append("e.id = ANY (%s)")
         params.append(shown_ids_data)
-
     if hidden_ids := data['hidden ids']:
         where_clauses.append("e.id != ALL (%s)")
         params.append(hidden_ids)
@@ -81,39 +72,31 @@ def get_browse_list_entities(
     if where_sql:
         where_sql = "WHERE " + where_sql
 
-    data['entities'] = db_entities.get_entities_list(
-        where_sql, tuple(params))
-    data['geometries'] = db_entities.get_geometries(
-        where_sql, tuple(params))
-
+    data['entities'] = db_entities.get_entities_list(where_sql, tuple(params))
+    data['geometries'] = db_entities.get_geometries(where_sql, tuple(params))
     results = db_entities.get_class_counts(where_sql, tuple(params))
 
-    # Convert list of (class_name, count) to a dictionary for easy access
     class_count_map = {
-        row['openatlas_class_name']: row['count'] for row in results
-    }
+        row['openatlas_class_name']: row['count'] for row in results}
 
-    # Build categorized counts
     categorized_counts = {}
+
     for category, class_names in app.config['VIEW_CLASSES'].items():
         category_counts = [
             {cls: class_count_map[cls]}
-            for cls in class_names if cls in class_count_map
-        ]
+            for cls in class_names if cls in class_count_map]
         if category_counts:  # Only include non-empty categories
             categorized_counts[category] = category_counts
 
     category_totals = {
         category: sum(next(iter(d.values())) for d in items)
-        for category, items in categorized_counts.items()
-    }
+        for category, items in categorized_counts.items()}
 
     data['cs_ids'] = []
     # build id lists for case studies
     if shown_case_studies:
         cs_infos = db_entities.get_case_study_infos(
             g.language, g.settings.preferred_language)
-
         for case_study in shown_case_studies:
             ids = db_entities.get_case_study_ids(case_study)
             if ids:
@@ -140,17 +123,14 @@ def return_entities(tab_name: str, id_: int) -> str:
 
     filtered_view_classes = {
         key: tuple(list(d.keys())[0] for d in value)
-        for key, value in data['counts'].items()
-    }
+        for key, value in data['counts'].items()}
 
     sidebar_elements = [
         {
             'order': i + 1,
             'route': key,
-            'label': f"{key.capitalize()} ({data['totals'][key]})"
-        }
-        for i, key in enumerate(data['counts'].keys())
-    ]
+            'label': f"{key.capitalize()} ({data['totals'][key]})"}
+        for i, key in enumerate(data['counts'].keys())]
 
     if not tab_name and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
